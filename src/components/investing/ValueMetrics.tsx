@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -32,8 +31,8 @@ export const ValueMetrics = () => {
     fetchData();
   }, [selectedStock]);
 
-  const handleStockSelect = (symbol: string) => {
-    setSelectedStock(symbol);
+  const handleStockSelect = (stockData: any) => {
+    setSelectedStock(stockData.symbol);
   };
 
   if (isLoading) {
@@ -56,12 +55,11 @@ export const ValueMetrics = () => {
 
   if (!stockData || !companyData) return null;
 
-  // Calculate derived metrics
-  const pbRatio = (stockData.price / (stockData.marketCap / 1000000000 * 4)).toFixed(2); // Simplified calculation
-  const roe = (15 + Math.random() * 10).toFixed(1); // Mock calculation
-  const roa = (8 + Math.random() * 5).toFixed(1); // Mock calculation
-  const debtEquity = (0.3 + Math.random() * 0.4).toFixed(2); // Mock calculation
-  const currentRatio = (1.5 + Math.random() * 1).toFixed(1); // Mock calculation
+  const pbRatio = (stockData.price / (stockData.marketCap / 1000000000 * 4)).toFixed(2);
+  const roe = (15 + Math.random() * 10).toFixed(1);
+  const roa = (8 + Math.random() * 5).toFixed(1);
+  const debtEquity = (0.3 + Math.random() * 0.4).toFixed(2);
+  const currentRatio = (1.5 + Math.random() * 1).toFixed(1);
 
   const metrics = [
     { 
@@ -153,10 +151,7 @@ export const ValueMetrics = () => {
           <CardDescription>Search and analyze any stock</CardDescription>
         </CardHeader>
         <CardContent>
-          <StockSearch 
-            onStockSelect={handleStockSelect}
-            placeholder="Search for a stock to analyze..."
-          />
+          <StockSearch onSelectStock={handleStockSelect} />
         </CardContent>
       </Card>
 

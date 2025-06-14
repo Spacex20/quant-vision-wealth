@@ -8,15 +8,18 @@ import { ValueInvestingTools } from "@/components/investing/ValueInvestingTools"
 import { PortfolioSimulator } from "@/components/simulation/PortfolioSimulator";
 import { EducationHub } from "@/components/education/EducationHub";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
-import { Navigation } from "@/components/layout/Navigation";
 import { PortfolioAnalytics } from "@/components/analytics/PortfolioAnalytics";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("overview");
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader />
+      <ErrorBoundary>
+        <DashboardHeader />
+      </ErrorBoundary>
+      
       <div className="container mx-auto px-4 py-6">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Quantitative Investment Platform</h1>
@@ -37,31 +40,45 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
-            <PortfolioOverview />
+            <ErrorBoundary>
+              <PortfolioOverview />
+            </ErrorBoundary>
           </TabsContent>
 
           <TabsContent value="builder" className="space-y-6">
-            <PortfolioBuilder />
+            <ErrorBoundary>
+              <PortfolioBuilder />
+            </ErrorBoundary>
           </TabsContent>
 
           <TabsContent value="manager" className="space-y-6">
-            <PortfolioManager />
+            <ErrorBoundary>
+              <PortfolioManager />
+            </ErrorBoundary>
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">
-            <PortfolioAnalytics />
+            <ErrorBoundary>
+              <PortfolioAnalytics />
+            </ErrorBoundary>
           </TabsContent>
 
           <TabsContent value="value-tools" className="space-y-6">
-            <ValueInvestingTools />
+            <ErrorBoundary>
+              <ValueInvestingTools />
+            </ErrorBoundary>
           </TabsContent>
 
           <TabsContent value="simulator" className="space-y-6">
-            <PortfolioSimulator />
+            <ErrorBoundary>
+              <PortfolioSimulator />
+            </ErrorBoundary>
           </TabsContent>
 
           <TabsContent value="education" className="space-y-6">
-            <EducationHub />
+            <ErrorBoundary>
+              <EducationHub />
+            </ErrorBoundary>
           </TabsContent>
         </Tabs>
       </div>
