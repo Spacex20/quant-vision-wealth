@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -33,13 +32,6 @@ export function DashboardHeader() {
                 />
               </Avatar>
             )}
-            <Button
-              variant="outline"
-              onClick={() => navigate("/profile")}
-              className="mr-1"
-            >
-              My Investor Profile
-            </Button>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
