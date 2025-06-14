@@ -6,12 +6,12 @@ import { useUserPortfolios, Portfolio } from "@/hooks/useUserPortfolios";
 import { LoadingSpinner } from "../common/LoadingSpinner";
 import { ScenarioResults } from './ScenarioResults';
 import { runScenario, ScenarioType, ScenarioResult } from '@/services/scenarioAnalysisService';
-import { Cpu, Landmark, Virus } from 'lucide-react';
+import { Cpu, Landmark, Biohazard } from 'lucide-react';
 
 const historicalScenarios: { id: ScenarioType; name: string; icon: React.ElementType }[] = [
   { id: 'DOTCOM_BUBBLE_2000', name: '2000 Dot-com Bubble', icon: Cpu },
   { id: 'FINANCIAL_CRISIS_2008', name: '2008 Financial Crisis', icon: Landmark },
-  { id: 'COVID_CRASH_2020', name: '2020 COVID-19 Crash', icon: Virus },
+  { id: 'COVID_CRASH_2020', name: '2020 COVID-19 Crash', icon: Biohazard },
 ];
 
 export const HistoricalAnalysis = () => {
