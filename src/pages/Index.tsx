@@ -9,6 +9,8 @@ import { PortfolioSimulator } from "@/components/simulation/PortfolioSimulator";
 import { EducationHub } from "@/components/education/EducationHub";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { PortfolioAnalytics } from "@/components/analytics/PortfolioAnalytics";
+import { MarketIntelligence } from "@/components/market/MarketIntelligence";
+import { StockScreener } from "@/components/research/StockScreener";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 
 const Index = () => {
@@ -22,20 +24,21 @@ const Index = () => {
       
       <div className="container mx-auto px-4 py-6">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Quantitative Investment Platform</h1>
+          <h1 className="text-4xl font-bold mb-2">Quantitative Investment Research Platform</h1>
           <p className="text-xl text-muted-foreground">
-            Advanced portfolio management with AI-driven insights and quantitative strategies
+            Advanced portfolio management with AI-driven insights and real-time market data
           </p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-7 mb-8">
-            <TabsTrigger value="overview">Portfolio Overview</TabsTrigger>
-            <TabsTrigger value="builder">Smart Builder</TabsTrigger>
-            <TabsTrigger value="manager">Portfolio Manager</TabsTrigger>
-            <TabsTrigger value="analytics">Advanced Analytics</TabsTrigger>
-            <TabsTrigger value="value-tools">Value Investing</TabsTrigger>
-            <TabsTrigger value="simulator">Simulation Lab</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 mb-8">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="builder">Builder</TabsTrigger>
+            <TabsTrigger value="manager">Manager</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="market">Market Data</TabsTrigger>
+            <TabsTrigger value="screener">Screener</TabsTrigger>
+            <TabsTrigger value="simulator">Simulator</TabsTrigger>
             <TabsTrigger value="education">Education</TabsTrigger>
           </TabsList>
 
@@ -63,9 +66,15 @@ const Index = () => {
             </ErrorBoundary>
           </TabsContent>
 
-          <TabsContent value="value-tools" className="space-y-6">
+          <TabsContent value="market" className="space-y-6">
             <ErrorBoundary>
-              <ValueInvestingTools />
+              <MarketIntelligence />
+            </ErrorBoundary>
+          </TabsContent>
+
+          <TabsContent value="screener" className="space-y-6">
+            <ErrorBoundary>
+              <StockScreener />
             </ErrorBoundary>
           </TabsContent>
 

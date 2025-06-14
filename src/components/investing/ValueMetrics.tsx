@@ -3,12 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { StockSearch } from "@/components/stocks/StockSearch";
-import { financialApi, StockQuote, CompanyProfile } from "@/services/financialApi";
+import { marketDataService, CompanyFundamentals } from "@/services/marketDataService";
 
 export const ValueMetrics = () => {
   const [selectedStock, setSelectedStock] = useState("AAPL");
-  const [stockData, setStockData] = useState<StockQuote | null>(null);
-  const [companyData, setCompanyData] = useState<CompanyProfile | null>(null);
+  const [stockData, setStockData] = useState<any>(null);
+  const [companyData, setCompanyData] = useState<CompanyFundamentals | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -16,8 +16,8 @@ export const ValueMetrics = () => {
       setIsLoading(true);
       try {
         const [quote, profile] = await Promise.all([
-          financialApi.getStockQuote(selectedStock),
-          financialApi.getCompanyProfile(selectedStock)
+          marketDataService.getRealTimeQuote(selectedStock),
+          marketDataService.getCompanyFundamentals(selectedStock)
         ]);
         setStockData(quote);
         setCompanyData(profile);
@@ -55,18 +55,18 @@ export const ValueMetrics = () => {
 
   if (!stockData || !companyData) return null;
 
-  const pbRatio = (stockData.price / (stockData.marketCap / 1000000000 * 4)).toFixed(2);
-  const roe = (15 + Math.random() * 10).toFixed(1);
-  const roa = (8 + Math.random() * 5).toFixed(1);
-  const debtEquity = (0.3 + Math.random() * 0.4).toFixed(2);
-  const currentRatio = (1.5 + Math.random() * 1).toFixed(1);
+  const pbRatio = companyData.priceToBook.toFixed(2);
+  const roe = companyData.roe.toFixed(1);
+  const roa = companyData.roa.toFixed(1);
+  const debtEquity = companyData.debtToEquity.toFixed(2);
+  const currentRatio = companyData.currentRatio.toFixed(1);
 
   const metrics = [
     { 
       name: "P/E Ratio", 
-      value: stockData.peRatio.toString(), 
+      value: companyData.peRatio.toString(), 
       benchmark: "22.0", 
-      status: stockData.peRatio < 25 ? "good" : "fair", 
+      status: companyData.peRatio < 25 ? "good" : "fair", 
       description: "Price to Earnings" 
     },
     { 
@@ -106,14 +106,14 @@ export const ValueMetrics = () => {
     },
     { 
       name: "Dividend Yield", 
-      value: `${stockData.dividendYield}%`, 
+      value: `${companyData.dividendYield.toFixed(2)}%`, 
       benchmark: "2.0%", 
-      status: stockData.dividendYield > 2 ? "good" : "fair", 
+      status: companyData.dividendYield > 2 ? "good" : "fair", 
       description: "Annual Dividends / Price" 
     },
     { 
       name: "Market Cap", 
-      value: `$${(stockData.marketCap / 1000000000).toFixed(1)}B`, 
+      value: `$${(companyData.marketCap / 1000000000).toFixed(1)}B`, 
       benchmark: "Large Cap", 
       status: "good", 
       description: "Total Market Value" 
