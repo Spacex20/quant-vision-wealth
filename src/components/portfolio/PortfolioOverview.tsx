@@ -49,7 +49,7 @@ export const PortfolioOverview = () => {
       value: +(portfolioValue * asset.allocation / 100).toFixed(2),
       change: Math.round((Math.random() - 0.4) * 100) / 10, // random short-term move
       weight: asset.allocation,
-      shares: asset.shares || null,
+      shares: typeof asset.shares !== "undefined" ? asset.shares : null,
     }));
 
   const assetAllocation = activePortfolio.assets.map((a) => ({
