@@ -1,1 +1,5 @@
+
 project_id = "sbjfoupfoefbzfkvkdol"
+
+[functions.api-webhooks-finnhub]
+verify_jwt = false
