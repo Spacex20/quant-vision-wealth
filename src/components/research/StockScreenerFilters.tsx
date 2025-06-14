@@ -1,4 +1,3 @@
-
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -22,14 +21,19 @@ export function StockScreenerFilters({ criteria, setCriteria }: Props) {
       <div className="space-y-2">
         <Label>Sector</Label>
         <Select
-          value={criteria.sector || ''}
-          onValueChange={v => setCriteria(prev => ({ ...prev, sector: v || undefined }))}
+          value={criteria.sector ?? "all"}
+          onValueChange={v =>
+            setCriteria(prev => ({
+              ...prev,
+              sector: v === "all" ? undefined : v
+            }))
+          }
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="All sectors" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All sectors</SelectItem>
+            <SelectItem value="all">All sectors</SelectItem>
             {sectors.map(s => (
               <SelectItem key={s} value={s}>{s}</SelectItem>
             ))}
