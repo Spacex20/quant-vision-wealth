@@ -1,18 +1,125 @@
 
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { StockSearch } from "@/components/stocks/StockSearch";
+import { financialApi, StockQuote, CompanyProfile } from "@/services/financialApi";
 
 export const ValueMetrics = () => {
+  const [selectedStock, setSelectedStock] = useState("AAPL");
+  const [stockData, setStockData] = useState<StockQuote | null>(null);
+  const [companyData, setCompanyData] = useState<CompanyProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const [quote, profile] = await Promise.all([
+          financialApi.getStockQuote(selectedStock),
+          financialApi.getCompanyProfile(selectedStock)
+        ]);
+        setStockData(quote);
+        setCompanyData(profile);
+      } catch (error) {
+        console.error('Error fetching stock data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [selectedStock]);
+
+  const handleStockSelect = (symbol: string) => {
+    setSelectedStock(symbol);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="animate-pulse space-y-4">
+              <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="h-20 bg-gray-200 rounded"></div>
+                <div className="h-20 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!stockData || !companyData) return null;
+
+  // Calculate derived metrics
+  const pbRatio = (stockData.price / (stockData.marketCap / 1000000000 * 4)).toFixed(2); // Simplified calculation
+  const roe = (15 + Math.random() * 10).toFixed(1); // Mock calculation
+  const roa = (8 + Math.random() * 5).toFixed(1); // Mock calculation
+  const debtEquity = (0.3 + Math.random() * 0.4).toFixed(2); // Mock calculation
+  const currentRatio = (1.5 + Math.random() * 1).toFixed(1); // Mock calculation
+
   const metrics = [
-    { name: "P/E Ratio", value: "18.5", benchmark: "22.0", status: "good", description: "Price to Earnings" },
-    { name: "P/B Ratio", value: "2.1", benchmark: "3.2", status: "good", description: "Price to Book" },
-    { name: "PEG Ratio", value: "1.2", benchmark: "1.0", status: "fair", description: "Price/Earnings to Growth" },
-    { name: "ROE", value: "15.8%", benchmark: "12.0%", status: "good", description: "Return on Equity" },
-    { name: "ROA", value: "8.2%", benchmark: "6.5%", status: "good", description: "Return on Assets" },
-    { name: "Debt/Equity", value: "0.45", benchmark: "0.60", status: "good", description: "Debt to Equity Ratio" },
-    { name: "Current Ratio", value: "2.1", benchmark: "1.5", status: "good", description: "Current Assets / Current Liabilities" },
-    { name: "Dividend Yield", value: "2.8%", benchmark: "2.0%", status: "good", description: "Annual Dividends / Price" },
+    { 
+      name: "P/E Ratio", 
+      value: stockData.peRatio.toString(), 
+      benchmark: "22.0", 
+      status: stockData.peRatio < 25 ? "good" : "fair", 
+      description: "Price to Earnings" 
+    },
+    { 
+      name: "P/B Ratio", 
+      value: pbRatio, 
+      benchmark: "3.2", 
+      status: parseFloat(pbRatio) < 3 ? "good" : "fair", 
+      description: "Price to Book" 
+    },
+    { 
+      name: "ROE", 
+      value: `${roe}%`, 
+      benchmark: "12.0%", 
+      status: parseFloat(roe) > 12 ? "good" : "fair", 
+      description: "Return on Equity" 
+    },
+    { 
+      name: "ROA", 
+      value: `${roa}%`, 
+      benchmark: "6.5%", 
+      status: parseFloat(roa) > 6.5 ? "good" : "fair", 
+      description: "Return on Assets" 
+    },
+    { 
+      name: "Debt/Equity", 
+      value: debtEquity, 
+      benchmark: "0.60", 
+      status: parseFloat(debtEquity) < 0.5 ? "good" : "fair", 
+      description: "Debt to Equity Ratio" 
+    },
+    { 
+      name: "Current Ratio", 
+      value: currentRatio, 
+      benchmark: "1.5", 
+      status: parseFloat(currentRatio) > 1.5 ? "good" : "fair", 
+      description: "Current Assets / Current Liabilities" 
+    },
+    { 
+      name: "Dividend Yield", 
+      value: `${stockData.dividendYield}%`, 
+      benchmark: "2.0%", 
+      status: stockData.dividendYield > 2 ? "good" : "fair", 
+      description: "Annual Dividends / Price" 
+    },
+    { 
+      name: "Market Cap", 
+      value: `$${(stockData.marketCap / 1000000000).toFixed(1)}B`, 
+      benchmark: "Large Cap", 
+      status: "good", 
+      description: "Total Market Value" 
+    },
   ];
 
   const getStatusColor = (status: string) => {
@@ -33,12 +140,32 @@ export const ValueMetrics = () => {
     }
   };
 
+  const goodMetrics = metrics.filter(m => m.status === "good").length;
+  const fairMetrics = metrics.filter(m => m.status === "fair").length;
+  const poorMetrics = metrics.filter(m => m.status === "poor").length;
+  const overallScore = ((goodMetrics * 1 + fairMetrics * 0.5) / metrics.length * 10).toFixed(1);
+
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Company: Apple Inc. (AAPL)</CardTitle>
-          <CardDescription>Fundamental analysis metrics</CardDescription>
+          <CardTitle>Stock Analysis</CardTitle>
+          <CardDescription>Search and analyze any stock</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <StockSearch 
+            onStockSelect={handleStockSelect}
+            placeholder="Search for a stock to analyze..."
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Company: {companyData.name} ({stockData.symbol})</CardTitle>
+          <CardDescription>
+            {companyData.sector} • {companyData.industry} • Current Price: ${stockData.price.toFixed(2)}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -84,32 +211,32 @@ export const ValueMetrics = () => {
       <Card>
         <CardHeader>
           <CardTitle>Value Score Summary</CardTitle>
-          <CardDescription>Overall value assessment</CardDescription>
+          <CardDescription>Overall value assessment for {stockData.symbol}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center space-y-4">
             <div>
               <p className="text-sm text-muted-foreground">Overall Value Score</p>
-              <p className="text-4xl font-bold text-green-600">8.2/10</p>
+              <p className="text-4xl font-bold text-green-600">{overallScore}/10</p>
             </div>
             
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <p className="text-2xl font-bold text-green-600">6</p>
+                <p className="text-2xl font-bold text-green-600">{goodMetrics}</p>
                 <p className="text-xs text-muted-foreground">Strong Metrics</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-yellow-600">1</p>
+                <p className="text-2xl font-bold text-yellow-600">{fairMetrics}</p>
                 <p className="text-xs text-muted-foreground">Fair Metrics</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-red-600">1</p>
+                <p className="text-2xl font-bold text-red-600">{poorMetrics}</p>
                 <p className="text-xs text-muted-foreground">Weak Metrics</p>
               </div>
             </div>
 
-            <Badge variant="default" className="text-sm">
-              STRONG BUY RECOMMENDATION
+            <Badge variant={parseFloat(overallScore) >= 7 ? "default" : parseFloat(overallScore) >= 5 ? "secondary" : "destructive"} className="text-sm">
+              {parseFloat(overallScore) >= 7 ? "STRONG BUY" : parseFloat(overallScore) >= 5 ? "MODERATE BUY" : "HOLD/SELL"} RECOMMENDATION
             </Badge>
           </div>
         </CardContent>

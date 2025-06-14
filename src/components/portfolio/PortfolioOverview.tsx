@@ -2,10 +2,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, PieChart, BarChart } from "lucide-react";
+import { PieChart, BarChart } from "lucide-react";
 import { PortfolioChart } from "./PortfolioChart";
 import { AssetAllocation } from "./AssetAllocation";
 import { PerformanceMetrics } from "./PerformanceMetrics";
+import { MarketOverview } from "@/components/dashboard/MarketOverview";
 
 export const PortfolioOverview = () => {
   return (
@@ -30,6 +31,8 @@ export const PortfolioOverview = () => {
 
       {/* Right Sidebar */}
       <div className="space-y-6">
+        <MarketOverview />
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
