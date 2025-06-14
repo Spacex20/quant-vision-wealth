@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,13 +28,28 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string, rememberMe?: boolean) => Promise<any>;
   signUp: (
-    email: string, password: string, fullName?: string, username?: string, phone?: string
+    email: string, password: string, fullName?: string, username?: string
   ) => Promise<any>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Helper: cleanup auth state in localStorage/sessionStorage for "limbo" state prevention
+export const cleanupAuthState = () => {
+  Object.keys(localStorage).forEach((key) => {
+    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+      localStorage.removeItem(key);
+    }
+  });
+  // Remove from sessionStorage as well
+  Object.keys(sessionStorage).forEach((key) => {
+    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+      sessionStorage.removeItem(key);
+    }
+  });
+};
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -97,11 +113,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Auth methods
   const signIn = async (email: string, password: string, rememberMe = false) => {
+    cleanupAuthState();
+    try {
+      await supabase.auth.signOut({ scope: "global" });
+    } catch { /* ignore */ }
     const { data, error } = await authService.signIn(email, password);
     if (!error && data?.user) {
       await fetchProfile(data.user.id);
       if (rememberMe) {
-        // Already persisted by Supabase, but can add a cookie or localStorage marker if needed
         localStorage.setItem('remember-me', '1');
       } else {
         localStorage.removeItem('remember-me');
@@ -111,7 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (
-    email: string, password: string, fullName?: string, username?: string, phone?: string
+    email: string, password: string, fullName?: string, username?: string
   ) => {
     // Check username uniqueness before registration
     if (username) {
@@ -129,14 +148,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email,
       password,
       fullName,
-      username,
-      phone,
+      username
     });
+    // If signup success, force user session refresh
+    if (!error && data?.user) {
+      setTimeout(() => {
+        fetchProfile(data.user.id);
+      }, 0);
+    }
     return { data, error };
   };
 
   const signOut = async () => {
-    await authService.signOut();
+    cleanupAuthState();
+    try {
+      await supabase.auth.signOut({ scope: "global" });
+    } catch { /* ignore */ }
     setProfile(null);
     setUser(null);
     setSession(null);

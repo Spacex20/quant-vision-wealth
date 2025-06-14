@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { SocialLoginButton } from "./SocialLoginButton";
+import { useNavigate } from "react-router-dom";
 
 export function AuthPage() {
   const [tab, setTab] = useState<"signin" | "signup">("signin");
@@ -14,12 +16,20 @@ export function AuthPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
+  // Remove phone-related state
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { signIn, signUp } = useAuth();
+  const { user, signIn, signUp } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  // If already authenticated, redirect to dashboard
+  useEffect(() => {
+    if (user) {
+      navigate("/", { replace: true });
+    }
+  }, [user, navigate]);
 
   // Password complexity checker
   const isPasswordStrong = (password: string) => {
@@ -53,7 +63,8 @@ export function AuthPage() {
       return;
     }
     setLoading(true);
-    const { error } = await signUp(email, password, fullName, username, phone);
+    // Remove phone from signUp call
+    const { error } = await signUp(email, password, fullName, username);
     setLoading(false);
     if (error) {
       toast({
@@ -65,7 +76,7 @@ export function AuthPage() {
       toast({
         title: "Success",
         description:
-          "Registration successful! Please check your email to verify your account.",
+          "Registration successful! Loading your account...",
       });
       setTab("signin");
     }
@@ -83,17 +94,22 @@ export function AuthPage() {
         description: error.message,
         variant: "destructive",
       });
+    } else {
+      toast({
+        title: "Welcome!",
+        description: "Logged in successfully. Redirecting...",
+      });
+      navigate("/", { replace: true });
     }
-    // If success, auto-redirect is handled by AuthProvider context
   };
 
   // Social login handlers - must return a Promise<any>
   const handleGoogleLogin = async () => {
-    // TODO: Implement actual Google login via Supabase
+    // TODO: Implement actual Google login via Supabase if needed
     return Promise.resolve();
   };
   const handleAppleLogin = async () => {
-    // TODO: Implement actual Apple login via Supabase
+    // TODO: Implement actual Apple login via Supabase if needed
     return Promise.resolve();
   };
 
@@ -108,6 +124,7 @@ export function AuthPage() {
                 : "bg-gray-100 text-gray-700"
             }`}
             onClick={() => setTab("signin")}
+            type="button"
           >
             Sign In
           </button>
@@ -118,6 +135,7 @@ export function AuthPage() {
                 : "bg-gray-100 text-gray-700"
             }`}
             onClick={() => setTab("signup")}
+            type="button"
           >
             Sign Up
           </button>
@@ -201,16 +219,7 @@ export function AuthPage() {
                 onChange={(e) => setFullName(e.target.value)}
               />
             </div>
-            <div>
-              <Label htmlFor="signup-phone">Phone</Label>
-              <Input
-                id="signup-phone"
-                type="tel"
-                value={phone}
-                autoComplete="tel"
-                onChange={(e) => setPhone(e.target.value)}
-              />
-            </div>
+            {/* Phone input removed */}
             <div>
               <Label htmlFor="signup-password">Password</Label>
               <Input
