@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PortfolioOverview } from "@/components/portfolio/PortfolioOverview";
@@ -13,9 +12,14 @@ import { MarketIntelligence } from "@/components/market/MarketIntelligence";
 import { StockScreener } from "@/components/research/StockScreener";
 import QuantLab from "@/components/research/QuantLab";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
@@ -24,11 +28,21 @@ const Index = () => {
       </ErrorBoundary>
       
       <div className="container mx-auto px-4 py-6">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Quantitative Investment Research Platform</h1>
-          <p className="text-xl text-muted-foreground">
-            Advanced portfolio management with AI-driven insights and real-time market data
-          </p>
+        <div className="mb-8 flex justify-between flex-wrap gap-2 items-center">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">Quantitative Investment Research Platform</h1>
+            <p className="text-xl text-muted-foreground">
+              Advanced portfolio management with AI-driven insights and real-time market data
+            </p>
+          </div>
+          {user && (
+            <Button
+              variant="secondary"
+              onClick={() => navigate("/profile")}
+            >
+              My Investor Profile
+            </Button>
+          )}
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

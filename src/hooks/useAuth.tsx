@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -58,11 +57,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return data;
   };
 
-  const refreshProfile = async () => {
+  const refreshProfile = async (): Promise<void> => {
     if (user) {
-      return await fetchProfile(user.id);
+      await fetchProfile(user.id);
+    } else {
+      setProfile(null);
     }
-    setProfile(null);
   };
 
   useEffect(() => {

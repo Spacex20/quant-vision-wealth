@@ -87,6 +87,16 @@ export function AuthPage() {
     // If success, auto-redirect is handled by AuthProvider context
   };
 
+  // Social login handlers - must return a Promise<any>
+  const handleGoogleLogin = async () => {
+    // TODO: Implement actual Google login via Supabase
+    return Promise.resolve();
+  };
+  const handleAppleLogin = async () => {
+    // TODO: Implement actual Apple login via Supabase
+    return Promise.resolve();
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-6 space-y-6">
@@ -153,8 +163,8 @@ export function AuthPage() {
             </Button>
             <Separator />
             <div className="space-y-2">
-              <SocialLoginButton provider="google" onLogin={() => {}} icon={null} label="Continue with Google" />
-              <SocialLoginButton provider="apple" onLogin={() => {}} icon={null} label="Continue with Apple" />
+              <SocialLoginButton provider="google" onLogin={handleGoogleLogin} icon={null} label="Continue with Google" />
+              <SocialLoginButton provider="apple" onLogin={handleAppleLogin} icon={null} label="Continue with Apple" />
             </div>
           </form>
         ) : (

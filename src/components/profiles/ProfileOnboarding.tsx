@@ -44,9 +44,9 @@ export function ProfileOnboarding() {
 
     setLoading(false);
     if (!error) {
-      toast({ title: "Success", description: "Onboarding complete!" });
+      toast({ title: "Success", description: "Profile saved!" });
       refreshProfile();
-      window.location.reload();
+      // Do NOT force window reload
     } else {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     }
@@ -91,3 +91,4 @@ export function ProfileOnboarding() {
     </div>
   );
 }
+
