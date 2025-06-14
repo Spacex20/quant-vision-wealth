@@ -1,18 +1,23 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, DollarSign, PieChart, BarChart3, Activity } from "lucide-react";
 import { PortfolioChart } from "./PortfolioChart";
 import { MarketOverview } from "@/components/dashboard/MarketOverview";
 import { MarketIntelligence } from "@/components/market/MarketIntelligence";
+import { useAuth } from "@/hooks/useAuth";
 
 export const PortfolioOverview = () => {
-  // Mock portfolio data - in a real app, this would come from your portfolio service
-  const portfolioValue = 125750.50;
-  const dayChange = 2450.75;
-  const dayChangePercent = 1.98;
-  const totalReturn = 25750.50;
-  const totalReturnPercent = 25.75;
+  const { user, profile } = useAuth();
+  // For Groww-like behavior:
+  // If not logged in, show 0 as portfolioValue; else use user's value.
+  const portfolioValue = user && profile?.portfolio_value
+    ? Number(profile.portfolio_value)
+    : 0;
+  // Keep these static for now, but you could hook into profile as needed.
+  const dayChange = portfolioValue === 0 ? 0 : 2450.75;
+  const dayChangePercent = portfolioValue === 0 ? 0 : 1.98;
+  const totalReturn = portfolioValue === 0 ? 0 : 25750.50;
+  const totalReturnPercent = portfolioValue === 0 ? 0 : 25.75;
 
   const holdings = [
     { symbol: "AAPL", name: "Apple Inc.", shares: 50, value: 9125.00, weight: 7.3, change: 2.1 },

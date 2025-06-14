@@ -6,21 +6,104 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { InteractiveBuilder } from "./InteractiveBuilder";
-import { Calculator, Zap, Settings } from "lucide-react";
-import { useState } from "react";
+import { Calculator, Zap } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 export const PortfolioBuilder = () => {
-  const [portfolioValue, setPortfolioValue] = useState("100000");
-  const [riskLevel, setRiskLevel] = useState([5]);
-  const [timeHorizon, setTimeHorizon] = useState([10]);
+  const { user, profile, refreshProfile, updateProfile } = useAuth();
+  const isLoggedIn = !!user;
+
+  const [portfolioValue, setPortfolioValue] = useState(profile?.portfolio_value || "");
+  const [riskLevel, setRiskLevel] = useState([profile?.risk_tolerance ? parseInt(profile.risk_tolerance) : 5]);
+  const [timeHorizon, setTimeHorizon] = useState([profile?.time_horizon ? parseInt(profile.time_horizon) : 10]);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    // Sync local state to profile when profile changes
+    setPortfolioValue(profile?.portfolio_value || "");
+    setRiskLevel([profile?.risk_tolerance ? parseInt(profile.risk_tolerance) : 5]);
+    setTimeHorizon([profile?.time_horizon ? parseInt(profile.time_horizon) : 10]);
+  }, [profile?.portfolio_value, profile?.risk_tolerance, profile?.time_horizon]);
+
+  const handleSavePreferences = async () => {
+    if (!isLoggedIn) return;
+    setSaving(true);
+    await updateProfile({
+      portfolio_value: portfolioValue,
+      risk_tolerance: riskLevel[0]?.toString(),
+      time_horizon: timeHorizon[0]?.toString(),
+    });
+    await refreshProfile();
+    setSaving(false);
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold mb-2">Smart Portfolio Builder</h2>
-        <p className="text-muted-foreground">
-          Build and optimize your portfolio with advanced quantitative tools. Choose your own portfolio value and adjust risk and time preferences below.
+    <div className="w-full max-w-4xl mx-auto space-y-8">
+      <div className="rounded-lg p-6 bg-white shadow flex flex-col items-center gap-5">
+        <h2 className="text-2xl md:text-3xl font-bold text-indigo-700 mb-2">Smart Portfolio Builder</h2>
+        <p className="text-muted-foreground text-center">
+          {isLoggedIn
+            ? "Personalize your portfolio with your own investment amount and preferences, just like Groww!"
+            : "Sign in to personalize your portfolio. Default values are shown below."}
         </p>
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            if (isLoggedIn) handleSavePreferences();
+          }}
+          className="w-full flex flex-col md:flex-row gap-4 items-center justify-between"
+        >
+          <div className="flex flex-col gap-2 w-full md:w-auto">
+            <Label htmlFor="portfolio-value">Portfolio Value</Label>
+            <Input
+              id="portfolio-value"
+              type="number"
+              min={0}
+              step={100}
+              className="rounded-md border px-3 py-2 text-lg font-semibold"
+              value={portfolioValue}
+              onChange={e => setPortfolioValue(e.target.value)}
+              disabled={!isLoggedIn}
+              placeholder="Enter amount (₹ / $)"
+            />
+          </div>
+          <div className="flex flex-col gap-2 w-full md:w-auto">
+            <Label>Risk</Label>
+            <Slider
+              value={riskLevel}
+              onValueChange={isLoggedIn ? setRiskLevel : () => {}}
+              max={10}
+              min={1}
+              step={1}
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>Conservative</span>
+              <span className="font-bold">{riskLevel[0]}/10</span>
+              <span>Aggressive</span>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2 w-full md:w-auto">
+            <Label>Time Horizon</Label>
+            <Slider
+              value={timeHorizon}
+              onValueChange={isLoggedIn ? setTimeHorizon : () => {}}
+              max={30}
+              min={1}
+              step={1}
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>1 year</span>
+              <span className="font-bold">{timeHorizon[0]} yr</span>
+              <span>30+ yrs</span>
+            </div>
+          </div>
+          {isLoggedIn && (
+            <Button type="submit" className="self-end" disabled={saving}>
+              {saving ? "Saving..." : "Save"}
+            </Button>
+          )}
+        </form>
       </div>
 
       <Tabs defaultValue="interactive" className="w-full">
@@ -34,11 +117,9 @@ export const PortfolioBuilder = () => {
             <span>Classic Builder</span>
           </TabsTrigger>
         </TabsList>
-
         <TabsContent value="interactive" className="space-y-6">
           <InteractiveBuilder />
         </TabsContent>
-
         <TabsContent value="classic" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-6">
