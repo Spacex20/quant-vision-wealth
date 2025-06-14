@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, DollarSign, PieChart, BarChart3, Activity } from "lucide-react";
@@ -44,13 +43,17 @@ export const PortfolioOverview = () => {
   const holdings = activePortfolio.assets
     .slice()
     .sort((a, b) => b.allocation - a.allocation)
-    .map((asset) => ({
-      ...asset,
-      value: +(portfolioValue * asset.allocation / 100).toFixed(2),
-      change: Math.round((Math.random() - 0.4) * 100) / 10, // random short-term move
-      weight: asset.allocation,
-      shares: typeof asset.shares !== "undefined" ? asset.shares : null,
-    }));
+    .map((asset) => {
+      // Use type assertion to allow optional properties like shares
+      const typedAsset = asset as typeof asset & { shares?: number };
+      return {
+        ...asset,
+        value: +(portfolioValue * asset.allocation / 100).toFixed(2),
+        change: Math.round((Math.random() - 0.4) * 100) / 10, // random short-term move
+        weight: asset.allocation,
+        shares: typeof typedAsset.shares !== "undefined" ? typedAsset.shares : null,
+      };
+    });
 
   const assetAllocation = activePortfolio.assets.map((a) => ({
     category: a.name,
