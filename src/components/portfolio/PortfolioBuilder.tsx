@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,7 @@ export const PortfolioBuilder = () => {
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold mb-2">Smart Portfolio Builder</h2>
         <p className="text-muted-foreground">
-          Build and optimize your portfolio with advanced quantitative tools
+          Build and optimize your portfolio with advanced quantitative tools. Choose your own portfolio value and adjust risk and time preferences below.
         </p>
       </div>
 
@@ -59,8 +58,9 @@ export const PortfolioBuilder = () => {
                       type="number"
                       value={portfolioValue}
                       onChange={(e) => setPortfolioValue(e.target.value)}
-                      placeholder="100000"
+                      placeholder="Enter your portfolio value (e.g., 50000)"
                       className="mt-1"
+                      min={0}
                     />
                   </div>
 

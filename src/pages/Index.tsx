@@ -35,14 +35,7 @@ const Index = () => {
               Advanced portfolio management with AI-driven insights and real-time market data
             </p>
           </div>
-          {user && (
-            <Button
-              variant="secondary"
-              onClick={() => navigate("/profile")}
-            >
-              My Investor Profile
-            </Button>
-          )}
+          {/* Investor Profile button removed */}
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
