@@ -3,3 +3,24 @@ project_id = "sbjfoupfoefbzfkvkdol"
 
 [functions.api-webhooks-finnhub]
 verify_jwt = false
+
+[functions.portfolio-advisor]
+verify_jwt = true
+
+[functions.market-data]
+verify_jwt = false
+
+[functions.portfolio-analytics]
+verify_jwt = true
+
+[functions.stock-screener]
+verify_jwt = true
+
+[functions.paper-trading]
+verify_jwt = true
+
+[functions.value-analysis]
+verify_jwt = false
+
+[functions.alerts-processor]
+verify_jwt = false

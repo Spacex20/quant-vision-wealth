@@ -9,6 +9,209 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      alerts: {
+        Row: {
+          alert_type: Database["public"]["Enums"]["alert_type"]
+          condition_operator: string | null
+          condition_value: number | null
+          created_at: string
+          id: string
+          is_active: boolean
+          message: string | null
+          symbol: string
+          triggered_at: string | null
+          user_id: string
+        }
+        Insert: {
+          alert_type: Database["public"]["Enums"]["alert_type"]
+          condition_operator?: string | null
+          condition_value?: number | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          message?: string | null
+          symbol: string
+          triggered_at?: string | null
+          user_id: string
+        }
+        Update: {
+          alert_type?: Database["public"]["Enums"]["alert_type"]
+          condition_operator?: string | null
+          condition_value?: number | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          message?: string | null
+          symbol?: string
+          triggered_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      market_data_cache: {
+        Row: {
+          data: Json
+          last_updated: string
+          symbol: string
+        }
+        Insert: {
+          data: Json
+          last_updated?: string
+          symbol: string
+        }
+        Update: {
+          data?: Json
+          last_updated?: string
+          symbol?: string
+        }
+        Relationships: []
+      }
+      paper_accounts: {
+        Row: {
+          created_at: string
+          current_balance: number
+          id: string
+          initial_balance: number
+          name: string
+          total_pnl: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_balance?: number
+          id?: string
+          initial_balance?: number
+          name: string
+          total_pnl?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_balance?: number
+          id?: string
+          initial_balance?: number
+          name?: string
+          total_pnl?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paper_accounts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      paper_orders: {
+        Row: {
+          account_id: string
+          created_at: string
+          filled_at: string | null
+          filled_price: number | null
+          id: string
+          order_type: Database["public"]["Enums"]["order_type"]
+          price: number | null
+          quantity: number
+          side: string
+          status: Database["public"]["Enums"]["order_status"]
+          stop_price: number | null
+          symbol: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          filled_at?: string | null
+          filled_price?: number | null
+          id?: string
+          order_type: Database["public"]["Enums"]["order_type"]
+          price?: number | null
+          quantity: number
+          side: string
+          status?: Database["public"]["Enums"]["order_status"]
+          stop_price?: number | null
+          symbol: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          filled_at?: string | null
+          filled_price?: number | null
+          id?: string
+          order_type?: Database["public"]["Enums"]["order_type"]
+          price?: number | null
+          quantity?: number
+          side?: string
+          status?: Database["public"]["Enums"]["order_status"]
+          stop_price?: number | null
+          symbol?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paper_orders_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "paper_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      paper_positions: {
+        Row: {
+          account_id: string
+          avg_price: number
+          current_price: number
+          id: string
+          quantity: number
+          realized_pnl: number
+          symbol: string
+          unrealized_pnl: number
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          avg_price: number
+          current_price?: number
+          id?: string
+          quantity: number
+          realized_pnl?: number
+          symbol: string
+          unrealized_pnl?: number
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          avg_price?: number
+          current_price?: number
+          id?: string
+          quantity?: number
+          realized_pnl?: number
+          symbol?: string
+          unrealized_pnl?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paper_positions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "paper_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       phone_verifications: {
         Row: {
           attempts: number | null
@@ -38,6 +241,56 @@ export type Database = {
           verification_code?: string
         }
         Relationships: []
+      }
+      portfolio_analytics: {
+        Row: {
+          analytics_data: Json
+          created_at: string
+          cumulative_return: number
+          daily_return: number
+          date: string
+          id: string
+          max_drawdown: number
+          portfolio_id: string
+          sharpe_ratio: number
+          total_value: number
+          volatility: number
+        }
+        Insert: {
+          analytics_data?: Json
+          created_at?: string
+          cumulative_return?: number
+          daily_return?: number
+          date: string
+          id?: string
+          max_drawdown?: number
+          portfolio_id: string
+          sharpe_ratio?: number
+          total_value: number
+          volatility?: number
+        }
+        Update: {
+          analytics_data?: Json
+          created_at?: string
+          cumulative_return?: number
+          daily_return?: number
+          date?: string
+          id?: string
+          max_drawdown?: number
+          portfolio_id?: string
+          sharpe_ratio?: number
+          total_value?: number
+          volatility?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_analytics_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "user_portfolios"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -113,6 +366,185 @@ export type Database = {
           username?: string | null
         }
         Relationships: []
+      }
+      research_notebooks: {
+        Row: {
+          cells: Json
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean
+          language: string
+          name: string
+          tags: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cells?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          language?: string
+          name: string
+          tags?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cells?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          language?: string
+          name?: string
+          tags?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "research_notebooks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      research_reports: {
+        Row: {
+          analysis_type: string
+          content: string
+          created_at: string
+          id: string
+          recommendation: string | null
+          risk_rating: number | null
+          symbol: string
+          target_price: number | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analysis_type: string
+          content: string
+          created_at?: string
+          id?: string
+          recommendation?: string | null
+          risk_rating?: number | null
+          symbol: string
+          target_price?: number | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analysis_type?: string
+          content?: string
+          created_at?: string
+          id?: string
+          recommendation?: string | null
+          risk_rating?: number | null
+          symbol?: string
+          target_price?: number | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "research_reports_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      screener_results: {
+        Row: {
+          created_at: string
+          filters: Json
+          id: string
+          name: string
+          results: Json
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          filters?: Json
+          id?: string
+          name: string
+          results?: Json
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          filters?: Json
+          id?: string
+          name?: string
+          results?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "screener_results_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trading_strategies: {
+        Row: {
+          backtest_results: Json | null
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          language: string
+          name: string
+          parameters: Json
+          user_id: string
+        }
+        Insert: {
+          backtest_results?: Json | null
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          language?: string
+          name: string
+          parameters?: Json
+          user_id: string
+        }
+        Update: {
+          backtest_results?: Json | null
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          language?: string
+          name?: string
+          parameters?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trading_strategies_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_portfolios: {
         Row: {
@@ -191,15 +623,61 @@ export type Database = {
         }
         Relationships: []
       }
+      watchlists: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          symbols: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          symbols?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          symbols?: string[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "watchlists_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      clean_old_market_data: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
-      [_ in never]: never
+      alert_type: "price" | "volume" | "news" | "technical"
+      asset_type: "stock" | "etf" | "bond" | "commodity" | "crypto" | "reit"
+      investment_experience: "beginner" | "intermediate" | "advanced" | "expert"
+      order_status: "pending" | "filled" | "cancelled" | "rejected"
+      order_type: "market" | "limit" | "stop" | "stop_limit"
+      risk_tolerance: "conservative" | "moderate" | "aggressive"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -314,6 +792,13 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      alert_type: ["price", "volume", "news", "technical"],
+      asset_type: ["stock", "etf", "bond", "commodity", "crypto", "reit"],
+      investment_experience: ["beginner", "intermediate", "advanced", "expert"],
+      order_status: ["pending", "filled", "cancelled", "rejected"],
+      order_type: ["market", "limit", "stop", "stop_limit"],
+      risk_tolerance: ["conservative", "moderate", "aggressive"],
+    },
   },
 } as const
