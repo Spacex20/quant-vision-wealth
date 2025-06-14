@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -249,7 +248,6 @@ export const SMLVisualizer = () => {
                   data={smlData}
                   fill="#8884d8"
                   line={{ stroke: '#8884d8', strokeWidth: 2 }}
-                  shape="none"
                 />
                 
                 {/* Individual Stocks */}
