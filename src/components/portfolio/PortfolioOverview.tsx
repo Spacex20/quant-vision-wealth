@@ -1,4 +1,4 @@
-
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, DollarSign, PieChart, BarChart3, Activity, Sparkles } from "lucide-react";
@@ -8,6 +8,11 @@ import { MarketIntelligence } from "@/components/market/MarketIntelligence";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserPortfolios } from "@/hooks/useUserPortfolios";
 import { LoadingSpinner } from "../common/LoadingSpinner";
+import { Button } from "@/components/ui/button";
+import { SavePortfolioDialog } from "./SavePortfolioDialog";
+import { SummaryReport } from "./SummaryReport";
+import { toast } from "sonner";
+import { portfolioManager } from "@/services/portfolioManager";
 
 // Type guard to check if current portfolio is the demo portfolio
 function isDemoPortfolio(portfolio: any): portfolio is {
@@ -27,7 +32,7 @@ export const PortfolioOverview = () => {
   const isLoggedIn = !!user;
   const { portfolios, isLoading } = useUserPortfolios();
 
-  // Ray Dalio's All Weather Strategy Demo Portfolio
+  // Demo portfolio fallback
   const allWeatherDemoPortfolio = {
     name: "All Weather Strategy",
     description: "Ray Dalio's risk-balanced portfolio designed to perform in all economic environments",
@@ -44,6 +49,8 @@ export const PortfolioOverview = () => {
     isDemo: true
   };
 
+  const [showSave, setShowSave] = useState(false);
+
   const activePortfolio =
     isLoggedIn && !isLoading && portfolios.length > 0
       ? portfolios[0]
@@ -54,6 +61,39 @@ export const PortfolioOverview = () => {
   }
 
   const portfolioValue = activePortfolio.total_value || 0;
+
+  // For JSON export
+  const handleDownloadJSON = () => {
+    const fileData = JSON.stringify(activePortfolio, null, 2);
+    const blob = new Blob([fileData], { type: "application/json" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.download = `${activePortfolio.name || "portfolio"}.json`;
+    link.href = url;
+    link.click();
+  };
+
+  // For save dialog (name, notes)
+  const handleSavePortfolio = async ({ name, notes }: { name: string; notes: string }) => {
+    if (!isLoggedIn) {
+      toast.error("Please log in to save portfolios!");
+      return;
+    }
+    // Save using existing service but with additional notes logic
+    // We'll save notes in the description
+    const data = {
+      name,
+      description: notes || "No additional notes.",
+      assets: activePortfolio.assets,
+      totalValue: activePortfolio.total_value || 0
+    };
+    const res = await portfolioManager.savePortfolio(data, user.id);
+    if (res) {
+      toast.success("Portfolio saved!");
+    } else {
+      toast.error("Failed to save portfolio.");
+    }
+  };
 
   const dayChange = portfolioValue ? +(portfolioValue * 0.008).toFixed(2) : 0;
   const dayChangePercent = portfolioValue ? 0.8 : 0;
@@ -85,6 +125,27 @@ export const PortfolioOverview = () => {
   // ---- BEGIN JSX ----
   return (
     <div className="space-y-6">
+      {/* Save Portfolio Dialog */}
+      <SavePortfolioDialog
+        open={showSave}
+        defaultName={activePortfolio.name}
+        onClose={() => setShowSave(false)}
+        onSave={handleSavePortfolio}
+      />
+      <div className="flex items-center justify-between">
+        <h2 className="text-3xl font-bold mb-2">Portfolio Overview</h2>
+        <div className="flex gap-2">
+          <Button onClick={() => setShowSave(true)}>Save Portfolio</Button>
+          {/* Export actions in summary report */}
+        </div>
+      </div>
+
+      {/* Summary Report Section */}
+      <SummaryReport
+        portfolio={activePortfolio}
+        onDownloadJSON={handleDownloadJSON}
+      />
+
       {/* Demo Portfolio Notice */}
       {isDemoPortfolio(activePortfolio) && (
         <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
