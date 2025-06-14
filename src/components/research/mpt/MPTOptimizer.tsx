@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -164,9 +163,30 @@ export const MPTOptimizer = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 20 }}>
                     <CartesianGrid />
-                    <XAxis type="number" dataKey="risk" name="Risk (Volatility)" unit="%" domain={[0, 'dataMax + 0.05']} tickFormatter={v => (v * 100).toFixed(0)} />
-                    <YAxis type="number" dataKey="return" name="Expected Return" unit="%" domain={[0, 'dataMax + 0.05']} tickFormatter={v => (v * 100).toFixed(0)} />
-                    <Tooltip formatter={(value, name) => [`(${(value * 100).toFixed(2)}%)`, name]} />
+                    <XAxis 
+                      type="number" 
+                      dataKey="risk" 
+                      name="Risk (Volatility)" 
+                      unit="%" 
+                      domain={[0, (dataMax: number) => (dataMax || 0.5) * 1.1]} 
+                      tickFormatter={(v) => typeof v === 'number' ? (v * 100).toFixed(0) : ''} 
+                    />
+                    <YAxis 
+                      type="number" 
+                      dataKey="return" 
+                      name="Expected Return" 
+                      unit="%" 
+                      domain={[0, (dataMax: number) => (dataMax || 0.5) * 1.1]} 
+                      tickFormatter={(v) => typeof v === 'number' ? (v * 100).toFixed(0) : ''} 
+                    />
+                    <Tooltip 
+                      formatter={(value, name) => {
+                        if (typeof value === 'number') {
+                          return [`${(value * 100).toFixed(2)}%`, name];
+                        }
+                        return [value, name];
+                      }}
+                    />
                     <Legend />
                     <Scatter name="Random Portfolios" data={frontierData} fill="#8884d8" shape="circle" style={{opacity: 0.5}} />
                     {optimalPortfolios.minVol && <Scatter name="Min Volatility" data={[optimalPortfolios.minVol]} fill="#82ca9d" shape="star" />}
