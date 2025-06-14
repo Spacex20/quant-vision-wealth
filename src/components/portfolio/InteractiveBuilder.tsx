@@ -235,7 +235,6 @@ export const InteractiveBuilder = ({
         assets={assets}
         totalValue={initialValue}
         onSave={() => {
-            toast.success("Portfolio saved successfully!");
             setIsSaveDialogOpen(false);
         }}
       />

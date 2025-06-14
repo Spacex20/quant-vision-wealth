@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { portfolioManager } from '@/services/portfolioManager';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface Asset {
   symbol: string;
@@ -22,27 +24,48 @@ interface SavePortfolioDialogProps {
 }
 
 export const SavePortfolioDialog = ({ open, onOpenChange, assets, totalValue, onSave }: SavePortfolioDialogProps) => {
+    const { user } = useAuth();
+    const queryClient = useQueryClient();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const [isSaving, setIsSaving] = useState(false);
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!name.trim()) {
             toast.error("Portfolio name is required.");
             return;
         }
+        if (!user) {
+            toast.error("You must be logged in to save a portfolio.");
+            return;
+        }
         
-        portfolioManager.savePortfolio({
+        setIsSaving(true);
+        const savedPortfolio = await portfolioManager.savePortfolio({
             name,
             description,
             assets: assets.map(a => ({ symbol: a.symbol, name: a.name, allocation: a.allocation })),
             totalValue,
-        });
+        }, user.id);
         
-        onSave();
+        if (savedPortfolio) {
+            toast.success(`Portfolio "${name}" saved successfully!`);
+            queryClient.invalidateQueries({ queryKey: ['user_portfolios', user.id] });
+            onSave();
+            setName('');
+            setDescription('');
+        }
+        setIsSaving(false);
     };
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open} onOpenChange={(isOpen) => {
+            if (!isOpen) {
+                setName('');
+                setDescription('');
+            }
+            onOpenChange(isOpen);
+        }}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Save Portfolio</DialogTitle>
@@ -66,7 +89,7 @@ export const SavePortfolioDialog = ({ open, onOpenChange, assets, totalValue, on
                 </div>
                 <DialogFooter>
                     <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-                    <Button onClick={handleSave} disabled={!name.trim()}>Save Portfolio</Button>
+                    <Button onClick={handleSave} disabled={!name.trim() || isSaving}>{isSaving ? 'Saving...' : 'Save Portfolio'}</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

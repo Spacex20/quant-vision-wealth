@@ -6,13 +6,13 @@ import { MarketOverview } from "@/components/dashboard/MarketOverview";
 import { MarketIntelligence } from "@/components/market/MarketIntelligence";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserPortfolios } from "@/hooks/useUserPortfolios";
+import { LoadingSpinner } from "../common/LoadingSpinner";
 
 export const PortfolioOverview = () => {
   const { user } = useAuth();
   const isLoggedIn = !!user;
   const { portfolios, isLoading } = useUserPortfolios();
 
-  // Demo fallback for guests or if user has no portfolios
   const demoPortfolio = {
     name: "Demo Portfolio",
     total_value: 125000,
@@ -23,17 +23,19 @@ export const PortfolioOverview = () => {
       { symbol: "AMZN", name: "Amazon", allocation: 10 },
       { symbol: "TSLA", name: "Tesla", allocation: 10 },
     ],
+    updated_at: new Date().toISOString(),
   };
 
-  // Select first portfolio or demo
-  const activePortfolio = isLoggedIn && portfolios.length > 0
+  const activePortfolio = isLoggedIn && !isLoading && portfolios.length > 0
     ? portfolios[0]
     : demoPortfolio;
 
-  // Example calculations based on the selected portfolio
+  if (isLoggedIn && isLoading) {
+    return <div className="flex justify-center items-center h-96"><LoadingSpinner /></div>;
+  }
+  
   const portfolioValue = activePortfolio.total_value || 0;
-
-  // Demo stats: Here, you'll want to replace with real analytics later
+  
   const dayChange = portfolioValue ? +(portfolioValue * 0.010).toFixed(2) : 0;
   const dayChangePercent = portfolioValue ? 1.0 : 0;
   const totalReturn = portfolioValue ? +(portfolioValue * 0.20).toFixed(2) : 0;
