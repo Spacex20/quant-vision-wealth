@@ -38,6 +38,12 @@ export const InteractiveBuilder = ({
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+  const [savedPortfolio, setSavedPortfolio] = useState<{
+    name: string;
+    notes: string;
+    assets: Asset[];
+    totalValue: number;
+  } | null>(null);
 
   // Re-initialize when template changes
   useEffect(() => {
@@ -117,6 +123,56 @@ export const InteractiveBuilder = ({
   };
 
   // Save or clone functionality can be added here for real use
+
+  const handleSavePortfolio = ({ name, notes }: { name: string; notes: string }) => {
+    setSavedPortfolio({
+      name,
+      notes,
+      assets: assets,
+      totalValue: initialValue,
+    });
+    toast.success("Portfolio saved locally! (Connect your account to store online)");
+    setIsSaveDialogOpen(false);
+  };
+
+  const downloadJSON = () => {
+    if (!savedPortfolio) return;
+    const fileData = JSON.stringify(savedPortfolio, null, 2);
+    const blob = new Blob([fileData], { type: "application/json" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.download = `${savedPortfolio.name || "portfolio"}.json`;
+    link.href = url;
+    link.click();
+  };
+
+  const downloadPDF = async () => {
+    if (!savedPortfolio) return;
+    // Dynamically import jsPDF and html2canvas to ensure client-side availability
+    const [{ default: jsPDF }, html2canvas] = await Promise.all([
+      import("jspdf"),
+      import("html2canvas"),
+    ]);
+    // Create a summary for export (you can enhance with graphs)
+    const element = document.createElement("div");
+    element.className = "p-6";
+    element.innerHTML = `
+      <h2 style="font-size:20px;font-weight:bold;margin-bottom:8px;">${savedPortfolio.name}</h2>
+      <div style="margin-bottom:6px;">${savedPortfolio.notes || ""}</div>
+      <ul style="margin-bottom:12px;">
+      ${savedPortfolio.assets.map(a => `<li>${a.name} (${a.symbol}): ${a.allocation}%</li>`).join("")}
+      </ul>
+      <div>Total Value: $${(savedPortfolio.totalValue || 0).toLocaleString()}</div>
+    `;
+    document.body.appendChild(element);
+    const canvas = await html2canvas.default(element, { backgroundColor: "#fff" });
+    document.body.removeChild(element);
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF();
+    pdf.text(savedPortfolio.name, 10, 15);
+    pdf.addImage(imgData, "PNG", 10, 25, 190, 40);
+    pdf.save(`${savedPortfolio.name}-summary.pdf`);
+  };
 
   return (
     <div className="space-y-6">
@@ -221,22 +277,33 @@ export const InteractiveBuilder = ({
             </Alert>
           )}
 
-          <div className="flex justify-end pt-4">
-            <Button onClick={() => setIsSaveDialogOpen(true)} disabled={balanceError || assets.length === 0}>
-                <Save className="h-4 w-4 mr-2" />
-                Save Portfolio
+          <div className="flex justify-end pt-4 gap-2">
+            <Button
+              onClick={() => setIsSaveDialogOpen(true)}
+              disabled={balanceError || assets.length === 0}
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Save Portfolio
             </Button>
+            {/* Show export buttons only after save */}
+            {savedPortfolio && (
+              <>
+                <Button variant="outline" onClick={downloadPDF}>
+                  Export PDF
+                </Button>
+                <Button variant="outline" onClick={downloadJSON}>
+                  Export JSON
+                </Button>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
       <SavePortfolioDialog
         open={isSaveDialogOpen}
-        onOpenChange={setIsSaveDialogOpen}
-        assets={assets}
-        totalValue={initialValue}
-        onSave={() => {
-            setIsSaveDialogOpen(false);
-        }}
+        defaultName={savedPortfolio ? savedPortfolio.name : "My Portfolio"}
+        onClose={() => setIsSaveDialogOpen(false)}
+        onSave={handleSavePortfolio}
       />
     </div>
   );
