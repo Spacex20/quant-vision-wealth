@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Portfolio } from "@/hooks/useUserPortfolios";
@@ -145,9 +144,44 @@ class PortfolioManager {
     toast.info("Cloning portfolios is coming soon!");
   }
 
-  comparePortfolios(portfolioIds: string[]): PortfolioComparison | null {
-    toast.info("Portfolio comparison is being updated.");
-    return null;
+  comparePortfolios(portfoliosToCompare: Portfolio[]): PortfolioComparison | null {
+    if (portfoliosToCompare.length < 2 || portfoliosToCompare.length > 4) {
+      toast.error("Please select between 2 and 4 portfolios to compare.");
+      return null;
+    }
+
+    const metrics: PortfolioComparisonMetric[] = portfoliosToCompare.map(() => {
+      // Mocked metrics for demonstration.
+      return {
+        expectedReturn: Math.random() * 0.15,
+        volatility: Math.random() * 0.25 + 0.05,
+        sharpeRatio: Math.random() * 1.5 + 0.5,
+        maxDrawdown: -Math.random() * 0.3,
+      };
+    });
+
+    const correlations: number[][] = [];
+    for (let i = 0; i < portfoliosToCompare.length; i++) {
+      correlations[i] = [];
+      for (let j = 0; j < portfoliosToCompare.length; j++) {
+        if (i === j) {
+          correlations[i][j] = 1;
+        } else if (j > i) {
+          const corr = Math.random() * 1.8 - 0.8;
+          correlations[i][j] = parseFloat(corr.toFixed(3));
+        } else {
+          correlations[i][j] = correlations[j][i];
+        }
+      }
+    }
+
+    toast.success("Comparison generated successfully!");
+
+    return {
+      portfolios: portfoliosToCompare,
+      metrics,
+      correlations,
+    };
   }
   
   getAllWatchlists(): Watchlist[] {

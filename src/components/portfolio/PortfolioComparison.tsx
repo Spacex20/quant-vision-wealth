@@ -28,7 +28,8 @@ export const PortfolioComparison = () => {
   const handleCompare = () => {
     if (selectedPortfolios.length < 2) return;
     
-    const result = portfolioManager.comparePortfolios(selectedPortfolios);
+    const portfoliosToCompare = portfolios.filter(p => selectedPortfolios.includes(p.id));
+    const result = portfolioManager.comparePortfolios(portfoliosToCompare);
     setComparison(result);
   };
 
@@ -308,3 +309,4 @@ export const PortfolioComparison = () => {
       )}
     </div>
   );
+};
