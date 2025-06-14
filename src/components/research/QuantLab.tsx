@@ -2,13 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Play, Plus, Save, Share, Code, BarChart3, TrendingUp, Users } from 'lucide-react';
-import { quantLabService, ResearchNotebook, NotebookCell, TradingStrategy, PaperTradingAccount } from '@/services/quantLabService';
+import { Play, Plus, Code, BarChart3, TrendingUp, Users, Settings, BookOpen } from 'lucide-react';
+import { quantLabService, ResearchNotebook, TradingStrategy, PaperTradingAccount } from '@/services/quantLabService';
+import { QuantLabWorkspace } from './QuantLabWorkspace';
 
 const QuantLab = () => {
   const [notebooks, setNotebooks] = useState<ResearchNotebook[]>([]);
@@ -16,6 +15,7 @@ const QuantLab = () => {
   const [strategies, setStrategies] = useState<TradingStrategy[]>([]);
   const [paperAccounts, setPaperAccounts] = useState<PaperTradingAccount[]>([]);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('notebooks');
 
   useEffect(() => {
     loadUserData();
@@ -52,49 +52,9 @@ const QuantLab = () => {
       const notebook = await quantLabService.createNotebook('user123', name, 'New quantitative research notebook');
       setNotebooks([...notebooks, notebook]);
       setCurrentNotebook(notebook);
+      setActiveTab('notebooks');
     } catch (error) {
       console.error('Error creating notebook:', error);
-    }
-  };
-
-  const executeCell = async (cellId: string) => {
-    if (!currentNotebook) return;
-
-    try {
-      const result = await quantLabService.executeCell(currentNotebook.id, cellId);
-      console.log('Cell execution result:', result);
-      
-      // Update the notebook with execution results
-      const updatedNotebook = await quantLabService.getNotebook(currentNotebook.id);
-      if (updatedNotebook) {
-        setCurrentNotebook(updatedNotebook);
-      }
-    } catch (error) {
-      console.error('Error executing cell:', error);
-    }
-  };
-
-  const addNewCell = async (type: NotebookCell['type']) => {
-    if (!currentNotebook) return;
-
-    try {
-      await quantLabService.addCell(currentNotebook.id, type);
-      const updatedNotebook = await quantLabService.getNotebook(currentNotebook.id);
-      if (updatedNotebook) {
-        setCurrentNotebook(updatedNotebook);
-      }
-    } catch (error) {
-      console.error('Error adding cell:', error);
-    }
-  };
-
-  const updateCellContent = async (cellId: string, content: string) => {
-    if (!currentNotebook) return;
-
-    try {
-      await quantLabService.updateCell(currentNotebook.id, cellId, { content });
-    } catch (error) {
-      console.error('Error updating cell:', error);
     }
   };
 
@@ -138,12 +98,12 @@ const QuantLab = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Quant Lab</h1>
-          <p className="text-gray-600">Advanced research environment for quantitative analysis</p>
+          <p className="text-gray-600">Advanced quantitative research workspace</p>
         </div>
         <div className="flex gap-2">
           <Button onClick={createNewNotebook} className="flex items-center gap-2">
@@ -157,7 +117,7 @@ const QuantLab = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="notebooks" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="notebooks" className="flex items-center gap-2">
             <Code className="w-4 h-4" />
@@ -171,9 +131,9 @@ const QuantLab = () => {
             <TrendingUp className="w-4 h-4" />
             Paper Trading
           </TabsTrigger>
-          <TabsTrigger value="collaboration" className="flex items-center gap-2">
-            <Users className="w-4 h-4" />
-            Collaboration
+          <TabsTrigger value="workspace" className="flex items-center gap-2">
+            <Settings className="w-4 h-4" />
+            Workspace
           </TabsTrigger>
         </TabsList>
 
@@ -216,88 +176,24 @@ const QuantLab = () => {
               </Card>
             </div>
 
-            {/* Notebook Editor */}
+            {/* Notebook Preview */}
             <div className="lg:col-span-3">
               {currentNotebook ? (
                 <Card>
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <div>
-                      <CardTitle>{currentNotebook.name}</CardTitle>
-                      <p className="text-sm text-gray-600">{currentNotebook.description}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline">
-                        <Save className="w-4 h-4 mr-2" />
-                        Save
-                      </Button>
-                      <Button size="sm" variant="outline">
-                        <Share className="w-4 h-4 mr-2" />
-                        Share
-                      </Button>
-                    </div>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BookOpen className="w-5 h-5" />
+                      {currentNotebook.name}
+                    </CardTitle>
+                    <p className="text-sm text-gray-600">{currentNotebook.description}</p>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    {currentNotebook.cells.map((cell, index) => (
-                      <div key={cell.id} className="border rounded-lg overflow-hidden">
-                        <div className="bg-gray-50 px-4 py-2 flex justify-between items-center">
-                          <Badge variant="outline" className="text-xs">
-                            {cell.type}
-                          </Badge>
-                          {cell.type === 'code' && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => executeCell(cell.id)}
-                              disabled={cell.isExecuting}
-                              className="flex items-center gap-1"
-                            >
-                              <Play className="w-3 h-3" />
-                              {cell.isExecuting ? 'Running...' : 'Run'}
-                            </Button>
-                          )}
-                        </div>
-                        <div className="p-4">
-                          {cell.type === 'code' ? (
-                            <Textarea
-                              value={cell.content}
-                              onChange={(e) => updateCellContent(cell.id, e.target.value)}
-                              className="font-mono text-sm"
-                              rows={4}
-                              placeholder="Enter your code here..."
-                            />
-                          ) : (
-                            <Textarea
-                              value={cell.content}
-                              onChange={(e) => updateCellContent(cell.id, e.target.value)}
-                              className="text-sm"
-                              rows={3}
-                              placeholder="Enter markdown content..."
-                            />
-                          )}
-                          {cell.output && (
-                            <div className="mt-4 p-3 bg-gray-50 rounded border-l-4 border-blue-500">
-                              <pre className="text-sm">{JSON.stringify(cell.output, null, 2)}</pre>
-                            </div>
-                          )}
-                          {cell.error && (
-                            <div className="mt-4 p-3 bg-red-50 rounded border-l-4 border-red-500">
-                              <p className="text-sm text-red-700">{cell.error}</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                    
-                    {/* Add Cell Buttons */}
-                    <div className="flex gap-2 pt-4 border-t">
-                      <Button size="sm" variant="outline" onClick={() => addNewCell('code')}>
-                        + Code Cell
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => addNewCell('markdown')}>
-                        + Markdown Cell
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => addNewCell('chart')}>
-                        + Chart Cell
+                  <CardContent>
+                    <div className="space-y-2">
+                      <p><strong>Language:</strong> {currentNotebook.language}</p>
+                      <p><strong>Cells:</strong> {currentNotebook.cells.length}</p>
+                      <p><strong>Created:</strong> {new Date(currentNotebook.createdAt).toLocaleDateString()}</p>
+                      <Button onClick={() => setActiveTab('workspace')} className="mt-4">
+                        Open in Workspace
                       </Button>
                     </div>
                   </CardContent>
@@ -433,21 +329,25 @@ const QuantLab = () => {
           </div>
         </TabsContent>
 
-        {/* Collaboration Tab */}
-        <TabsContent value="collaboration" className="space-y-4">
-          <Card>
-            <CardContent className="flex items-center justify-center h-64">
-              <div className="text-center">
-                <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Collaboration Features</h3>
-                <p className="text-gray-600 mb-4">Share notebooks, collaborate on strategies, and work together with your team.</p>
-                <Button>
-                  <Share className="w-4 h-4 mr-2" />
-                  Start Collaboration
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Workspace Tab */}
+        <TabsContent value="workspace" className="space-y-4">
+          {currentNotebook ? (
+            <QuantLabWorkspace 
+              currentNotebook={currentNotebook} 
+              onNotebookUpdate={setCurrentNotebook}
+            />
+          ) : (
+            <Card>
+              <CardContent className="flex items-center justify-center h-64">
+                <div className="text-center">
+                  <Settings className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium mb-2">No Notebook Selected</h3>
+                  <p className="text-gray-600 mb-4">Select a notebook to open the workspace environment.</p>
+                  <Button onClick={createNewNotebook}>Create New Notebook</Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
       </Tabs>
     </div>

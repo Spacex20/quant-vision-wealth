@@ -12,12 +12,6 @@ export interface SignUpData {
   email: string;
   password: string;
   fullName?: string;
-  phone?: string;
-}
-
-export interface PhoneVerification {
-  phoneNumber: string;
-  verificationCode: string;
 }
 
 export interface TwoFactorSetup {
@@ -102,8 +96,7 @@ class AuthService {
       options: {
         emailRedirectTo: redirectUrl,
         data: {
-          full_name: signUpData.fullName,
-          phone_number: signUpData.phone
+          full_name: signUpData.fullName
         }
       }
     });
@@ -140,59 +133,6 @@ class AuthService {
     });
     
     return { data, error };
-  }
-
-  // Phone Verification
-  async sendPhoneVerification(phoneNumber: string) {
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 minutes
-
-    const { data, error } = await supabase
-      .from('phone_verifications')
-      .insert({
-        phone_number: phoneNumber,
-        verification_code: verificationCode,
-        expires_at: expiresAt
-      })
-      .select()
-      .single();
-
-    // In a real app, you'd send SMS here using Twilio or similar
-    console.log(`SMS Verification Code for ${phoneNumber}: ${verificationCode}`);
-    
-    return { data, error };
-  }
-
-  async verifyPhone(phoneNumber: string, code: string) {
-    const { data, error } = await supabase
-      .from('phone_verifications')
-      .select('*')
-      .eq('phone_number', phoneNumber)
-      .eq('verification_code', code)
-      .gt('expires_at', new Date().toISOString())
-      .eq('is_verified', false)
-      .single();
-
-    if (error || !data) {
-      return { data: null, error: error || new Error('Invalid verification code') };
-    }
-
-    // Mark as verified
-    await supabase
-      .from('phone_verifications')
-      .update({ is_verified: true })
-      .eq('id', data.id);
-
-    // Update user profile
-    await supabase
-      .from('profiles')
-      .update({ 
-        phone_number: phoneNumber,
-        is_phone_verified: true 
-      })
-      .eq('id', (await supabase.auth.getUser()).data.user?.id);
-
-    return { data: true, error: null };
   }
 
   // Two-Factor Authentication
