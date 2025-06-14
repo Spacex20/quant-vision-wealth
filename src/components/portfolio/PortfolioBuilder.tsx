@@ -1,3 +1,4 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,23 +15,23 @@ export const PortfolioBuilder = () => {
   const { user, profile, refreshProfile, updateProfile } = useAuth();
   const isLoggedIn = !!user;
 
-  const [portfolioValue, setPortfolioValue] = useState(profile?.portfolio_value || "");
+  // Use local state for portfolio value (not on profile)
+  const [portfolioValue, setPortfolioValue] = useState("");
   const [riskLevel, setRiskLevel] = useState([profile?.risk_tolerance ? parseInt(profile.risk_tolerance) : 5]);
   const [timeHorizon, setTimeHorizon] = useState([profile?.time_horizon ? parseInt(profile.time_horizon) : 10]);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    // Sync local state to profile when profile changes
-    setPortfolioValue(profile?.portfolio_value || "");
+    setPortfolioValue(""); // Always reset portfolio value for demo (not persisted in profile)
     setRiskLevel([profile?.risk_tolerance ? parseInt(profile.risk_tolerance) : 5]);
     setTimeHorizon([profile?.time_horizon ? parseInt(profile.time_horizon) : 10]);
-  }, [profile?.portfolio_value, profile?.risk_tolerance, profile?.time_horizon]);
+  }, [profile?.risk_tolerance, profile?.time_horizon]);
 
   const handleSavePreferences = async () => {
     if (!isLoggedIn) return;
     setSaving(true);
     await updateProfile({
-      portfolio_value: portfolioValue,
+      // Portfolio value is NOT saved to profile as it's not a valid field
       risk_tolerance: riskLevel[0]?.toString(),
       time_horizon: timeHorizon[0]?.toString(),
     });
@@ -67,6 +68,9 @@ export const PortfolioBuilder = () => {
               disabled={!isLoggedIn}
               placeholder="Enter amount (₹ / $)"
             />
+            <span className="text-xs text-muted-foreground">
+              <strong>Note:</strong> This amount is not saved to your profile (demo only)
+            </span>
           </div>
           <div className="flex flex-col gap-2 w-full md:w-auto">
             <Label>Risk</Label>
@@ -143,6 +147,9 @@ export const PortfolioBuilder = () => {
                       className="mt-1"
                       min={0}
                     />
+                    <span className="text-xs text-muted-foreground">
+                      <strong>Note:</strong> This amount is not saved to your profile (demo only)
+                    </span>
                   </div>
 
                   <div>

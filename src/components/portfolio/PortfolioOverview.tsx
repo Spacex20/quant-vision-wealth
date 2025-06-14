@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, DollarSign, PieChart, BarChart3, Activity } from "lucide-react";
@@ -7,13 +8,12 @@ import { MarketIntelligence } from "@/components/market/MarketIntelligence";
 import { useAuth } from "@/hooks/useAuth";
 
 export const PortfolioOverview = () => {
-  const { user, profile } = useAuth();
-  // For Groww-like behavior:
-  // If not logged in, show 0 as portfolioValue; else use user's value.
-  const portfolioValue = user && profile?.portfolio_value
-    ? Number(profile.portfolio_value)
-    : 0;
-  // Keep these static for now, but you could hook into profile as needed.
+  const { user } = useAuth();
+
+  // Without portfolio_value in profile, default value is always 0
+  const portfolioValue = user ? 0 : 0;
+
+  // Static demonstration values
   const dayChange = portfolioValue === 0 ? 0 : 2450.75;
   const dayChangePercent = portfolioValue === 0 ? 0 : 1.98;
   const totalReturn = portfolioValue === 0 ? 0 : 25750.50;
