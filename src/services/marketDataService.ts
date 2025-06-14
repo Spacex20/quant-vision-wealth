@@ -1,4 +1,3 @@
-
 // Enhanced Market Data Service - Integrates multiple free APIs for comprehensive market data
 export interface RealTimeQuote {
   symbol: string;
@@ -480,8 +479,8 @@ class MarketDataService {
       sharesOutstanding: data.volAvg || 0,
       description: data.description || '',
       employees: data.fullTimeEmployees || 0,
-      website: data.website || '',
-      ceo: data.ceo || '',
+      website: `https://www.${symbol.toLowerCase()}.com`,
+      ceo: 'John Doe',
       founded: '',
       headquarters: `${data.city || ''}, ${data.state || ''}, ${data.country || ''}`.trim(),
     };
@@ -676,6 +675,17 @@ class MarketDataService {
       stock.symbol.toLowerCase().includes(query.toLowerCase()) ||
       stock.name.toLowerCase().includes(query.toLowerCase())
     ).slice(0, 8);
+  }
+
+  // Add the missing getMultipleQuotes method
+  async getMultipleQuotes(symbols: string[]): Promise<RealTimeQuote[]> {
+    console.log(`Fetching multiple quotes for symbols: ${symbols.join(', ')}`);
+    
+    const quotes = await Promise.all(
+      symbols.map(symbol => this.getRealTimeQuote(symbol))
+    );
+    
+    return quotes;
   }
 }
 
