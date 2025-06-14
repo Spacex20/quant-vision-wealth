@@ -1,8 +1,8 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScenarioAnalysis } from "./ScenarioAnalysis";
 import { HistoricalAnalysis } from "./HistoricalAnalysis";
 import { PlayCircle, History } from "lucide-react";
+import { StrategyLibrary } from "@/components/strategies/StrategyLibrary";
 
 export const PortfolioSimulator = () => {
   return (
@@ -43,6 +43,11 @@ export const PortfolioSimulator = () => {
           <HistoricalAnalysis />
         </CardContent>
       </Card>
+
+      {/* Strategy Library Section */}
+      <div>
+        <StrategyLibrary />
+      </div>
     </div>
   );
 };
