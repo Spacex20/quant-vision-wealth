@@ -41,49 +41,76 @@ export type Database = {
       }
       profiles: {
         Row: {
+          annual_income_range: string | null
           avatar_url: string | null
           created_at: string | null
           email: string | null
           full_name: string | null
           id: string
+          investment_experience: string | null
+          investment_goals: string[] | null
           is_phone_verified: boolean | null
+          net_worth_range: string | null
+          onboarding_completed: boolean | null
           phone_number: string | null
           preferences: Json | null
+          preferred_sectors: string[] | null
           provider: string | null
           provider_id: string | null
+          risk_tolerance: string | null
+          time_horizon: string | null
           two_factor_enabled: boolean | null
           two_factor_secret: string | null
           updated_at: string | null
+          username: string | null
         }
         Insert: {
+          annual_income_range?: string | null
           avatar_url?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string | null
           id: string
+          investment_experience?: string | null
+          investment_goals?: string[] | null
           is_phone_verified?: boolean | null
+          net_worth_range?: string | null
+          onboarding_completed?: boolean | null
           phone_number?: string | null
           preferences?: Json | null
+          preferred_sectors?: string[] | null
           provider?: string | null
           provider_id?: string | null
+          risk_tolerance?: string | null
+          time_horizon?: string | null
           two_factor_enabled?: boolean | null
           two_factor_secret?: string | null
           updated_at?: string | null
+          username?: string | null
         }
         Update: {
+          annual_income_range?: string | null
           avatar_url?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
+          investment_experience?: string | null
+          investment_goals?: string[] | null
           is_phone_verified?: boolean | null
+          net_worth_range?: string | null
+          onboarding_completed?: boolean | null
           phone_number?: string | null
           preferences?: Json | null
+          preferred_sectors?: string[] | null
           provider?: string | null
           provider_id?: string | null
+          risk_tolerance?: string | null
+          time_horizon?: string | null
           two_factor_enabled?: boolean | null
           two_factor_secret?: string | null
           updated_at?: string | null
+          username?: string | null
         }
         Relationships: []
       }
