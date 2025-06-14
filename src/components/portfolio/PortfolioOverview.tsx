@@ -6,33 +6,57 @@ import { PortfolioChart } from "./PortfolioChart";
 import { MarketOverview } from "@/components/dashboard/MarketOverview";
 import { MarketIntelligence } from "@/components/market/MarketIntelligence";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserPortfolios } from "@/hooks/useUserPortfolios";
 
 export const PortfolioOverview = () => {
   const { user } = useAuth();
+  const isLoggedIn = !!user;
+  const { portfolios, isLoading } = useUserPortfolios();
 
-  // Without portfolio_value in profile, default value is always 0
-  const portfolioValue = user ? 0 : 0;
+  // Demo fallback for guests or if user has no portfolios
+  const demoPortfolio = {
+    name: "Demo Portfolio",
+    total_value: 125000,
+    assets: [
+      { symbol: "AAPL", name: "Apple Inc.", allocation: 40 },
+      { symbol: "MSFT", name: "Microsoft", allocation: 25 },
+      { symbol: "GOOGL", name: "Alphabet", allocation: 15 },
+      { symbol: "AMZN", name: "Amazon", allocation: 10 },
+      { symbol: "TSLA", name: "Tesla", allocation: 10 },
+    ],
+  };
 
-  // Static demonstration values
-  const dayChange = portfolioValue === 0 ? 0 : 2450.75;
-  const dayChangePercent = portfolioValue === 0 ? 0 : 1.98;
-  const totalReturn = portfolioValue === 0 ? 0 : 25750.50;
-  const totalReturnPercent = portfolioValue === 0 ? 0 : 25.75;
+  // Select first portfolio or demo
+  const activePortfolio = isLoggedIn && portfolios.length > 0
+    ? portfolios[0]
+    : demoPortfolio;
 
-  const holdings = [
-    { symbol: "AAPL", name: "Apple Inc.", shares: 50, value: 9125.00, weight: 7.3, change: 2.1 },
-    { symbol: "MSFT", name: "Microsoft", shares: 30, value: 11370.00, weight: 9.0, change: 1.8 },
-    { symbol: "GOOGL", name: "Alphabet", shares: 25, value: 3564.00, weight: 2.8, change: -0.5 },
-    { symbol: "AMZN", name: "Amazon", shares: 15, value: 2040.00, weight: 1.6, change: 3.2 },
-    { symbol: "TSLA", name: "Tesla", shares: 20, value: 4100.00, weight: 3.3, change: -1.2 },
-  ];
+  // Example calculations based on the selected portfolio
+  const portfolioValue = activePortfolio.total_value || 0;
 
-  const assetAllocation = [
-    { category: "US Stocks", percentage: 65, value: 81737.83 },
-    { category: "International", percentage: 20, value: 25150.10 },
-    { category: "Bonds", percentage: 10, value: 12575.05 },
-    { category: "Cash", percentage: 5, value: 6287.52 },
-  ];
+  // Demo stats: Here, you'll want to replace with real analytics later
+  const dayChange = portfolioValue ? +(portfolioValue * 0.010).toFixed(2) : 0;
+  const dayChangePercent = portfolioValue ? 1.0 : 0;
+  const totalReturn = portfolioValue ? +(portfolioValue * 0.20).toFixed(2) : 0;
+  const totalReturnPercent = portfolioValue ? 20.0 : 0;
+
+  // Holdings are just the assets sorted by allocation
+  const holdings = activePortfolio.assets
+    .slice()
+    .sort((a, b) => b.allocation - a.allocation)
+    .map((asset) => ({
+      ...asset,
+      value: +(portfolioValue * asset.allocation / 100).toFixed(2),
+      change: Math.round((Math.random() - 0.4) * 100) / 10, // random short-term move
+      weight: asset.allocation,
+      shares: asset.shares || null,
+    }));
+
+  const assetAllocation = activePortfolio.assets.map((a) => ({
+    category: a.name,
+    percentage: a.allocation,
+    value: +(portfolioValue * a.allocation / 100).toFixed(2),
+  }));
 
   return (
     <div className="space-y-6">

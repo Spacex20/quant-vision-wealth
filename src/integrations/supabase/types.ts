@@ -114,6 +114,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_portfolios: {
+        Row: {
+          assets: Json
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          total_value: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assets?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          total_value?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assets?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          total_value?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_portfolios_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_sessions: {
         Row: {
           created_at: string | null
