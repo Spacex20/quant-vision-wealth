@@ -6,9 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Plus, Trash2, Search, RefreshCw } from "lucide-react";
-import { portfolioManager } from "@/services/portfolioManager";
+import { Plus, Trash2, Search, RefreshCw, Save } from "lucide-react";
 import { marketDataService } from "@/services/marketData";
+import { SavePortfolioDialog } from "./SavePortfolioDialog";
+import { toast } from "sonner";
 
 interface Asset {
   symbol: string;
@@ -36,6 +37,7 @@ export const InteractiveBuilder = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
 
   // Re-initialize when template changes
   useEffect(() => {
@@ -146,14 +148,15 @@ export const InteractiveBuilder = ({
           </div>
 
           {searchResults.length > 0 && (
-            <div className="max-h-40 overflow-y-auto">
+            <div className="max-h-40 overflow-y-auto border rounded-md mt-2">
               {searchResults.map((result) => (
                 <div
                   key={result.symbol}
-                  className="px-2 py-1 hover:bg-secondary cursor-pointer"
+                  className="px-3 py-2 hover:bg-secondary cursor-pointer"
                   onClick={() => handleSelectSearchResult(result)}
                 >
-                  {result.name} ({result.symbol})
+                  <span className="font-medium">{result.symbol}</span>
+                  <span className="text-sm text-muted-foreground ml-2">{result.name}</span>
                 </div>
               ))}
             </div>
@@ -172,7 +175,7 @@ export const InteractiveBuilder = ({
               value={newAsset.allocation}
               onChange={(e) => setNewAsset({ ...newAsset, allocation: parseFloat(e.target.value) })}
             />
-            <Button onClick={handleAddAsset} disabled={balanceError}>
+            <Button onClick={handleAddAsset}>
               <Plus className="h-4 w-4 mr-2" />
               Add Asset
             </Button>
@@ -188,21 +191,21 @@ export const InteractiveBuilder = ({
 
           <div className="space-y-2">
             {assets.map((asset) => (
-              <div key={asset.symbol} className="flex items-center justify-between">
+              <div key={asset.symbol} className="flex items-center justify-between p-2 border rounded-md">
                 <div>
-                  {asset.name} ({asset.symbol})
-                  <Badge className="ml-2">{asset.price.toFixed(2)}</Badge>
+                  <span className="font-semibold">{asset.name} ({asset.symbol})</span>
+                  <Badge variant="outline" className="ml-2">Price: ${asset.price.toFixed(2)}</Badge>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <Label className="w-16 text-right">{asset.allocation}%</Label>
+                  <Label className="w-16 text-right font-mono">{asset.allocation}%</Label>
                   <Slider
-                    defaultValue={[asset.allocation]}
+                    value={[asset.allocation]}
                     max={100}
                     step={1}
                     onValueChange={(value) => handleAllocationChange(asset.symbol, value[0])}
-                    className="w-32"
+                    className="w-48"
                   />
-                  <Button variant="ghost" size="sm" onClick={() => handleRemoveAsset(asset.symbol)}>
+                  <Button variant="ghost" size="icon" onClick={() => handleRemoveAsset(asset.symbol)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -217,8 +220,25 @@ export const InteractiveBuilder = ({
               </AlertDescription>
             </Alert>
           )}
+
+          <div className="flex justify-end pt-4">
+            <Button onClick={() => setIsSaveDialogOpen(true)} disabled={balanceError || assets.length === 0}>
+                <Save className="h-4 w-4 mr-2" />
+                Save Portfolio
+            </Button>
+          </div>
         </CardContent>
       </Card>
+      <SavePortfolioDialog
+        open={isSaveDialogOpen}
+        onOpenChange={setIsSaveDialogOpen}
+        assets={assets}
+        totalValue={initialValue}
+        onSave={() => {
+            toast.success("Portfolio saved successfully!");
+            setIsSaveDialogOpen(false);
+        }}
+      />
     </div>
   );
 };

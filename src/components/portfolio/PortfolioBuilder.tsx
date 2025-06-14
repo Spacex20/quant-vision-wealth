@@ -10,8 +10,18 @@ import { Calculator, Zap } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { portfolioManager } from "@/services/portfolioManager";
+import { portfolioOptimization, OptimizationResult, OptimizationConstraints } from "@/services/portfolioOptimization";
+import { toast } from "sonner";
 
 const TEMPLATES = portfolioManager.getDefaultPortfolios();
+const ASSETS_FOR_OPTIMIZATION = [
+    { symbol: 'VTI', name: 'Vanguard Total Stock Market ETF', allocation: 20, expectedReturn: 0.10, volatility: 0.18 },
+    { symbol: 'QQQ', name: 'Invesco QQQ Trust', allocation: 20, expectedReturn: 0.18, volatility: 0.28 },
+    { symbol: 'VEA', name: 'Vanguard FTSE Developed Markets ETF', allocation: 20, expectedReturn: 0.07, volatility: 0.15 },
+    { symbol: 'VWO', name: 'Vanguard FTSE Emerging Markets ETF', allocation: 20, expectedReturn: 0.09, volatility: 0.22 },
+    { symbol: 'BND', name: 'Vanguard Total Bond Market ETF', allocation: 20, expectedReturn: 0.03, volatility: 0.05 },
+];
+
 
 export const PortfolioBuilder = () => {
   const { user, profile, refreshProfile, updateProfile } = useAuth();
@@ -27,6 +37,8 @@ export const PortfolioBuilder = () => {
     profile?.time_horizon ? parseInt(profile.time_horizon) : 10
   ]);
   const [saving, setSaving] = useState(false);
+  const [optimizing, setOptimizing] = useState(false);
+  const [optimizedPortfolio, setOptimizedPortfolio] = useState<OptimizationResult | null>(null);
 
   // Set initial state to match selected template on mount or when template is changed
   useEffect(() => {
@@ -50,6 +62,29 @@ export const PortfolioBuilder = () => {
     });
     await refreshProfile();
     setSaving(false);
+  };
+
+  const handleGeneratePortfolio = () => {
+    setOptimizing(true);
+    // Map risk level (1-10) to max risk (e.g., 8% - 25% volatility)
+    const maxRisk = 0.08 + (riskLevel[0] / 10) * 0.17;
+    
+    const constraints: OptimizationConstraints = {
+      minAllocation: 0,
+      maxAllocation: 50, // Max 50% in any single asset
+      maxAssets: 10,
+      maxRisk: maxRisk,
+    };
+  
+    // Simulate async optimization
+    setTimeout(() => {
+      const result = portfolioOptimization.optimizePortfolio(ASSETS_FOR_OPTIMIZATION, constraints);
+      setOptimizedPortfolio(result);
+      setOptimizing(false);
+      toast.success("Portfolio Optimized!", {
+        description: "AI-Recommended allocation has been updated based on your risk profile.",
+      });
+    }, 500);
   };
 
   return (
@@ -187,7 +222,7 @@ export const PortfolioBuilder = () => {
                 changePercent: 0
               })) || []
             }
-            initialValue={
+            initialValue={Number(portfolioValue) || 
               TEMPLATES.find(t => t.id === selectedTemplateId)?.totalValue || 0
             }
           />
@@ -256,9 +291,9 @@ export const PortfolioBuilder = () => {
                     </div>
                   </div>
 
-                  <Button className="w-full">
+                  <Button className="w-full" onClick={handleGeneratePortfolio} disabled={optimizing}>
                     <Zap className="h-4 w-4 mr-2" />
-                    Generate Optimal Portfolio
+                    {optimizing ? 'Optimizing...' : 'Generate Optimal Portfolio'}
                   </Button>
                 </CardContent>
               </Card>
@@ -272,15 +307,21 @@ export const PortfolioBuilder = () => {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <span className="text-sm">Expected Return</span>
-                      <Badge variant="outline">8.2% annually</Badge>
+                      <Badge variant="outline">
+                        {((optimizedPortfolio?.expectedReturn || 0.082) * 100).toFixed(1)}% annually
+                      </Badge>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm">Expected Volatility</span>
-                      <Badge variant="outline">12.4% annually</Badge>
+                      <Badge variant="outline">
+                         {((optimizedPortfolio?.expectedRisk || 0.124) * 100).toFixed(1)}% annually
+                      </Badge>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm">Sharpe Ratio</span>
-                      <Badge variant="outline">1.42</Badge>
+                      <Badge variant="outline">
+                        {(optimizedPortfolio?.sharpeRatio || 1.42).toFixed(2)}
+                      </Badge>
                     </div>
                   </div>
                 </CardContent>
@@ -294,21 +335,21 @@ export const PortfolioBuilder = () => {
                   <CardDescription>Optimized for your risk profile</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    {[
-                      { asset: "US Large Cap", allocation: 35, amount: 35000 },
-                      { asset: "International Developed", allocation: 20, amount: 20000 },
-                      { asset: "Emerging Markets", allocation: 10, amount: 10000 },
-                      { asset: "Bonds", allocation: 25, amount: 25000 },
-                      { asset: "REITs", allocation: 7, amount: 7000 },
-                      { asset: "Commodities", allocation: 3, amount: 3000 },
-                    ].map((item) => (
-                      <div key={item.asset} className="flex items-center justify-between p-3 border rounded">
+                   <div className="space-y-4">
+                    {(optimizedPortfolio?.assets || [
+                      { asset: "US Large Cap", name: "US Large Cap", symbol: 'LC', allocation: 35, amount: 35000 },
+                      { asset: "International Developed", name: 'International Developed', symbol: 'ID', allocation: 20, amount: 20000 },
+                      { asset: "Emerging Markets", name: 'Emerging Markets', symbol: 'EM', allocation: 10, amount: 10000 },
+                      { asset: "Bonds", name: 'Bonds', symbol: 'BND', allocation: 25, amount: 25000 },
+                      { asset: "REITs", name: 'REITs', symbol: 'REIT', allocation: 7, amount: 7000 },
+                      { asset: "Commodities", name: 'Commodities', symbol: 'CMD', allocation: 3, amount: 3000 },
+                    ]).map((item) => (
+                      <div key={item.symbol} className="flex items-center justify-between p-3 border rounded">
                         <div>
-                          <span className="font-medium">{item.asset}</span>
-                          <div className="text-sm text-muted-foreground">${item.amount.toLocaleString()}</div>
+                          <span className="font-medium">{item.name}</span>
+                          <div className="text-sm text-muted-foreground">${((item.allocation / 100) * Number(portfolioValue)).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
                         </div>
-                        <Badge>{item.allocation}%</Badge>
+                        <Badge>{item.allocation.toFixed(1)}%</Badge>
                       </div>
                     ))}
                   </div>
