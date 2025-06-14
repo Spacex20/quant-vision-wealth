@@ -19,14 +19,28 @@ interface Asset {
   changePercent: number;
 }
 
-export const InteractiveBuilder = () => {
-  const [assets, setAssets] = useState<Asset[]>([]);
+interface InteractiveBuilderProps {
+  initialAssets?: Asset[];
+  initialValue?: number;
+}
+
+export const InteractiveBuilder = ({
+  initialAssets = [],
+  initialValue = 0
+}: InteractiveBuilderProps) => {
+  // Initialize assets from template/props
+  const [assets, setAssets] = useState<Asset[]>(initialAssets);
   const [newAsset, setNewAsset] = useState({ symbol: '', allocation: 5 });
   const [totalAllocation, setTotalAllocation] = useState(0);
   const [balanceError, setBalanceError] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  // Re-initialize when template changes
+  useEffect(() => {
+    setAssets(initialAssets);
+  }, [JSON.stringify(initialAssets)]);
 
   useEffect(() => {
     const sum = assets.reduce((acc, asset) => acc + asset.allocation, 0);
@@ -100,12 +114,16 @@ export const InteractiveBuilder = () => {
     setSearchResults([]);
   };
 
+  // Save or clone functionality can be added here for real use
+
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Build Your Portfolio</CardTitle>
-          <CardDescription>Allocate percentages to different assets</CardDescription>
+          <CardDescription>
+            Allocate percentages to different assets. Start with a template, then tweak as you wish!
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center space-x-2">

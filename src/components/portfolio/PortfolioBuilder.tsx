@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,19 +9,34 @@ import { InteractiveBuilder } from "./InteractiveBuilder";
 import { Calculator, Zap } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { portfolioManager } from "@/services/portfolioManager";
+
+const TEMPLATES = portfolioManager.getDefaultPortfolios();
 
 export const PortfolioBuilder = () => {
   const { user, profile, refreshProfile, updateProfile } = useAuth();
   const isLoggedIn = !!user;
 
-  // Use local state for portfolio value (not on profile)
-  const [portfolioValue, setPortfolioValue] = useState("");
-  const [riskLevel, setRiskLevel] = useState([profile?.risk_tolerance ? parseInt(profile.risk_tolerance) : 5]);
-  const [timeHorizon, setTimeHorizon] = useState([profile?.time_horizon ? parseInt(profile.time_horizon) : 10]);
+  // Selected template for starting configuration
+  const [selectedTemplateId, setSelectedTemplateId] = useState(TEMPLATES[0]?.id || "");
+  const [portfolioValue, setPortfolioValue] = useState(TEMPLATES[0].totalValue.toString());
+  const [riskLevel, setRiskLevel] = useState([
+    profile?.risk_tolerance ? parseInt(profile.risk_tolerance) : 5
+  ]);
+  const [timeHorizon, setTimeHorizon] = useState([
+    profile?.time_horizon ? parseInt(profile.time_horizon) : 10
+  ]);
   const [saving, setSaving] = useState(false);
 
+  // Set initial state to match selected template on mount or when template is changed
   useEffect(() => {
-    setPortfolioValue(""); // Always reset portfolio value for demo (not persisted in profile)
+    const template = TEMPLATES.find(t => t.id === selectedTemplateId);
+    if (template) {
+      setPortfolioValue(template.totalValue.toString());
+    }
+  }, [selectedTemplateId]);
+
+  useEffect(() => {
     setRiskLevel([profile?.risk_tolerance ? parseInt(profile.risk_tolerance) : 5]);
     setTimeHorizon([profile?.time_horizon ? parseInt(profile.time_horizon) : 10]);
   }, [profile?.risk_tolerance, profile?.time_horizon]);
@@ -31,7 +45,6 @@ export const PortfolioBuilder = () => {
     if (!isLoggedIn) return;
     setSaving(true);
     await updateProfile({
-      // Portfolio value is NOT saved to profile as it's not a valid field
       risk_tolerance: riskLevel[0]?.toString(),
       time_horizon: timeHorizon[0]?.toString(),
     });
@@ -46,8 +59,9 @@ export const PortfolioBuilder = () => {
         <p className="text-muted-foreground text-center">
           {isLoggedIn
             ? "Personalize your portfolio with your own investment amount and preferences, just like Groww!"
-            : "Sign in to personalize your portfolio. Default values are shown below."}
+            : "Sign in to personalize your portfolio or start with one of our optimized templates below."}
         </p>
+        {/* Template selection UI */}
         <form
           onSubmit={e => {
             e.preventDefault();
@@ -55,6 +69,21 @@ export const PortfolioBuilder = () => {
           }}
           className="w-full flex flex-col md:flex-row gap-4 items-center justify-between"
         >
+          <div className="flex flex-col gap-2 w-full md:w-auto">
+            <Label htmlFor="template-select">Start from a template</Label>
+            <select
+              id="template-select"
+              className="rounded-md border px-3 py-2 font-semibold"
+              value={selectedTemplateId}
+              onChange={e => setSelectedTemplateId(e.target.value)}
+            >
+              {TEMPLATES.map(template => (
+                <option value={template.id} key={template.id}>
+                  {template.name}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="flex flex-col gap-2 w-full md:w-auto">
             <Label htmlFor="portfolio-value">Portfolio Value</Label>
             <Input
@@ -65,7 +94,6 @@ export const PortfolioBuilder = () => {
               className="rounded-md border px-3 py-2 text-lg font-semibold"
               value={portfolioValue}
               onChange={e => setPortfolioValue(e.target.value)}
-              disabled={!isLoggedIn}
               placeholder="Enter amount (₹ / $)"
             />
             <span className="text-xs text-muted-foreground">
@@ -108,6 +136,31 @@ export const PortfolioBuilder = () => {
             </Button>
           )}
         </form>
+        {/* Template Details below selector */}
+        <div className="w-full mt-2">
+          {(() => {
+            const tpl = TEMPLATES.find(t => t.id === selectedTemplateId);
+            if (!tpl) return null;
+            return (
+              <Card className="mt-3 shadow-sm border-2 border-indigo-100">
+                <CardHeader>
+                  <CardTitle>{tpl.name}</CardTitle>
+                  <CardDescription>{tpl.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {tpl.assets.map(asset => (
+                      <div key={asset.symbol} className="flex justify-between text-sm">
+                        <span className="font-medium">{asset.name} ({asset.symbol})</span>
+                        <Badge>{asset.allocation}%</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })()}
+        </div>
       </div>
 
       <Tabs defaultValue="interactive" className="w-full">
@@ -122,7 +175,22 @@ export const PortfolioBuilder = () => {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="interactive" className="space-y-6">
-          <InteractiveBuilder />
+          {/* Pass template to InteractiveBuilder for editable starting point */}
+          <InteractiveBuilder
+            initialAssets={
+              TEMPLATES.find(t => t.id === selectedTemplateId)?.assets.map(a => ({
+                symbol: a.symbol,
+                name: a.name,
+                allocation: a.allocation,
+                price: 0,
+                change: 0,
+                changePercent: 0
+              })) || []
+            }
+            initialValue={
+              TEMPLATES.find(t => t.id === selectedTemplateId)?.totalValue || 0
+            }
+          />
         </TabsContent>
         <TabsContent value="classic" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

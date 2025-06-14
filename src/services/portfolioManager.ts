@@ -1,4 +1,3 @@
-
 export interface Portfolio {
   id: string;
   name: string;
@@ -195,15 +194,17 @@ class PortfolioManager {
   }
 
   private getDefaultPortfolios(): Portfolio[] {
+    // Improved default portfolios for new users
     return [
       {
-        id: 'default-1',
-        name: 'Conservative Growth',
-        description: 'Low-risk balanced portfolio for steady growth',
+        id: 'default-balanced',
+        name: 'Balanced Growth',
+        description: 'A diversified portfolio of US stocks, international equities, and bonds for steady growth and risk reduction.',
         assets: [
-          { symbol: 'VTI', name: 'Vanguard Total Stock Market', allocation: 40 },
-          { symbol: 'BND', name: 'Vanguard Total Bond Market', allocation: 50 },
-          { symbol: 'VEA', name: 'Vanguard FTSE Developed Markets', allocation: 10 }
+          { symbol: 'VTI', name: 'Vanguard Total Stock Market ETF', allocation: 35 },
+          { symbol: 'VEA', name: 'Vanguard FTSE Developed Markets ETF', allocation: 15 },
+          { symbol: 'VWO', name: 'Vanguard FTSE Emerging Markets ETF', allocation: 10 },
+          { symbol: 'BND', name: 'Vanguard Total Bond Market ETF', allocation: 40 }
         ],
         totalValue: 50000,
         createdAt: '2024-01-01T00:00:00Z',
@@ -211,16 +212,33 @@ class PortfolioManager {
         isDefault: true
       },
       {
-        id: 'default-2',
-        name: 'Aggressive Growth',
-        description: 'High-growth portfolio for long-term investors',
+        id: 'default-growth',
+        name: 'Global Growth',
+        description: 'For higher returns: Tech, international, and factor tilts, suited for long time horizons.',
         assets: [
-          { symbol: 'QQQ', name: 'Invesco QQQ Trust', allocation: 40 },
-          { symbol: 'VTI', name: 'Vanguard Total Stock Market', allocation: 30 },
-          { symbol: 'VWO', name: 'Vanguard Emerging Markets', allocation: 20 },
-          { symbol: 'VEA', name: 'Vanguard FTSE Developed Markets', allocation: 10 }
+          { symbol: 'QQQ', name: 'Invesco NASDAQ 100 ETF', allocation: 35 },
+          { symbol: 'VTI', name: 'Vanguard Total Stock Market ETF', allocation: 20 },
+          { symbol: 'EFA', name: 'iShares MSCI EAFE ETF', allocation: 15 },
+          { symbol: 'IEMG', name: 'iShares Core MSCI Emerging Markets ETF', allocation: 10 },
+          { symbol: 'BND', name: 'Vanguard Total Bond Market ETF', allocation: 15 },
+          { symbol: 'VNQ', name: 'Vanguard Real Estate ETF', allocation: 5 }
         ],
-        totalValue: 75000,
+        totalValue: 80000,
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
+        isDefault: true
+      },
+      {
+        id: 'default-income',
+        name: 'Income Focus',
+        description: 'Strong on dividends, with bonds and real estate for income stability.',
+        assets: [
+          { symbol: 'SCHD', name: 'Schwab US Dividend Equity ETF', allocation: 30 },
+          { symbol: 'BND', name: 'Vanguard Total Bond Market ETF', allocation: 40 },
+          { symbol: 'VYM', name: 'Vanguard High Dividend Yield ETF', allocation: 15 },
+          { symbol: 'VNQ', name: 'Vanguard Real Estate ETF', allocation: 15 }
+        ],
+        totalValue: 60000,
         createdAt: '2024-01-01T00:00:00Z',
         updatedAt: '2024-01-01T00:00:00Z',
         isDefault: true
