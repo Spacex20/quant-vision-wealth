@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Play, Plus, Code, BarChart3, TrendingUp, Users, Settings, BookOpen, Calculator } from 'lucide-react';
+import { Play, Plus, Code, BarChart3, TrendingUp, Users, Settings, BookOpen, Calculator, Target } from 'lucide-react';
 import { quantLabService, ResearchNotebook, TradingStrategy, PaperTradingAccount } from '@/services/quantLabService';
 import { QuantLabWorkspace } from './QuantLabWorkspace';
 import { CAPMWorkspace } from './CAPMWorkspace';
+import { MPTWorkspace } from './MPTWorkspace';
 
 const QuantLab = () => {
   const [notebooks, setNotebooks] = useState<ResearchNotebook[]>([]);
@@ -134,6 +135,10 @@ const QuantLab = () => {
           <TabsTrigger value="capm" className="flex items-center gap-2">
             <Calculator className="w-4 h-4" />
             CAPM Tools
+          </TabsTrigger>
+          <TabsTrigger value="mpt" className="flex items-center gap-2">
+            <Target className="w-4 h-4" />
+            MPT Tools
           </TabsTrigger>
           <TabsTrigger value="workspace" className="flex items-center gap-2">
             <Settings className="w-4 h-4" />
@@ -336,6 +341,11 @@ const QuantLab = () => {
         {/* CAPM Tools Tab */}
         <TabsContent value="capm" className="space-y-4">
           <CAPMWorkspace />
+        </TabsContent>
+
+        {/* MPT Tools Tab */}
+        <TabsContent value="mpt" className="space-y-4">
+          <MPTWorkspace />
         </TabsContent>
 
         {/* Workspace Tab */}
