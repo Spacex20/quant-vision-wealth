@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session, AuthError } from '@supabase/supabase-js';
 
