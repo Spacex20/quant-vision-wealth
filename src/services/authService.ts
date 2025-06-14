@@ -41,6 +41,28 @@ class AuthService {
     const { error } = await supabase.auth.signOut();
     return { error };
   }
+
+  async enableTwoFactor() {
+    // Mock implementation for two-factor setup
+    // In a real implementation, this would integrate with Supabase's MFA features
+    const mockData = {
+      qrCode: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+      secret: "MOCK2FA3SECRET4CODE5",
+      backupCodes: ["123456", "234567", "345678", "456789", "567890", "678901", "789012", "890123"]
+    };
+    
+    return { data: mockData, error: null };
+  }
+
+  async verifyTwoFactor(code: string, challengeId: string) {
+    // Mock implementation for two-factor verification
+    // In a real implementation, this would verify the TOTP code with Supabase
+    if (code === "123456") {
+      return { error: null };
+    } else {
+      return { error: { message: "Invalid verification code" } };
+    }
+  }
 }
 
 export const authService = new AuthService();
