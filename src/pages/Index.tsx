@@ -1,7 +1,9 @@
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PortfolioOverview } from "@/components/portfolio/PortfolioOverview";
 import { PortfolioBuilder } from "@/components/portfolio/PortfolioBuilder";
+import { PortfolioManager } from "@/components/portfolio/PortfolioManager";
 import { ValueInvestingTools } from "@/components/investing/ValueInvestingTools";
 import { PortfolioSimulator } from "@/components/simulation/PortfolioSimulator";
 import { EducationHub } from "@/components/education/EducationHub";
@@ -24,9 +26,10 @@ const Index = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6 mb-8">
+          <TabsList className="grid w-full grid-cols-7 mb-8">
             <TabsTrigger value="overview">Portfolio Overview</TabsTrigger>
             <TabsTrigger value="builder">Smart Builder</TabsTrigger>
+            <TabsTrigger value="manager">Portfolio Manager</TabsTrigger>
             <TabsTrigger value="analytics">Advanced Analytics</TabsTrigger>
             <TabsTrigger value="value-tools">Value Investing</TabsTrigger>
             <TabsTrigger value="simulator">Simulation Lab</TabsTrigger>
@@ -39,6 +42,10 @@ const Index = () => {
 
           <TabsContent value="builder" className="space-y-6">
             <PortfolioBuilder />
+          </TabsContent>
+
+          <TabsContent value="manager" className="space-y-6">
+            <PortfolioManager />
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">
