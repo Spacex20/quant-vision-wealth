@@ -3,14 +3,17 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
-import { TrendingUp, TrendingDown, BarChart3, Target, AlertTriangle } from "lucide-react";
+import { BarChart3, AlertTriangle } from "lucide-react";
 import { portfolioManager, Portfolio, PortfolioComparison as ComparisonType } from "@/services/portfolioManager";
+import { useUserPortfolios } from "@/hooks/useUserPortfolios";
+import { LoadingSpinner } from "../common/LoadingSpinner";
+import { useAuth } from "@/hooks/useAuth";
 
 export const PortfolioComparison = () => {
-  const portfolios = portfolioManager.getAllPortfolios();
+  const { user } = useAuth();
+  const { portfolios, isLoading, error } = useUserPortfolios();
   const [selectedPortfolios, setSelectedPortfolios] = useState<string[]>([]);
   const [comparison, setComparison] = useState<ComparisonType | null>(null);
 
@@ -88,51 +91,58 @@ export const PortfolioComparison = () => {
           <CardDescription>Choose 2-4 portfolios for detailed comparison</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-            {portfolios.map((portfolio) => (
-              <div
-                key={portfolio.id}
-                className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                  selectedPortfolios.includes(portfolio.id)
-                    ? 'border-primary bg-primary/5'
-                    : 'hover:border-muted-foreground'
-                }`}
-                onClick={() => handlePortfolioSelection(portfolio.id)}
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-medium">{portfolio.name}</h4>
-                  {selectedPortfolios.includes(portfolio.id) && (
-                    <Badge>Selected</Badge>
-                  )}
-                </div>
-                <p className="text-sm text-muted-foreground mb-2">
-                  {portfolio.description || "No description"}
-                </p>
-                <div className="flex justify-between text-sm">
-                  <span>Value: ${portfolio.totalValue.toLocaleString()}</span>
-                  <span>Assets: {portfolio.assets.length}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {selectedPortfolios.length > 4 && (
-            <Alert>
+          {isLoading && <LoadingSpinner />}
+          {error && <Alert variant="destructive"><AlertDescription>Error loading portfolios: {error.message}</AlertDescription></Alert>}
+          {!isLoading && !error && !user && <Alert><AlertDescription>Please log in to compare your portfolios.</AlertDescription></Alert>}
+          {!isLoading && !error && user && portfolios.length < 2 && (
+             <Alert>
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                Maximum of 4 portfolios can be compared at once.
+                You need at least 2 portfolios to perform comparisons. Create more portfolios to use this feature.
               </AlertDescription>
             </Alert>
           )}
 
-          <Button
-            onClick={handleCompare}
-            disabled={selectedPortfolios.length < 2}
-            className="w-full"
-          >
-            <BarChart3 className="h-4 w-4 mr-2" />
-            Compare Portfolios ({selectedPortfolios.length})
-          </Button>
+          {user && portfolios.length >= 2 && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                {portfolios.map((portfolio) => (
+                  <div
+                    key={portfolio.id}
+                    className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                      selectedPortfolios.includes(portfolio.id)
+                        ? 'border-primary bg-primary/5'
+                        : 'hover:border-muted-foreground'
+                    }`}
+                    onClick={() => handlePortfolioSelection(portfolio.id)}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-medium">{portfolio.name}</h4>
+                      {selectedPortfolios.includes(portfolio.id) && (
+                        <Badge>Selected</Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {portfolio.description || "No description"}
+                    </p>
+                    <div className="flex justify-between text-sm">
+                      <span>Value: ${portfolio.total_value.toLocaleString()}</span>
+                      <span>Assets: {portfolio.assets.length}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Button
+                onClick={handleCompare}
+                disabled={selectedPortfolios.length < 2}
+                className="w-full"
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Compare Portfolios ({selectedPortfolios.length})
+              </Button>
+            </>
+          )}
         </CardContent>
       </Card>
 
@@ -296,15 +306,5 @@ export const PortfolioComparison = () => {
           </Card>
         </div>
       )}
-
-      {portfolios.length < 2 && (
-        <Alert>
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>
-            You need at least 2 portfolios to perform comparisons. Create more portfolios to use this feature.
-          </AlertDescription>
-        </Alert>
-      )}
     </div>
   );
-};
