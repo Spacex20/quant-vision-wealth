@@ -1,3 +1,4 @@
+
 // Microservices Orchestrator - Coordinates all platform services
 import { portfolioService } from './portfolioService';
 import { marketDataService } from './marketDataService';
@@ -196,6 +197,8 @@ class MicroservicesOrchestrator {
   }
 
   private setupDefaultWorkflows(): void {
+    const now = new Date().toISOString();
+    
     // Portfolio rebalancing workflow
     this.workflows.set('portfolio-rebalancing', {
       id: 'portfolio-rebalancing',
@@ -223,7 +226,9 @@ class MicroservicesOrchestrator {
           condition: 'drift_detected'
         }
       ],
-      isActive: true
+      isActive: true,
+      createdAt: now,
+      updatedAt: now
     });
 
     // Market data update workflow
@@ -249,7 +254,9 @@ class MicroservicesOrchestrator {
           timeout: 60000
         }
       ],
-      isActive: false
+      isActive: false,
+      createdAt: now,
+      updatedAt: now
     });
 
     // News aggregation workflow
@@ -282,7 +289,9 @@ class MicroservicesOrchestrator {
           timeout: 30000
         }
       ],
-      isActive: false
+      isActive: false,
+      createdAt: now,
+      updatedAt: now
     });
   }
 

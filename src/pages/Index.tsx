@@ -11,6 +11,7 @@ import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { PortfolioAnalytics } from "@/components/analytics/PortfolioAnalytics";
 import { MarketIntelligence } from "@/components/market/MarketIntelligence";
 import { StockScreener } from "@/components/research/StockScreener";
+import QuantLab from "@/components/research/QuantLab";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 
 const Index = () => {
@@ -31,13 +32,14 @@ const Index = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 mb-8">
+          <TabsList className="grid w-full grid-cols-5 lg:grid-cols-9 mb-8">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="builder">Builder</TabsTrigger>
             <TabsTrigger value="manager">Manager</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="market">Market Data</TabsTrigger>
             <TabsTrigger value="screener">Screener</TabsTrigger>
+            <TabsTrigger value="quantlab">Quant Lab</TabsTrigger>
             <TabsTrigger value="simulator">Simulator</TabsTrigger>
             <TabsTrigger value="education">Education</TabsTrigger>
           </TabsList>
@@ -75,6 +77,12 @@ const Index = () => {
           <TabsContent value="screener" className="space-y-6">
             <ErrorBoundary>
               <StockScreener />
+            </ErrorBoundary>
+          </TabsContent>
+
+          <TabsContent value="quantlab" className="space-y-6">
+            <ErrorBoundary>
+              <QuantLab />
             </ErrorBoundary>
           </TabsContent>
 
