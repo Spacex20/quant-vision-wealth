@@ -1,240 +1,267 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Trash2, Copy, Edit, Plus, Star } from "lucide-react";
-import { Portfolio, portfolioManager } from "@/services/portfolioManager";
-import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Plus, Edit, Trash2, Copy, TrendingUp, TrendingDown, DollarSign, Calendar } from "lucide-react";
+import { portfolioManager, Portfolio } from "@/services/portfolioManager";
 
-interface PortfolioListProps {
-  onSelectPortfolio?: (portfolio: Portfolio) => void;
-  selectedPortfolioId?: string;
-}
-
-export const PortfolioList = ({ onSelectPortfolio, selectedPortfolioId }: PortfolioListProps) => {
-  const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
+export const PortfolioList = () => {
+  const [portfolios, setPortfolios] = useState<Portfolio[]>(portfolioManager.getAllPortfolios());
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [newPortfolioName, setNewPortfolioName] = useState("");
-  const [newPortfolioDescription, setNewPortfolioDescription] = useState("");
-  const { toast } = useToast();
-
-  useEffect(() => {
-    loadPortfolios();
-  }, []);
-
-  const loadPortfolios = () => {
-    const allPortfolios = portfolioManager.getAllPortfolios();
-    setPortfolios(allPortfolios);
-  };
+  const [editingPortfolio, setEditingPortfolio] = useState<Portfolio | null>(null);
+  const [newPortfolio, setNewPortfolio] = useState({
+    name: "",
+    description: "",
+    totalValue: 10000
+  });
 
   const handleCreatePortfolio = () => {
-    if (!newPortfolioName.trim()) {
-      toast({
-        title: "Error",
-        description: "Portfolio name is required",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const newPortfolio = portfolioManager.savePortfolio({
-      name: newPortfolioName,
-      description: newPortfolioDescription,
-      assets: [],
-      totalValue: 0
-    });
-
-    setPortfolios(prev => [...prev, newPortfolio]);
-    setNewPortfolioName("");
-    setNewPortfolioDescription("");
-    setIsCreateDialogOpen(false);
+    if (!newPortfolio.name.trim()) return;
     
-    toast({
-      title: "Success",
-      description: "Portfolio created successfully"
+    const created = portfolioManager.savePortfolio({
+      name: newPortfolio.name,
+      description: newPortfolio.description,
+      assets: [],
+      totalValue: newPortfolio.totalValue
     });
+    
+    setPortfolios(portfolioManager.getAllPortfolios());
+    setNewPortfolio({ name: "", description: "", totalValue: 10000 });
+    setIsCreateDialogOpen(false);
   };
 
   const handleDeletePortfolio = (id: string) => {
-    if (portfolioManager.deletePortfolio(id)) {
-      setPortfolios(prev => prev.filter(p => p.id !== id));
-      toast({
-        title: "Success",
-        description: "Portfolio deleted successfully"
-      });
-    }
+    portfolioManager.deletePortfolio(id);
+    setPortfolios(portfolioManager.getAllPortfolios());
   };
 
-  const handleClonePortfolio = (portfolio: Portfolio) => {
-    const cloned = portfolioManager.clonePortfolio(portfolio.id, `${portfolio.name} (Copy)`);
-    if (cloned) {
-      setPortfolios(prev => [...prev, cloned]);
-      toast({
-        title: "Success",
-        description: "Portfolio cloned successfully"
-      });
-    }
+  const handleClonePortfolio = (id: string, name: string) => {
+    portfolioManager.clonePortfolio(id, `${name} (Copy)`);
+    setPortfolios(portfolioManager.getAllPortfolios());
   };
 
-  const formatValue = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(value);
+  const handleUpdatePortfolio = () => {
+    if (!editingPortfolio) return;
+    
+    portfolioManager.updatePortfolio(editingPortfolio.id, {
+      name: editingPortfolio.name,
+      description: editingPortfolio.description
+    });
+    
+    setPortfolios(portfolioManager.getAllPortfolios());
+    setEditingPortfolio(null);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  const calculatePerformance = (portfolio: Portfolio) => {
+    const change = (Math.random() - 0.5) * 10;
+    return {
+      change,
+      changePercent: (change / portfolio.totalValue) * 100
+    };
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h3 className="text-lg font-semibold">My Portfolios</h3>
-          <p className="text-sm text-muted-foreground">Manage and compare your investment portfolios</p>
+          <h3 className="text-2xl font-bold">My Portfolios</h3>
+          <p className="text-muted-foreground">Manage and analyze your investment portfolios</p>
         </div>
         
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="h-4 w-4 mr-2" />
-              New Portfolio
+              Create Portfolio
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Create New Portfolio</DialogTitle>
               <DialogDescription>
-                Create a new portfolio to start building your investment strategy.
+                Set up a new portfolio to track your investments
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="portfolio-name">Portfolio Name</Label>
+                <label className="text-sm font-medium">Portfolio Name</label>
                 <Input
-                  id="portfolio-name"
-                  value={newPortfolioName}
-                  onChange={(e) => setNewPortfolioName(e.target.value)}
+                  value={newPortfolio.name}
+                  onChange={(e) => setNewPortfolio({ ...newPortfolio, name: e.target.value })}
                   placeholder="e.g., Growth Portfolio"
                 />
               </div>
               <div>
-                <Label htmlFor="portfolio-description">Description (Optional)</Label>
+                <label className="text-sm font-medium">Description</label>
                 <Textarea
-                  id="portfolio-description"
-                  value={newPortfolioDescription}
-                  onChange={(e) => setNewPortfolioDescription(e.target.value)}
-                  placeholder="Describe your investment strategy..."
+                  value={newPortfolio.description}
+                  onChange={(e) => setNewPortfolio({ ...newPortfolio, description: e.target.value })}
+                  placeholder="Portfolio strategy and goals..."
                 />
               </div>
-              <div className="flex space-x-2 pt-4">
-                <Button onClick={handleCreatePortfolio} className="flex-1">Create Portfolio</Button>
-                <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Cancel</Button>
+              <div>
+                <label className="text-sm font-medium">Initial Value ($)</label>
+                <Input
+                  type="number"
+                  value={newPortfolio.totalValue}
+                  onChange={(e) => setNewPortfolio({ ...newPortfolio, totalValue: parseFloat(e.target.value) || 0 })}
+                />
               </div>
+              <Button onClick={handleCreatePortfolio} className="w-full">
+                Create Portfolio
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {portfolios.map((portfolio) => (
-          <Card 
-            key={portfolio.id}
-            className={`cursor-pointer transition-all hover:shadow-md ${
-              selectedPortfolioId === portfolio.id ? 'ring-2 ring-primary' : ''
-            }`}
-            onClick={() => onSelectPortfolio?.(portfolio)}
-          >
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <CardTitle className="text-base flex items-center space-x-2">
-                    <span>{portfolio.name}</span>
-                    {portfolio.isDefault && <Star className="h-4 w-4 text-yellow-500" />}
-                  </CardTitle>
-                  {portfolio.description && (
-                    <CardDescription className="text-xs mt-1">
-                      {portfolio.description}
+      {portfolios.length === 0 && (
+        <Alert>
+          <AlertDescription>
+            You haven't created any portfolios yet. Create your first portfolio to get started!
+          </AlertDescription>
+        </Alert>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {portfolios.map((portfolio) => {
+          const performance = calculatePerformance(portfolio);
+          return (
+            <Card key={portfolio.id} className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="flex items-center space-x-2">
+                      <span>{portfolio.name}</span>
+                      {portfolio.isDefault && <Badge variant="outline">Default</Badge>}
+                    </CardTitle>
+                    <CardDescription className="mt-1">
+                      {portfolio.description || "No description"}
                     </CardDescription>
-                  )}
-                </div>
-                <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleClonePortfolio(portfolio)}
-                    className="h-6 w-6 p-0"
-                  >
-                    <Copy className="h-3 w-3" />
-                  </Button>
-                  {!portfolio.isDefault && (
+                  </div>
+                  <div className="flex space-x-1">
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleDeletePortfolio(portfolio.id)}
-                      className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                      onClick={() => setEditingPortfolio(portfolio)}
                     >
-                      <Trash2 className="h-3 w-3" />
+                      <Edit className="h-3 w-3" />
                     </Button>
-                  )}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Total Value</span>
-                  <span className="font-semibold">{formatValue(portfolio.totalValue)}</span>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Assets</span>
-                  <Badge variant="outline">{portfolio.assets.length}</Badge>
-                </div>
-                
-                <div className="space-y-1">
-                  <span className="text-xs text-muted-foreground">Top Holdings</span>
-                  <div className="flex flex-wrap gap-1">
-                    {portfolio.assets.slice(0, 3).map((asset) => (
-                      <Badge key={asset.symbol} variant="secondary" className="text-xs">
-                        {asset.symbol}
-                      </Badge>
-                    ))}
-                    {portfolio.assets.length > 3 && (
-                      <Badge variant="outline" className="text-xs">
-                        +{portfolio.assets.length - 3}
-                      </Badge>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleClonePortfolio(portfolio.id, portfolio.name)}
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                    {!portfolio.isDefault && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeletePortfolio(portfolio.id)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
                     )}
                   </div>
                 </div>
-                
-                <div className="text-xs text-muted-foreground">
-                  Updated {new Date(portfolio.updatedAt).toLocaleDateString()}
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <DollarSign className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Total Value</span>
+                    </div>
+                    <span className="font-medium">${portfolio.totalValue.toLocaleString()}</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      {performance.change >= 0 ? (
+                        <TrendingUp className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <TrendingDown className="h-4 w-4 text-red-600" />
+                      )}
+                      <span className="text-sm text-muted-foreground">Performance</span>
+                    </div>
+                    <span className={`font-medium ${performance.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {performance.change >= 0 ? '+' : ''}{performance.changePercent.toFixed(2)}%
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Created</span>
+                    </div>
+                    <span className="text-sm">{formatDate(portfolio.createdAt)}</span>
+                  </div>
+
+                  <div className="pt-2">
+                    <div className="text-sm text-muted-foreground mb-2">Holdings ({portfolio.assets.length})</div>
+                    <div className="space-y-1">
+                      {portfolio.assets.slice(0, 3).map((asset) => (
+                        <div key={asset.symbol} className="flex justify-between text-xs">
+                          <span>{asset.symbol}</span>
+                          <span>{asset.allocation.toFixed(1)}%</span>
+                        </div>
+                      ))}
+                      {portfolio.assets.length > 3 && (
+                        <div className="text-xs text-muted-foreground">
+                          +{portfolio.assets.length - 3} more...
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
-      {portfolios.length === 0 && (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <div className="text-muted-foreground mb-4">
-              <div className="text-lg font-medium mb-2">No portfolios yet</div>
-              <p>Create your first portfolio to start managing your investments.</p>
+      {/* Edit Portfolio Dialog */}
+      <Dialog open={!!editingPortfolio} onOpenChange={() => setEditingPortfolio(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Portfolio</DialogTitle>
+            <DialogDescription>
+              Update portfolio details
+            </DialogDescription>
+          </DialogHeader>
+          {editingPortfolio && (
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Portfolio Name</label>
+                <Input
+                  value={editingPortfolio.name}
+                  onChange={(e) => setEditingPortfolio({ ...editingPortfolio, name: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Description</label>
+                <Textarea
+                  value={editingPortfolio.description || ""}
+                  onChange={(e) => setEditingPortfolio({ ...editingPortfolio, description: e.target.value })}
+                />
+              </div>
+              <Button onClick={handleUpdatePortfolio} className="w-full">
+                Update Portfolio
+              </Button>
             </div>
-            <Button onClick={() => setIsCreateDialogOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Portfolio
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
