@@ -1,13 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Play, Plus, Code, BarChart3, TrendingUp, Users, Settings, BookOpen } from 'lucide-react';
+import { Play, Plus, Code, BarChart3, TrendingUp, Users, Settings, BookOpen, Calculator } from 'lucide-react';
 import { quantLabService, ResearchNotebook, TradingStrategy, PaperTradingAccount } from '@/services/quantLabService';
 import { QuantLabWorkspace } from './QuantLabWorkspace';
+import { CAPMWorkspace } from './CAPMWorkspace';
 
 const QuantLab = () => {
   const [notebooks, setNotebooks] = useState<ResearchNotebook[]>([]);
@@ -130,6 +130,10 @@ const QuantLab = () => {
           <TabsTrigger value="paper-trading" className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4" />
             Paper Trading
+          </TabsTrigger>
+          <TabsTrigger value="capm" className="flex items-center gap-2">
+            <Calculator className="w-4 h-4" />
+            CAPM Tools
           </TabsTrigger>
           <TabsTrigger value="workspace" className="flex items-center gap-2">
             <Settings className="w-4 h-4" />
@@ -327,6 +331,11 @@ const QuantLab = () => {
               </Card>
             )}
           </div>
+        </TabsContent>
+
+        {/* CAPM Tools Tab */}
+        <TabsContent value="capm" className="space-y-4">
+          <CAPMWorkspace />
         </TabsContent>
 
         {/* Workspace Tab */}
