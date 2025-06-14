@@ -1,9 +1,9 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PortfolioList } from "./PortfolioList";
 import { PortfolioComparison } from "./PortfolioComparison";
 import { WatchlistManager } from "./WatchlistManager";
 import { FolderOpen, BarChart3, Eye } from "lucide-react";
+import { PortfolioAdvisorChat } from "./PortfolioAdvisorChat";
 
 export const PortfolioManager = () => {
   return (
@@ -16,7 +16,7 @@ export const PortfolioManager = () => {
       </div>
 
       <Tabs defaultValue="portfolios" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="portfolios" className="flex items-center space-x-2">
             <FolderOpen className="h-4 w-4" />
             <span>My Portfolios</span>
@@ -28,6 +28,10 @@ export const PortfolioManager = () => {
           <TabsTrigger value="watchlists" className="flex items-center space-x-2">
             <Eye className="h-4 w-4" />
             <span>Watchlists</span>
+          </TabsTrigger>
+          <TabsTrigger value="advisor" className="flex items-center space-x-2">
+            <span role="img" aria-label="AI">🤖</span>
+            <span>Advisor Chat</span>
           </TabsTrigger>
         </TabsList>
 
@@ -41,6 +45,10 @@ export const PortfolioManager = () => {
 
         <TabsContent value="watchlists" className="space-y-6">
           <WatchlistManager />
+        </TabsContent>
+
+        <TabsContent value="advisor" className="space-y-6">
+          <PortfolioAdvisorChat />
         </TabsContent>
       </Tabs>
     </div>
