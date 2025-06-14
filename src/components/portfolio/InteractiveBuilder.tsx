@@ -1,412 +1,332 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Zap, Target, AlertTriangle, CheckCircle, TrendingUp, DollarSign } from "lucide-react";
-import { AllocationSlider } from "./AllocationSlider";
-import { ConstraintsConfig } from "./ConstraintsConfig";
-import { StockSearch } from "@/components/stocks/StockSearch";
-import { Asset, OptimizationConstraints, portfolioOptimization } from "@/services/portfolioOptimization";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { Plus, Minus, TrendingUp, TrendingDown, DollarSign, Percent, Target, AlertCircle, CheckCircle } from "lucide-react";
 import { marketDataService } from "@/services/marketDataService";
 
+interface Asset {
+  id: string;
+  symbol: string;
+  name: string;
+  allocation: number;
+  price: number;
+  change: number;
+  changePercent: number;
+  value: number;
+}
+
+interface PortfolioMetrics {
+  totalValue: number;
+  targetAllocation: number;
+  currentAllocation: number;
+  riskScore: number;
+}
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#d0ed57'];
+
+const initialMetrics: PortfolioMetrics = {
+  totalValue: 100000,
+  targetAllocation: 100,
+  currentAllocation: 0,
+  riskScore: 0
+};
+
 export const InteractiveBuilder = () => {
-  const [assets, setAssets] = useState<Asset[]>([
-    {
-      symbol: "AAPL",
-      name: "Apple Inc.",
-      allocation: 25,
-      expectedReturn: 0.12,
-      volatility: 0.22,
-      minAllocation: 5,
-      maxAllocation: 40
-    },
-    {
-      symbol: "MSFT",
-      name: "Microsoft Corp.",
-      allocation: 20,
-      expectedReturn: 0.11,
-      volatility: 0.20,
-      minAllocation: 5,
-      maxAllocation: 35
-    },
-    {
-      symbol: "GOOGL",
-      name: "Alphabet Inc.",
-      allocation: 15,
-      expectedReturn: 0.13,
-      volatility: 0.25,
-      minAllocation: 0,
-      maxAllocation: 30
-    },
-    {
-      symbol: "BND",
-      name: "Vanguard Total Bond",
-      allocation: 25,
-      expectedReturn: 0.04,
-      volatility: 0.05,
-      minAllocation: 10,
-      maxAllocation: 60
-    },
-    {
-      symbol: "VTI",
-      name: "Vanguard Total Stock",
-      allocation: 15,
-      expectedReturn: 0.10,
-      volatility: 0.18,
-      minAllocation: 5,
-      maxAllocation: 50
-    }
-  ]);
-
-  const [constraints, setConstraints] = useState<OptimizationConstraints>({
-    minAllocation: 5,
-    maxAllocation: 40,
-    maxAssets: 10,
-    targetReturn: undefined,
-    maxRisk: undefined
-  });
-
-  const [optimizationResult, setOptimizationResult] = useState(
-    portfolioOptimization.optimizePortfolio(assets, constraints)
-  );
-
-  const [portfolioValue, setPortfolioValue] = useState(100000);
-  const [marketData, setMarketData] = useState<{[key: string]: any}>({});
-  const [isLoadingMarketData, setIsLoadingMarketData] = useState(false);
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [newAsset, setNewAsset] = useState({ symbol: "", allocation: "" });
+  const [portfolioMetrics, setPortfolioMetrics] = useState<PortfolioMetrics>(initialMetrics);
+  const [allocationComplete, setAllocationComplete] = useState(false);
+  const [riskLevel, setRiskLevel] = useState<"low" | "moderate" | "high">("moderate");
 
   useEffect(() => {
-    const result = portfolioOptimization.optimizePortfolio(assets, constraints);
-    setOptimizationResult(result);
-  }, [assets, constraints]);
+    updatePortfolioMetrics(assets);
+    setAllocationComplete(portfolioMetrics.currentAllocation === portfolioMetrics.targetAllocation);
+  }, [assets, portfolioMetrics.currentAllocation, portfolioMetrics.targetAllocation]);
 
-  // Fetch real-time market data for assets
-  useEffect(() => {
-    const fetchMarketData = async () => {
-      setIsLoadingMarketData(true);
-      const data: {[key: string]: any} = {};
-      
-      for (const asset of assets) {
-        try {
-          const quote = await marketDataService.getRealTimeQuote(asset.symbol);
-          data[asset.symbol] = quote;
-        } catch (error) {
-          console.error(`Error fetching data for ${asset.symbol}:`, error);
-        }
-      }
-      
-      setMarketData(data);
-      setIsLoadingMarketData(false);
-    };
-
-    fetchMarketData();
-  }, [assets]);
-
-  const handleAllocationChange = (symbol: string, allocation: number) => {
-    setAssets(prev => prev.map(asset => 
-      asset.symbol === symbol ? { ...asset, allocation } : asset
-    ));
-  };
-
-  const handleRemoveAsset = (symbol: string) => {
-    setAssets(prev => {
-      const filtered = prev.filter(asset => asset.symbol !== symbol);
-      // Redistribute allocation
-      const removedAllocation = prev.find(a => a.symbol === symbol)?.allocation || 0;
-      const remaining = filtered.length;
-      return filtered.map(asset => ({
-        ...asset,
-        allocation: asset.allocation + (removedAllocation / remaining)
-      }));
-    });
-  };
-
-  const handleAddAsset = async (stockData: any) => {
+  const addAsset = async () => {
+    if (!newAsset.symbol || !newAsset.allocation) return;
+    
     try {
-      // Fetch real market data for the new asset
-      const fundamentals = await marketDataService.getCompanyFundamentals(stockData.symbol);
-      
-      const newAsset: Asset = {
-        symbol: stockData.symbol,
-        name: stockData.name || fundamentals.name,
-        allocation: 5,
-        expectedReturn: Math.max(0.02, Math.min(0.20, fundamentals.revenueGrowth / 100 || 0.08)),
-        volatility: Math.max(0.10, Math.min(0.40, (100 - fundamentals.peRatio) / 100 || 0.20)),
-        minAllocation: 0,
-        maxAllocation: 30
+      const quote = await marketDataService.getQuote(newAsset.symbol);
+      const asset: Asset = {
+        id: Date.now().toString(),
+        symbol: newAsset.symbol.toUpperCase(),
+        name: quote?.name || newAsset.symbol.toUpperCase(),
+        allocation: parseFloat(newAsset.allocation),
+        price: quote?.price || 0,
+        change: quote?.change || 0,
+        changePercent: quote?.changePercent || 0,
+        value: 0
       };
       
-      // Reduce other allocations proportionally
-      const totalCurrent = assets.reduce((sum, asset) => sum + asset.allocation, 0);
-      const reductionFactor = (totalCurrent - newAsset.allocation) / totalCurrent;
-      
-      setAssets(prev => [
-        ...prev.map(asset => ({
-          ...asset,
-          allocation: asset.allocation * reductionFactor
-        })),
-        newAsset
-      ]);
+      const newAssets = [...assets, asset];
+      const normalizedAssets = normalizeAllocations(newAssets);
+      setAssets(normalizedAssets);
+      setNewAsset({ symbol: "", allocation: "" });
+      updatePortfolioMetrics(normalizedAssets);
     } catch (error) {
-      console.error('Error adding asset:', error);
-      // Fallback to mock data
-      const newAsset: Asset = {
-        symbol: stockData.symbol,
-        name: stockData.name,
-        allocation: 5,
-        expectedReturn: 0.08 + Math.random() * 0.06,
-        volatility: 0.15 + Math.random() * 0.15,
-        minAllocation: 0,
-        maxAllocation: 30
-      };
-      
-      const totalCurrent = assets.reduce((sum, asset) => sum + asset.allocation, 0);
-      const reductionFactor = (totalCurrent - newAsset.allocation) / totalCurrent;
-      
-      setAssets(prev => [
-        ...prev.map(asset => ({
-          ...asset,
-          allocation: asset.allocation * reductionFactor
-        })),
-        newAsset
-      ]);
+      console.error("Error adding asset:", error);
     }
   };
 
-  const handleOptimize = () => {
-    setAssets(optimizationResult.assets);
+  const removeAsset = (id: string) => {
+    const updatedAssets = assets.filter((asset) => asset.id !== id);
+    const normalizedAssets = normalizeAllocations(updatedAssets);
+    setAssets(normalizedAssets);
+    updatePortfolioMetrics(normalizedAssets);
   };
 
-  const totalAllocation = assets.reduce((sum, asset) => sum + asset.allocation, 0);
-  const allocationDiff = Math.abs(100 - totalAllocation);
-
-  // Calculate portfolio market value
-  const calculatePortfolioMarketValue = () => {
-    return assets.reduce((total, asset) => {
-      const marketPrice = marketData[asset.symbol]?.price || 100;
-      const shares = (portfolioValue * asset.allocation / 100) / marketPrice;
-      return total + (shares * marketPrice);
-    }, 0);
+  const updateAllocation = (id: string, newAllocation: number) => {
+    const updatedAssets = assets.map((asset) =>
+      asset.id === id ? { ...asset, allocation: newAllocation } : asset
+    );
+    const normalizedAssets = normalizeAllocations(updatedAssets);
+    setAssets(normalizedAssets);
+    updatePortfolioMetrics(normalizedAssets);
   };
 
-  const currentMarketValue = calculatePortfolioMarketValue();
-  const portfolioGainLoss = currentMarketValue - portfolioValue;
-  const portfolioGainLossPercent = (portfolioGainLoss / portfolioValue) * 100;
+  const normalizeAllocations = (assetList: Asset[]): Asset[] => {
+    const totalAllocation = assetList.reduce((sum, asset) => sum + asset.allocation, 0);
+    return assetList.map(asset => ({
+      ...asset,
+      allocation: parseFloat((asset.allocation / totalAllocation * 100).toFixed(2))
+    }));
+  };
+
+  const updatePortfolioMetrics = (assetList: Asset[]) => {
+    const currentAllocation = assetList.reduce((sum, asset) => sum + asset.allocation, 0);
+  
+    // Basic risk score calculation (can be expanded)
+    let riskScore = 0;
+    if (assetList.length > 0) {
+      riskScore = assetList.reduce((sum, asset) => {
+        // Example: Higher allocation to a volatile stock increases risk
+        return sum + (Math.abs(asset.changePercent) * asset.allocation);
+      }, 0) / assetList.length;
+    }
+  
+    setPortfolioMetrics(prevMetrics => ({
+      ...prevMetrics,
+      currentAllocation: parseFloat(currentAllocation.toFixed(2)),
+      riskScore: parseFloat(riskScore.toFixed(2))
+    }));
+  
+    if (riskScore < 5) setRiskLevel("low");
+    else if (riskScore < 10) setRiskLevel("moderate");
+    else setRiskLevel("high");
+  };
+
+  const formatChange = (change: number, changePercent: number) => {
+    const isPositive = change >= 0;
+    const Icon = isPositive ? TrendingUp : TrendingDown;
+    const colorClass = isPositive ? "text-green-600" : "text-red-600";
+    
+    return (
+      <div className={`flex items-center space-x-1 ${colorClass}`}>
+        <Icon className="h-3 w-3" />
+        <span className="text-xs">
+          {isPositive ? '+' : ''}{change.toFixed(2)} ({isPositive ? '+' : ''}{changePercent.toFixed(2)}%)
+        </span>
+      </div>
+    );
+  };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-      {/* Asset Allocation Panel */}
-      <div className="xl:col-span-2 space-y-4">
-        {/* Portfolio Value Summary */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Portfolio Summary</span>
-              <div className="flex items-center space-x-2">
-                <DollarSign className="h-5 w-5" />
-                <span className="text-lg font-bold">${currentMarketValue.toLocaleString()}</span>
-              </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <div className="text-sm text-muted-foreground">Initial Value</div>
-                <div className="font-bold">${portfolioValue.toLocaleString()}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-sm text-muted-foreground">Current Value</div>
-                <div className="font-bold">${currentMarketValue.toLocaleString()}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-sm text-muted-foreground">Gain/Loss</div>
-                <div className={`font-bold flex items-center justify-center ${portfolioGainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {portfolioGainLoss >= 0 ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
-                  ${Math.abs(portfolioGainLoss).toLocaleString()}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-sm text-muted-foreground">Return %</div>
-                <div className={`font-bold ${portfolioGainLossPercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {portfolioGainLossPercent >= 0 ? '+' : ''}{portfolioGainLossPercent.toFixed(2)}%
-                </div>
-              </div>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Portfolio Composition</CardTitle>
+          <CardDescription>
+            Design your ideal portfolio by adding assets and adjusting allocations.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="asset-symbol">Asset Symbol</Label>
+              <Input
+                type="text"
+                id="asset-symbol"
+                placeholder="e.g., AAPL"
+                value={newAsset.symbol}
+                onChange={(e) => setNewAsset({ ...newAsset, symbol: e.target.value })}
+              />
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <Label htmlFor="asset-allocation">Allocation (%)</Label>
+              <Input
+                type="number"
+                id="asset-allocation"
+                placeholder="e.g., 25"
+                value={newAsset.allocation}
+                onChange={(e) => setNewAsset({ ...newAsset, allocation: e.target.value })}
+              />
+            </div>
+          </div>
+          <Button onClick={addAsset} className="w-full">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Asset
+          </Button>
+        </CardContent>
+      </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Asset Allocation</CardTitle>
-            <CardDescription>
-              Drag sliders to adjust allocations. Total: {totalAllocation.toFixed(1)}%
-              {isLoadingMarketData && <span className="text-blue-600 ml-2">(Loading market data...)</span>}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {allocationDiff > 1 && (
-              <Alert className="mb-4">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>
-                  Portfolio allocation is {allocationDiff.toFixed(1)}% off target. 
-                  Consider rebalancing.
-                </AlertDescription>
-              </Alert>
-            )}
-            
-            <div className="space-y-3">
-              {assets.map(asset => {
-                const quote = marketData[asset.symbol];
-                return (
-                  <div key={asset.symbol}>
-                    <AllocationSlider
-                      asset={asset}
-                      onAllocationChange={handleAllocationChange}
-                      onRemoveAsset={handleRemoveAsset}
-                    />
-                    
-                    {/* Real-time market data display */}
-                    {quote && (
-                      <div className="mt-2 p-2 bg-gray-50 rounded text-xs grid grid-cols-2 md:grid-cols-4 gap-2">
-                        <div>
-                          <span className="text-muted-foreground">Price: </span>
-                          <span className="font-medium">${quote.price.toFixed(2)}</span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Change: </span>
-                          <span className={`font-medium ${quote.changePercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            {quote.changePercent >= 0 ? '+' : ''}{quote.changePercent.toFixed(2)}%
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Volume: </span>
-                          <span className="font-medium">{(quote.volume / 1000000).toFixed(1)}M</span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Shares: </span>
-                          <span className="font-medium">
-                            {((portfolioValue * asset.allocation / 100) / quote.price).toFixed(0)}
-                          </span>
-                        </div>
-                      </div>
-                    )}
+      {assets.length === 0 ? (
+        <Alert>
+          <AlertDescription>
+            Add assets to your portfolio to start building your investment strategy.
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Current Portfolio</CardTitle>
+              <CardDescription>Adjust allocations to meet your investment goals.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead>
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Asset
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Price
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Change
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Allocation
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {assets.map((asset) => (
+                      <tr key={asset.id}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="ml-4">
+                              <div className="text-sm font-medium text-gray-900">{asset.name}</div>
+                              <div className="text-sm text-gray-500">{asset.symbol}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">${asset.price.toFixed(2)}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {formatChange(asset.change, asset.changePercent)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <Input
+                              type="number"
+                              className="w-24 text-sm"
+                              value={asset.allocation}
+                              onChange={(e) => {
+                                const newAllocation = parseFloat(e.target.value);
+                                if (!isNaN(newAllocation)) {
+                                  updateAllocation(asset.id, newAllocation);
+                                }
+                              }}
+                            />
+                            <Percent className="h-4 w-4 ml-1 text-gray-500" />
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                          <Button variant="ghost" size="sm" onClick={() => removeAsset(asset.id)}>
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Portfolio Metrics</CardTitle>
+              <CardDescription>
+                Understand your portfolio's overall composition and risk level.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm font-medium text-gray-700">
+                    Current Allocation: {portfolioMetrics.currentAllocation}%
                   </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Add New Assets</CardTitle>
-            <CardDescription>Search and add stocks with real-time market data</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <StockSearch onSelectStock={handleAddAsset} />
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Optimization Panel */}
-      <div className="space-y-6">
-        <ConstraintsConfig
-          constraints={constraints}
-          onConstraintsChange={setConstraints}
-        />
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Target className="h-5 w-5" />
-              <span>Portfolio Metrics</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-sm">Expected Return</span>
-              <Badge variant="outline">
-                {(optimizationResult.expectedReturn * 100).toFixed(1)}%
-              </Badge>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm">Expected Risk</span>
-              <Badge variant="outline">
-                {(optimizationResult.expectedRisk * 100).toFixed(1)}%
-              </Badge>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm">Sharpe Ratio</span>
-              <Badge variant={optimizationResult.sharpeRatio > 1.2 ? "default" : "secondary"}>
-                {optimizationResult.sharpeRatio.toFixed(2)}
-              </Badge>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm">Optimization Status</span>
-              <Badge variant={optimizationResult.isOptimal ? "default" : "destructive"}>
-                {optimizationResult.isOptimal ? (
-                  <><CheckCircle className="h-3 w-3 mr-1" />Optimal</>
-                ) : (
-                  <><AlertTriangle className="h-3 w-3 mr-1" />Suboptimal</>
-                )}
-              </Badge>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm">Market Value</span>
-              <Badge variant="outline">
-                ${currentMarketValue.toLocaleString()}
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>AI Suggestions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {optimizationResult.suggestions.map((suggestion, index) => (
-              <div key={index} className="p-3 bg-blue-50 rounded-lg">
-                <p className="text-sm text-blue-800">{suggestion}</p>
-              </div>
-            ))}
-            
-            {/* Market-based suggestions */}
-            {portfolioGainLossPercent < -5 && (
-              <div className="p-3 bg-orange-50 rounded-lg">
-                <p className="text-sm text-orange-800">
-                  Portfolio is down {Math.abs(portfolioGainLossPercent).toFixed(1)}%. Consider rebalancing or reviewing asset selection.
-                </p>
-              </div>
-            )}
-            
-            <Button onClick={handleOptimize} className="w-full">
-              <Zap className="h-4 w-4 mr-2" />
-              Apply Optimization
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Market Data Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Market Data Status</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {assets.map(asset => (
-                <div key={asset.symbol} className="flex justify-between items-center">
-                  <span className="text-sm">{asset.symbol}</span>
-                  <Badge variant={marketData[asset.symbol] ? "default" : "secondary"}>
-                    {marketData[asset.symbol] ? "Live" : "Mock"}
-                  </Badge>
+                  <Progress value={portfolioMetrics.currentAllocation} max={100} />
+                  {allocationComplete ? (
+                    <div className="flex items-center text-sm text-green-600 mt-1">
+                      <CheckCircle className="h-4 w-4 mr-1" />
+                      Allocation Complete!
+                    </div>
+                  ) : (
+                    <div className="flex items-center text-sm text-red-600 mt-1">
+                      <AlertCircle className="h-4 w-4 mr-1" />
+                      Allocation Incomplete
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                <div>
+                  <div className="text-sm font-medium text-gray-700">
+                    Risk Level: {riskLevel}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    Based on asset allocation and market volatility.
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Portfolio Allocation</CardTitle>
+              <CardDescription>Visualize your asset allocation.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={assets}
+                    dataKey="allocation"
+                    nameKey="symbol"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    fill="#8884d8"
+                    label
+                  >
+                    {
+                      assets.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))
+                    }
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
