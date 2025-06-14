@@ -193,7 +193,8 @@ class PortfolioManager {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
 
-  private getDefaultPortfolios(): Portfolio[] {
+  // --- FIX: Make this public for PortfolioBuilder.tsx ---
+  public getDefaultPortfolios(): Portfolio[] {
     // Improved default portfolios for new users
     return [
       {
