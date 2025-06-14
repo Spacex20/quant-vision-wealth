@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { StrategyChart } from './StrategyChart';
 import { TrendingUp, TrendingDown, Layers, Target, PieChart, Info, BookOpen } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface StrategyCardProps {
   strategy: Strategy;
