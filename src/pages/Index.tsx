@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PortfolioOverview } from "@/components/portfolio/PortfolioOverview";
@@ -30,12 +31,21 @@ const Index = () => {
       <div className="container mx-auto px-4 py-6">
         <div className="mb-8 flex justify-between flex-wrap gap-2 items-center">
           <div>
-            <h1 className="text-4xl font-bold mb-2">Quantitative Investment Research Platform</h1>
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Portfolio Intelligence Platform
+            </h1>
             <p className="text-xl text-muted-foreground">
-              Advanced portfolio management with AI-driven insights and real-time market data
+              Build wealth with AI-driven insights and proven investment strategies 💎
             </p>
           </div>
-          {/* Investor Profile button removed */}
+          {!user && (
+            <Button 
+              onClick={() => navigate('/login')} 
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            >
+              Get Started Free 🚀
+            </Button>
+          )}
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

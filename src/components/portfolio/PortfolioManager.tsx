@@ -2,7 +2,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PortfolioComparison } from "./PortfolioComparison";
 import { WatchlistManager } from "./WatchlistManager";
-import { FolderOpen, BarChart3, Eye, Trash2, Edit } from "lucide-react";
+import { FolderOpen, BarChart3, Eye, Trash2, Edit, Sparkles } from "lucide-react";
 import { PortfolioAdvisorChat } from "./PortfolioAdvisorChat";
 import { useUserPortfolios } from "@/hooks/useUserPortfolios";
 import { useQueryClient } from "@tanstack/react-query";
@@ -28,6 +28,8 @@ export const PortfolioManager = () => {
       }
     }
   };
+
+  const defaultPortfolios = portfolioManager.getDefaultPortfolios();
 
   return (
     <div className="space-y-6">
@@ -59,7 +61,40 @@ export const PortfolioManager = () => {
         </TabsList>
 
         <TabsContent value="portfolios" className="space-y-6">
-           <Card>
+          {/* Demo Portfolios Section */}
+          {!user && (
+            <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Sparkles className="h-5 w-5 text-blue-600" />
+                  <span className="text-blue-900">Demo Portfolios</span>
+                </CardTitle>
+                <CardDescription className="text-blue-700">
+                  Explore these professionally designed portfolios. Sign up to create your own! 🚀
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {defaultPortfolios.map(p => (
+                    <div key={p.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border border-blue-200 rounded-lg bg-white/50 gap-4">
+                      <div className="flex-grow">
+                        <h3 className="font-semibold text-lg text-blue-900">{p.name}</h3>
+                        <p className="text-sm text-blue-700">{p.description}</p>
+                        <div className="text-xs text-blue-600 mt-1">
+                          <span>Assets: {p.assets.length}</span> | <span>Value: ${p.totalValue.toLocaleString()}</span>
+                        </div>
+                      </div>
+                      <Button variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-100">
+                        View Details
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          <Card>
             <CardHeader>
               <CardTitle>My Saved Portfolios</CardTitle>
               <CardDescription>View and manage your saved investment portfolios.</CardDescription>
