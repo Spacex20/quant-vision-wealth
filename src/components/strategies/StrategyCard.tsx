@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Strategy } from '@/data/strategies';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -10,6 +9,10 @@ import { Input } from '@/components/ui/input';
 import { StrategyChart } from './StrategyChart';
 import { TrendingUp, TrendingDown, Layers, Target, PieChart, Info, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from "@/hooks/useAuth";
+import { portfolioManager } from "@/services/portfolioManager";
+import { toast } from "sonner";
+import { EditStrategyModal } from "./EditStrategyModal";
 
 interface StrategyCardProps {
   strategy: Strategy;
@@ -26,7 +29,74 @@ const RiskBadge = ({ risk }: { risk: Strategy['riskProfile'] }) => {
 
 export const StrategyCard = ({ strategy }: StrategyCardProps) => {
   const [simulationAmount, setSimulationAmount] = useState('100000');
-  
+  const [simResult, setSimResult] = useState<{ asset: string; weight: number; amount: number; etf?: string }[] | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const { user } = useAuth();
+
+  // Simulate the strategy with the entered amount
+  const handleSimulate = () => {
+    const invest = Number(simulationAmount);
+    if (!invest || invest < 100) {
+      toast.error("Please enter a valid amount.");
+      return;
+    }
+    const allocation = strategy.allocation.map(asset => ({
+      ...asset,
+      amount: +(invest * asset.weight / 100).toFixed(2),
+    }));
+    setSimResult(allocation);
+  };
+
+  // Export to dashboard handler
+  const handleExport = async () => {
+    if (!user) {
+      toast.error("Please login to export!");
+      return;
+    }
+    const invest = Number(simulationAmount);
+    const data = {
+      name: `${strategy.name} (${new Date().toLocaleDateString()})`,
+      description: `Exported from strategy library. Based on a ₹${invest.toLocaleString()} simulation.`,
+      assets: strategy.allocation.map(x => ({
+        symbol: x.etf || x.asset,
+        name: x.asset,
+        allocation: x.weight
+      })),
+      totalValue: invest
+    };
+    const res = await portfolioManager.savePortfolio(data, user.id);
+    if (res) {
+      toast.success("Strategy exported to your dashboard as a portfolio!");
+    } else {
+      toast.error("Failed to export strategy.");
+    }
+  };
+
+  // Save edited as new strategy (in our case, save as a portfolio)
+  const handleSaveEditedStrategy = async ({ allocation, name }: { allocation: { asset: string; weight: number; etf?: string }[]; name: string }) => {
+    if (!user) {
+      toast.error("Please login to save custom strategies!");
+      return;
+    }
+    const invest = Number(simulationAmount);
+    const data = {
+      name,
+      description: `Custom version of ${strategy.name}. Based on a ₹${invest.toLocaleString()} simulation.`,
+      assets: allocation.map(x => ({
+        symbol: x.etf || x.asset,
+        name: x.asset,
+        allocation: x.weight
+      })),
+      totalValue: invest
+    };
+    const res = await portfolioManager.savePortfolio(data, user.id);
+    if (res) {
+      toast.success("Your custom strategy has been saved as a portfolio!");
+    } else {
+      toast.error("Failed to save custom strategy.");
+    }
+  };
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -114,21 +184,58 @@ export const StrategyCard = ({ strategy }: StrategyCardProps) => {
         </Accordion>
       </CardContent>
       <CardFooter className="bg-muted/50 p-4 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-b-lg">
-        <div className="flex items-center space-x-2">
-          <Input 
-            type="number" 
-            value={simulationAmount}
-            onChange={(e) => setSimulationAmount(e.target.value)}
-            className="w-40"
-            placeholder="₹1,00,000"
-          />
-          <Button disabled>Simulate Strategy</Button>
+        <div className="flex flex-col space-y-2">
+          <div className="flex items-center space-x-2">
+            <Input 
+              type="number" 
+              value={simulationAmount}
+              onChange={(e) => setSimulationAmount(e.target.value)}
+              className="w-40"
+              placeholder="₹1,00,000"
+              min={100}
+              step={100}
+            />
+            <Button onClick={handleSimulate}>Simulate Strategy</Button>
+          </div>
+          {/* Show simulation result */}
+          {simResult && (
+            <div className="bg-white rounded shadow p-2 mt-2 border w-full">
+              <div className="text-xs font-medium mb-1">Simulated Allocation:</div>
+              <table className="w-full text-xs mb-1">
+                <thead>
+                  <tr>
+                    <th className="text-left">Asset</th>
+                    <th className="text-left">ETF</th>
+                    <th className="text-right">Weight</th>
+                    <th className="text-right">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {simResult.map(row => (
+                    <tr key={row.asset}>
+                      <td>{row.asset}</td>
+                      <td>{row.etf || "N/A"}</td>
+                      <td className="text-right">{row.weight}%</td>
+                      <td className="text-right">₹{row.amount.toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
         <div className="flex items-center space-x-2">
-            <Button variant="outline" disabled>Edit & Save</Button>
-            <Button variant="ghost" disabled>Export to Dashboard</Button>
+            <Button variant="outline" onClick={() => setEditModalOpen(true)}>Edit & Save</Button>
+            <Button variant="ghost" onClick={handleExport}>Export to Dashboard</Button>
         </div>
       </CardFooter>
+      <EditStrategyModal
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        strategy={strategy}
+        simulationAmount={Number(simulationAmount)}
+        onSave={handleSaveEditedStrategy}
+      />
     </Card>
   );
 };
