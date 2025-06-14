@@ -1,7 +1,8 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScenarioAnalysis } from "./ScenarioAnalysis";
-import { PlayCircle } from "lucide-react";
+import { HistoricalAnalysis } from "./HistoricalAnalysis";
+import { PlayCircle, History } from "lucide-react";
 
 export const PortfolioSimulator = () => {
   return (
@@ -17,7 +18,7 @@ export const PortfolioSimulator = () => {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <PlayCircle className="h-5 w-5 text-primary" />
-            <span>Scenario Analysis Engine</span>
+            <span>Hypothetical Scenario Engine</span>
           </CardTitle>
           <CardDescription>
             Select a macroeconomic scenario to see how your portfolio might perform over a 6-month period.
@@ -25,6 +26,21 @@ export const PortfolioSimulator = () => {
         </CardHeader>
         <CardContent>
           <ScenarioAnalysis />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <History className="h-5 w-5 text-primary" />
+            <span>Historical Crisis Simulation</span>
+          </CardTitle>
+          <CardDescription>
+            Test your portfolio's resilience against major financial crises from the past.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <HistoricalAnalysis />
         </CardContent>
       </Card>
     </div>

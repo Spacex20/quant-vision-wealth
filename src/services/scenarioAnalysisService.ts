@@ -1,4 +1,3 @@
-
 import { Portfolio } from "@/hooks/useUserPortfolios";
 import { toast } from "sonner";
 
@@ -8,7 +7,11 @@ export type ScenarioType =
   | 'INTEREST_RATE_HIKE'
   | 'RECESSION'
   | 'BULL_MARKET'
-  | 'WAR_ENERGY_CRISIS';
+  | 'WAR_ENERGY_CRISIS'
+  // Historical Scenarios
+  | 'DOTCOM_BUBBLE_2000'
+  | 'FINANCIAL_CRISIS_2008'
+  | 'COVID_CRASH_2020';
 
 // Define the asset categories for simulation
 export type AssetCategory = 'stocks' | 'long_bonds' | 'intermediate_bonds' | 'gold' | 'commodities' | 'other';
@@ -55,6 +58,31 @@ const scenarioImpacts: Record<ScenarioType, Record<AssetCategory, number>> = {
     commodities: 0.45,
     other: -0.12,
   },
+  // Historical Crisis Impacts
+  DOTCOM_BUBBLE_2000: {
+    stocks: -0.30,
+    long_bonds: 0.10,
+    intermediate_bonds: 0.06,
+    gold: 0.05,
+    commodities: -0.05,
+    other: -0.15,
+  },
+  FINANCIAL_CRISIS_2008: {
+    stocks: -0.25,
+    long_bonds: 0.15,
+    intermediate_bonds: 0.08,
+    gold: 0.10,
+    commodities: -0.30,
+    other: -0.20,
+  },
+  COVID_CRASH_2020: {
+    stocks: -0.15,
+    long_bonds: 0.12,
+    intermediate_bonds: 0.07,
+    gold: 0.08,
+    commodities: -0.20,
+    other: -0.10,
+  },
 };
 
 const recommendations: Record<ScenarioType, string> = {
@@ -63,6 +91,9 @@ const recommendations: Record<ScenarioType, string> = {
     INTEREST_RATE_HIKE: "Bonds and growth-oriented stocks are under pressure. This is a good time to review for quality companies with strong balance sheets. Value stocks may outperform.",
     BULL_MARKET: "The portfolio is capturing market growth well. Ensure you're not overly concentrated in a few high-flying stocks. Stick to your target allocation and rebalance if necessary.",
     WAR_ENERGY_CRISIS: "Energy and commodities are driving performance. This highlights the importance of diversification. Monitor geopolitical risks closely and consider hedges like gold.",
+    DOTCOM_BUBBLE_2000: "This crisis underscored the danger of concentration in 'hot' sectors like technology. Diversification into non-correlated assets like bonds and gold proved crucial for capital preservation.",
+    FINANCIAL_CRISIS_2008: "A systemic crisis that hit almost all asset classes. High-quality government bonds were one of the few safe havens. This tests the ultimate resilience of a portfolio against severe credit and liquidity shocks.",
+    COVID_CRASH_2020: "This event highlighted the speed at which modern markets can fall and recover. Portfolios with liquidity and a rebalancing strategy could capitalize on the rapid V-shaped recovery. Agility was key.",
 };
 
 // Helper to map asset symbols to categories
