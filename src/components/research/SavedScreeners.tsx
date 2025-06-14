@@ -7,9 +7,11 @@ import { useState } from "react";
 type Saved = { name: string; criteria: ScreenerCriteria };
 
 export function SavedScreeners({
-  onLoad
+  onLoad,
+  getCurrentCriteria
 }: {
   onLoad: (criteria: ScreenerCriteria) => void;
+  getCurrentCriteria: () => ScreenerCriteria;
 }) {
   const [saved, setSaved] = useState<Saved[]>(
     () => {
@@ -20,11 +22,12 @@ export function SavedScreeners({
   const { toast } = useToast();
   const [newName, setNewName] = useState("");
 
-  const save = (criteria: ScreenerCriteria) => {
+  const save = () => {
     if (!newName) {
       toast({ title: "Please name your screener" });
       return;
     }
+    const criteria = getCurrentCriteria();
     const updated = [...saved, { name: newName, criteria }];
     setSaved(updated);
     localStorage.setItem("savedScreeners", JSON.stringify(updated));
@@ -51,17 +54,17 @@ export function SavedScreeners({
         <Button
           size="sm"
           variant="outline"
-          onClick={() => save(onLoad())}
+          onClick={save}
         >Save Criteria</Button>
       </div>
       {saved.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-2">
           {saved.map(s => (
             <div key={s.name} className="bg-muted rounded px-2 py-1 flex gap-2 items-center">
-              <Button size="xs" variant="ghost" onClick={() => onLoad(s.criteria)}>
+              <Button size="sm" variant="ghost" onClick={() => onLoad(s.criteria)}>
                 {s.name}
               </Button>
-              <Button size="xs" variant="destructive" onClick={() => remove(s.name)}>
+              <Button size="sm" variant="destructive" onClick={() => remove(s.name)}>
                 ×
               </Button>
             </div>

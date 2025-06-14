@@ -34,6 +34,18 @@ export const StockScreener = () => {
     criteria, setCriteria, results, loading, runScreener, clearFilters, setResults,
   } = useStockScreener();
 
+  // Ensure results have the fields expected by StockResult
+  const stockResults = results.map((r: any) => ({
+    symbol: r.symbol,
+    name: r.name,
+    sector: r.sector,
+    price: r.price ?? 0,
+    marketCap: r.marketCap ?? 0,
+    peRatio: r.peRatio ?? 0,
+    dividendYield: r.dividendYield ?? 0,
+    volume: r.volume,
+  }));
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
@@ -44,7 +56,10 @@ export const StockScreener = () => {
       </div>
 
       <div className="flex flex-wrap gap-4 justify-between items-end">
-        <SavedScreeners onLoad={(c) => { setCriteria(() => c); return c; }} />
+        <SavedScreeners
+          onLoad={(c) => { setCriteria(() => c); return c; }}
+          getCurrentCriteria={() => criteria}
+        />
         <Button onClick={clearFilters} variant="outline">Clear All</Button>
       </div>
 
@@ -61,8 +76,8 @@ export const StockScreener = () => {
           Run Screen
         </Button>
       </form>
-      
-      <StockScreenerResultsTable data={results} />
+
+      <StockScreenerResultsTable data={stockResults} />
     </div>
   );
 };

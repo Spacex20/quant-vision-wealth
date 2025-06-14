@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { FileExport } from "lucide-react";
+import { FileText } from "lucide-react";
 
 type StockResult = {
   symbol: string;
@@ -77,7 +77,7 @@ export function StockScreenerResultsTable({ data }: Props) {
         className="absolute right-2 top-2 flex items-center gap-1"
         onClick={() => downloadCSV(sorted)}
       >
-        <FileExport className="w-4 h-4" />
+        <FileText className="w-4 h-4" />
         Export CSV
       </Button>
       <Table>
@@ -121,3 +121,4 @@ export function StockScreenerResultsTable({ data }: Props) {
     </div>
   );
 }
+
