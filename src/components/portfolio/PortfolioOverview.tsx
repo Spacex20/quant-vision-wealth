@@ -9,6 +9,19 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserPortfolios } from "@/hooks/useUserPortfolios";
 import { LoadingSpinner } from "../common/LoadingSpinner";
 
+// Type guard to check if current portfolio is the demo portfolio
+function isDemoPortfolio(portfolio: any): portfolio is {
+  name: string;
+  description: string;
+  total_value: number;
+  assets: { symbol: string; name: string; allocation: number }[];
+  updated_at: string;
+  strategy: string;
+  isDemo: boolean;
+} {
+  return !!portfolio && typeof portfolio.isDemo === "boolean";
+}
+
 export const PortfolioOverview = () => {
   const { user } = useAuth();
   const isLoggedIn = !!user;
@@ -31,16 +44,17 @@ export const PortfolioOverview = () => {
     isDemo: true
   };
 
-  const activePortfolio = isLoggedIn && !isLoading && portfolios.length > 0
-    ? portfolios[0]
-    : allWeatherDemoPortfolio;
+  const activePortfolio =
+    isLoggedIn && !isLoading && portfolios.length > 0
+      ? portfolios[0]
+      : allWeatherDemoPortfolio;
 
   if (isLoggedIn && isLoading) {
     return <div className="flex justify-center items-center h-96"><LoadingSpinner /></div>;
   }
-  
+
   const portfolioValue = activePortfolio.total_value || 0;
-  
+
   const dayChange = portfolioValue ? +(portfolioValue * 0.008).toFixed(2) : 0;
   const dayChangePercent = portfolioValue ? 0.8 : 0;
   const totalReturn = portfolioValue ? +(portfolioValue * 0.12).toFixed(2) : 0;
@@ -51,6 +65,7 @@ export const PortfolioOverview = () => {
     .slice()
     .sort((a, b) => b.allocation - a.allocation)
     .map((asset) => {
+      // Portfolio may have shares if it's a real (user) portfolio
       const typedAsset = asset as typeof asset & { shares?: number };
       return {
         ...asset,
@@ -67,10 +82,11 @@ export const PortfolioOverview = () => {
     value: +(portfolioValue * a.allocation / 100).toFixed(2),
   }));
 
+  // ---- BEGIN JSX ----
   return (
     <div className="space-y-6">
       {/* Demo Portfolio Notice */}
-      {activePortfolio.isDemo && (
+      {isDemoPortfolio(activePortfolio) && (
         <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
           <CardContent className="pt-6">
             <div className="flex items-center space-x-3">
@@ -78,7 +94,7 @@ export const PortfolioOverview = () => {
               <div>
                 <h3 className="font-semibold text-blue-900">Demo Portfolio - Ray Dalio's All Weather Strategy</h3>
                 <p className="text-sm text-blue-700">
-                  This balanced portfolio is designed to perform well across all economic environments. 
+                  This balanced portfolio is designed to perform well across all economic environments.
                   Sign up to create your own custom portfolios and access advanced features! 🚀
                 </p>
               </div>
@@ -143,7 +159,12 @@ export const PortfolioOverview = () => {
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent className="relative">
-            <div className="text-2xl font-bold">{activePortfolio.strategy || "Balanced"}</div>
+            <div className="text-2xl font-bold">
+              {/* Show the strategy if it's a demo portfolio, else fallback */}
+              {isDemoPortfolio(activePortfolio)
+                ? activePortfolio.strategy
+                : "Balanced"}
+            </div>
             <p className="text-xs text-muted-foreground">
               Risk-optimized
             </p>
@@ -157,10 +178,10 @@ export const PortfolioOverview = () => {
           <CardTitle className="flex items-center space-x-2">
             <Activity className="h-5 w-5" />
             <span>Portfolio Performance</span>
-            {activePortfolio.isDemo && <Badge variant="outline" className="ml-2">Demo</Badge>}
+            {isDemoPortfolio(activePortfolio) && <Badge variant="outline" className="ml-2">Demo</Badge>}
           </CardTitle>
           <CardDescription>
-            {activePortfolio.isDemo 
+            {isDemoPortfolio(activePortfolio) 
               ? "Simulated performance of the All Weather strategy over time"
               : "Track your portfolio value over time"
             }
@@ -177,7 +198,7 @@ export const PortfolioOverview = () => {
           <CardHeader>
             <CardTitle>Asset Allocation</CardTitle>
             <CardDescription>
-              {activePortfolio.isDemo 
+              {isDemoPortfolio(activePortfolio) 
                 ? "Ray Dalio's balanced approach across economic environments"
                 : "Your largest positions"
               }
@@ -220,7 +241,7 @@ export const PortfolioOverview = () => {
           <CardHeader>
             <CardTitle>Strategy Breakdown</CardTitle>
             <CardDescription>
-              {activePortfolio.isDemo 
+              {isDemoPortfolio(activePortfolio) 
                 ? "How the All Weather strategy balances risk across economic scenarios"
                 : "Portfolio breakdown by asset class"
               }
@@ -228,7 +249,7 @@ export const PortfolioOverview = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {activePortfolio.isDemo ? (
+              {isDemoPortfolio(activePortfolio) ? (
                 <>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
@@ -317,7 +338,7 @@ export const PortfolioOverview = () => {
       {/* Market Data Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <MarketOverview />
-        
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
