@@ -1,6 +1,6 @@
 
 // Optimization Engine - Portfolio optimization, asset allocation, and strategy optimization
-import { portfolioService, PortfolioServiceConfig } from './portfolioService';
+import { portfolioManager as portfolioService } from './portfolioManager';
 import { marketDataService } from './marketDataService';
 import { analyticsEngine } from './analyticsEngine';
 

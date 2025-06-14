@@ -1,7 +1,6 @@
-
 // Quant Lab Service - Advanced research environment for quantitative analysis
 import { marketDataService } from './marketDataService';
-import { portfolioService } from './portfolioService';
+import { portfolioManager as portfolioService } from './portfolioManager';
 
 export interface NotebookCell {
   id: string;

@@ -1,6 +1,6 @@
 
 // Microservices Orchestrator - Coordinates all platform services
-import { portfolioService } from './portfolioService';
+import { portfolioManager as portfolioService } from './portfolioManager';
 import { marketDataService } from './marketDataService';
 import { analyticsEngine } from './analyticsEngine';
 import { researchEnvironmentService } from './researchEnvironmentService';

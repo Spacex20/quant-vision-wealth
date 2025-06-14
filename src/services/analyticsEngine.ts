@@ -1,6 +1,6 @@
 
 // Analytics Engine - Advanced portfolio analytics and performance metrics
-import { portfolioService } from './portfolioService';
+import { portfolioManager as portfolioService } from './portfolioManager';
 import { marketDataService } from './marketDataService';
 import { portfolioAnalytics, RiskMetrics, CorrelationData, HoldingData } from './portfolioAnalytics';
 

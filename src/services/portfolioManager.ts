@@ -144,6 +144,22 @@ class PortfolioManager {
     toast.info("Cloning portfolios is coming soon!");
   }
 
+  calculatePortfolioPerformance(portfolioId: string): Promise<any> {
+    console.warn("`calculatePortfolioPerformance` is a mocked method.");
+    return Promise.resolve({
+      dayChangePercent: (Math.random() - 0.5) * 2,
+      weekChangePercent: (Math.random() - 0.5) * 5,
+      monthChangePercent: (Math.random() - 0.5) * 10,
+      yearChangePercent: (Math.random() - 0.5) * 20,
+      totalReturnPercent: (Math.random() - 0.5) * 30
+    });
+  }
+
+  checkRebalanceNeed(portfolioId: string): Promise<boolean> {
+    console.warn("`checkRebalanceNeed` is a mocked method.");
+    return Promise.resolve(Math.random() > 0.5);
+  }
+
   comparePortfolios(portfoliosToCompare: Portfolio[]): PortfolioComparison | null {
     if (portfoliosToCompare.length < 2 || portfoliosToCompare.length > 4) {
       toast.error("Please select between 2 and 4 portfolios to compare.");
