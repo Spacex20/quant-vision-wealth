@@ -1,4 +1,3 @@
-
 import { financialApi, StockQuote as USStockQuote, SearchResult as USSearchResult } from './financialApi';
 import { indianFinancialApi, IndianStockQuote, IndianSearchResult } from './indianFinancialApi';
 
@@ -51,11 +50,16 @@ class UnifiedMarketDataService {
       };
     } else {
       const usQuote = await financialApi.getStockQuote(symbol);
+      // Get company profile to fetch the name
+      const profile = await financialApi.getCompanyProfile(symbol);
       return {
         ...usQuote,
+        name: profile.name,
         market: 'US',
         currency: 'USD',
-        exchange: 'NASDAQ'
+        exchange: 'NASDAQ',
+        sector: profile.sector,
+        industry: profile.industry
       };
     }
   }
