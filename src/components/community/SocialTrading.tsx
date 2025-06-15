@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart2, TrendingUp, Star, Copy } from "lucide-react";
+import { BarChart2, TrendingUp, Star, Copy, Users, Activity } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useTopTraders, usePopularStrategies, useUserFeed } from "@/hooks/useSocialTrading";
+import { useTopTraders, usePopularStrategies, useUserFeed, useFollowUser, useUnfollowUser } from "@/hooks/useSocialTrading";
 import { StrategyCardSocial } from "./StrategyCardSocial";
+import { EmptyState } from "@/components/common/EmptyState";
+import { toast } from "sonner";
 
 export function SocialTrading() {
   const { user } = useAuth();
@@ -16,6 +18,34 @@ export function SocialTrading() {
   const { data: topTraders = [], isLoading: loadingTraders } = useTopTraders();
   const { data: popularStrategies = [], isLoading: loadingStrategies } = usePopularStrategies();
   const { data: feed = [], isLoading: loadingFeed } = useUserFeed(user?.id || "");
+  
+  const followUser = useFollowUser();
+  const unfollowUser = useUnfollowUser();
+  
+  const handleFollowToggle = async (traderId: string, isCurrentlyFollowing: boolean) => {
+    if (!user?.id) {
+      toast.error("Please sign in to follow traders");
+      return;
+    }
+
+    try {
+      if (isCurrentlyFollowing) {
+        await unfollowUser.mutateAsync({ 
+          follower_id: user.id, 
+          followed_id: traderId 
+        });
+        toast.success("Unfollowed trader");
+      } else {
+        await followUser.mutateAsync({ 
+          follower_id: user.id, 
+          followed_id: traderId 
+        });
+        toast.success("Following trader");
+      }
+    } catch (error) {
+      toast.error("Failed to update follow status");
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -35,13 +65,27 @@ export function SocialTrading() {
         </TabsList>
 
         <TabsContent value="traders" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {loadingTraders ? (
-              <div>Loading traders...</div>
-            ) : topTraders.length === 0 ? (
-              <div>No traders found</div>
-            ) : (
-              topTraders.map((trader: any) => (
+          {loadingTraders ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardContent className="p-6">
+                    <div className="h-20 bg-muted rounded"></div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : topTraders.length === 0 ? (
+            <EmptyState
+              icon={Users}
+              title="No Top Traders Yet"
+              description="Our community is growing! Check back soon to discover talented traders and their strategies."
+              actionLabel="Explore Strategies"
+              onAction={() => {}} // Could navigate to strategies tab
+            />
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {topTraders.map((trader: any) => (
                 <Card key={trader.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <div className="flex items-center gap-3">
@@ -60,7 +104,7 @@ export function SocialTrading() {
                           </AvatarFallback>
                         )}
                       </Avatar>
-                      <div>
+                      <div className="flex-1">
                         <CardTitle className="flex items-center gap-2">
                           {trader.full_name || "Anonymous Trader"}
                           {trader.is_curated_trader && (
@@ -70,7 +114,7 @@ export function SocialTrading() {
                         <CardDescription className="text-xs">
                           <span className="text-muted-foreground">
                             {trader.returns != null ? (
-                              <>Return: <b>{Number(trader.returns).toFixed(2)}%</b></>
+                              <>Return: <b className="text-green-600">{Number(trader.returns).toFixed(2)}%</b></>
                             ) : (
                               "—"
                             )}
@@ -90,7 +134,7 @@ export function SocialTrading() {
                         Sharpe: {trader.sharpe_ratio ? trader.sharpe_ratio.toFixed(2) : "—"}
                       </Badge>
                       {trader.bio && (
-                        <Badge variant="outline">
+                        <Badge variant="outline" className="max-w-[200px] truncate">
                           {trader.bio.length > 22 ? trader.bio.slice(0, 22) + "…" : trader.bio}
                         </Badge>
                       )}
@@ -99,29 +143,48 @@ export function SocialTrading() {
                       <Button variant="secondary" className="flex-1">
                         <BarChart2 className="w-4 h-4 mr-2" /> View Profile
                       </Button>
-                      <Button variant="outline" className="flex-1">
-                        <Copy className="w-4 h-4 mr-2" /> Clone Latest Portfolio
+                      <Button 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => handleFollowToggle(trader.id, false)}
+                        disabled={followUser.isPending}
+                      >
+                        <Copy className="w-4 h-4 mr-2" /> Follow
                       </Button>
                     </div>
                   </CardContent>
                 </Card>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="strategies" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {loadingStrategies ? (
-              <div>Loading strategies...</div>
-            ) : popularStrategies.length === 0 ? (
-              <div>No strategies found</div>
-            ) : (
-              popularStrategies.map((strategy: any) => (
+          {loadingStrategies ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardContent className="p-6">
+                    <div className="h-32 bg-muted rounded"></div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : popularStrategies.length === 0 ? (
+            <EmptyState
+              icon={Activity}
+              title="No Strategies Available"
+              description="Be the first to share a strategy! Create and publish your investment strategy to help others learn."
+              actionLabel="Create Strategy"
+              onAction={() => {}} // Could navigate to strategy creation
+            />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {popularStrategies.map((strategy: any) => (
                 <StrategyCardSocial key={strategy.id} strategy={strategy} />
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="following" className="space-y-6">
@@ -129,19 +192,35 @@ export function SocialTrading() {
             {!user && (
               <Card>
                 <CardContent className="py-8 text-center">
-                  Please sign in to view your feed!
+                  <EmptyState
+                    icon={Users}
+                    title="Sign In Required"
+                    description="Please sign in to view your personalized feed and follow your favorite traders."
+                  />
                 </CardContent>
               </Card>
             )}
             {loadingFeed && user && (
-              <Card>
-                <CardContent>Loading...</CardContent>
-              </Card>
+              <div className="space-y-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Card key={i} className="animate-pulse">
+                    <CardContent className="p-4">
+                      <div className="h-16 bg-muted rounded"></div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             )}
             {!loadingFeed && user && feed.length === 0 && (
               <Card>
                 <CardContent className="text-center py-8">
-                  Your feed is empty. Follow traders and clone strategies to see activity here!
+                  <EmptyState
+                    icon={Activity}
+                    title="Your Feed is Empty"
+                    description="Follow traders and clone strategies to see their latest activities and performance updates here!"
+                    actionLabel="Discover Traders"
+                    onAction={() => {}} // Could switch to traders tab
+                  />
                 </CardContent>
               </Card>
             )}
@@ -152,7 +231,9 @@ export function SocialTrading() {
                     <CardContent className="py-3">
                       <div className="flex items-center gap-2">
                         <Avatar className="h-8 w-8">
-                          <AvatarFallback>U</AvatarFallback>
+                          <AvatarFallback>
+                            {item.user_id?.[0]?.toUpperCase() || "U"}
+                          </AvatarFallback>
                         </Avatar>
                         <div>
                           <span className="font-semibold">{item.type || "Activity"}</span>
