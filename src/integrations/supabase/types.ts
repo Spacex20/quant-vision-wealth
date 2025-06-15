@@ -9,6 +9,61 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      activity_feed: {
+        Row: {
+          content: string | null
+          created_at: string
+          data: Json | null
+          id: string
+          referenced_user: string | null
+          strategy_id: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          data?: Json | null
+          id?: string
+          referenced_user?: string | null
+          strategy_id?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          data?: Json | null
+          id?: string
+          referenced_user?: string | null
+          strategy_id?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_feed_referenced_user_fkey"
+            columns: ["referenced_user"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_feed_strategy_id_fkey"
+            columns: ["strategy_id"]
+            isOneToOne: false
+            referencedRelation: "trading_strategies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_feed_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       alerts: {
         Row: {
           alert_type: Database["public"]["Enums"]["alert_type"]
@@ -190,6 +245,42 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      followers: {
+        Row: {
+          created_at: string
+          followed_id: string
+          follower_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          followed_id: string
+          follower_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          followed_id?: string
+          follower_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "followers_followed_id_fkey"
+            columns: ["followed_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followers_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       investment_server_announcements: {
         Row: {
@@ -923,6 +1014,54 @@ export type Database = {
           },
         ]
       }
+      performance_snapshots: {
+        Row: {
+          drawdown: number | null
+          id: string
+          returns: number | null
+          sharpe_ratio: number | null
+          snapshot_at: string
+          strategy_id: string | null
+          user_id: string | null
+          volatility: number | null
+        }
+        Insert: {
+          drawdown?: number | null
+          id?: string
+          returns?: number | null
+          sharpe_ratio?: number | null
+          snapshot_at?: string
+          strategy_id?: string | null
+          user_id?: string | null
+          volatility?: number | null
+        }
+        Update: {
+          drawdown?: number | null
+          id?: string
+          returns?: number | null
+          sharpe_ratio?: number | null
+          snapshot_at?: string
+          strategy_id?: string | null
+          user_id?: string | null
+          volatility?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_snapshots_strategy_id_fkey"
+            columns: ["strategy_id"]
+            isOneToOne: false
+            referencedRelation: "trading_strategies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_snapshots_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       phone_verifications: {
         Row: {
           attempts: number | null
@@ -1007,12 +1146,14 @@ export type Database = {
         Row: {
           annual_income_range: string | null
           avatar_url: string | null
+          bio: string | null
           created_at: string | null
           email: string | null
           full_name: string | null
           id: string
           investment_experience: string | null
           investment_goals: string[] | null
+          is_curated_trader: boolean
           is_phone_verified: boolean | null
           net_worth_range: string | null
           onboarding_completed: boolean | null
@@ -1022,6 +1163,7 @@ export type Database = {
           provider: string | null
           provider_id: string | null
           risk_tolerance: string | null
+          social_links: Json | null
           time_horizon: string | null
           two_factor_enabled: boolean | null
           two_factor_secret: string | null
@@ -1031,12 +1173,14 @@ export type Database = {
         Insert: {
           annual_income_range?: string | null
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string | null
           id: string
           investment_experience?: string | null
           investment_goals?: string[] | null
+          is_curated_trader?: boolean
           is_phone_verified?: boolean | null
           net_worth_range?: string | null
           onboarding_completed?: boolean | null
@@ -1046,6 +1190,7 @@ export type Database = {
           provider?: string | null
           provider_id?: string | null
           risk_tolerance?: string | null
+          social_links?: Json | null
           time_horizon?: string | null
           two_factor_enabled?: boolean | null
           two_factor_secret?: string | null
@@ -1055,12 +1200,14 @@ export type Database = {
         Update: {
           annual_income_range?: string | null
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
           investment_experience?: string | null
           investment_goals?: string[] | null
+          is_curated_trader?: boolean
           is_phone_verified?: boolean | null
           net_worth_range?: string | null
           onboarding_completed?: boolean | null
@@ -1070,6 +1217,7 @@ export type Database = {
           provider?: string | null
           provider_id?: string | null
           risk_tolerance?: string | null
+          social_links?: Json | null
           time_horizon?: string | null
           two_factor_enabled?: boolean | null
           two_factor_secret?: string | null
@@ -1210,9 +1358,170 @@ export type Database = {
           },
         ]
       }
+      strategy_clones: {
+        Row: {
+          cloned_by: string
+          cloned_from_id: string | null
+          created_at: string
+          id: string
+          name: string | null
+          note: string | null
+          original_owner: string | null
+          strategy_id: string
+        }
+        Insert: {
+          cloned_by: string
+          cloned_from_id?: string | null
+          created_at?: string
+          id?: string
+          name?: string | null
+          note?: string | null
+          original_owner?: string | null
+          strategy_id: string
+        }
+        Update: {
+          cloned_by?: string
+          cloned_from_id?: string | null
+          created_at?: string
+          id?: string
+          name?: string | null
+          note?: string | null
+          original_owner?: string | null
+          strategy_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strategy_clones_cloned_by_fkey"
+            columns: ["cloned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "strategy_clones_cloned_from_id_fkey"
+            columns: ["cloned_from_id"]
+            isOneToOne: false
+            referencedRelation: "strategy_clones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "strategy_clones_original_owner_fkey"
+            columns: ["original_owner"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "strategy_clones_strategy_id_fkey"
+            columns: ["strategy_id"]
+            isOneToOne: false
+            referencedRelation: "trading_strategies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      strategy_comments: {
+        Row: {
+          content: string
+          created_at: string
+          feed_id: string | null
+          id: string
+          strategy_id: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          feed_id?: string | null
+          id?: string
+          strategy_id?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          feed_id?: string | null
+          id?: string
+          strategy_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strategy_comments_feed_id_fkey"
+            columns: ["feed_id"]
+            isOneToOne: false
+            referencedRelation: "activity_feed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "strategy_comments_strategy_id_fkey"
+            columns: ["strategy_id"]
+            isOneToOne: false
+            referencedRelation: "trading_strategies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "strategy_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      strategy_reactions: {
+        Row: {
+          created_at: string
+          feed_id: string | null
+          id: string
+          strategy_id: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feed_id?: string | null
+          id?: string
+          strategy_id?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feed_id?: string | null
+          id?: string
+          strategy_id?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strategy_reactions_feed_id_fkey"
+            columns: ["feed_id"]
+            isOneToOne: false
+            referencedRelation: "activity_feed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "strategy_reactions_strategy_id_fkey"
+            columns: ["strategy_id"]
+            isOneToOne: false
+            referencedRelation: "trading_strategies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "strategy_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trading_strategies: {
         Row: {
           backtest_results: Json | null
+          clones_count: number
           code: string
           created_at: string
           description: string | null
@@ -1221,10 +1530,13 @@ export type Database = {
           language: string
           name: string
           parameters: Json
+          upvotes_count: number
           user_id: string
+          visibility: string
         }
         Insert: {
           backtest_results?: Json | null
+          clones_count?: number
           code: string
           created_at?: string
           description?: string | null
@@ -1233,10 +1545,13 @@ export type Database = {
           language?: string
           name: string
           parameters?: Json
+          upvotes_count?: number
           user_id: string
+          visibility?: string
         }
         Update: {
           backtest_results?: Json | null
+          clones_count?: number
           code?: string
           created_at?: string
           description?: string | null
@@ -1245,7 +1560,9 @@ export type Database = {
           language?: string
           name?: string
           parameters?: Json
+          upvotes_count?: number
           user_id?: string
+          visibility?: string
         }
         Relationships: [
           {
