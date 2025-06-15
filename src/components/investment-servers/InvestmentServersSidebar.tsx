@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, LogIn } from "lucide-react";
@@ -12,7 +11,7 @@ interface Props {
   onRefresh: () => void;
 }
 
-export function InvestmentServersSidebar({ servers, activeServerId, setActiveServerId, onRefresh }: Props) {
+export function InvestmentServersSidebar({ servers, activeServerId, setActiveServerId, onRefresh }: any) {
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
 
@@ -27,7 +26,7 @@ export function InvestmentServersSidebar({ servers, activeServerId, setActiveSer
       <div className="flex-1 px-2 pt-2 overflow-y-auto">
         <h4 className="font-semibold text-xs mb-2">Your Servers</h4>
         {servers.length ? (
-          servers.map(server => (
+          servers.map((server: any) => (
             <Button
               key={server.id}
               variant={activeServerId === server.id ? "secondary" : "ghost"}
@@ -36,11 +35,17 @@ export function InvestmentServersSidebar({ servers, activeServerId, setActiveSer
             >
               <span
                 className="inline-block w-2 h-2 rounded-full mr-2"
-                style={{
-                  background: server.color || "#bbb"
-                }}
+                style={{ background: server.color || "#bbb" }}
               />
-              {server.name}
+              {server.icon_url && (
+                <img src={server.icon_url} alt="icon" className="inline-block w-4 h-4 mr-2 rounded-full object-cover" />
+              )}
+              {server.name}{" "}
+              {Array.isArray(server.category_tags) && server.category_tags.length > 0 && (
+                <span className="ml-2 text-muted-foreground text-[10px]">
+                  [{server.category_tags.slice(0,2).join(", ")}{server.category_tags.length>2 ? "…" : ""}]
+                </span>
+              )}
             </Button>
           ))
         ) : (

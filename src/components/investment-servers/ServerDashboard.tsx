@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -6,10 +5,12 @@ import { Hash } from "lucide-react";
 import { ServerStrategyShares } from "./ServerStrategyShares";
 import { ServerMembers } from "./ServerMembers";
 import { ServerChannelChat } from "./ServerChannelChat";
+import { ServerAboutPanel } from "./ServerAboutPanel";
 
 export function ServerDashboard({ serverId, onRefreshSidebar }: { serverId: string, onRefreshSidebar: () => void }) {
   const [channels, setChannels] = useState<any[]>([]);
   const [selectedChannelId, setSelectedChannelId] = useState<string | null>(null);
+  const [serverMetadata, setServerMetadata] = useState<any>(null);
 
   // Load channels for this server
   useEffect(() => {
@@ -26,6 +27,19 @@ export function ServerDashboard({ serverId, onRefreshSidebar }: { serverId: stri
     }
     fetchChannels();
   }, [serverId]);
+
+  // Fetch server meta (for guidelines, rules, etc)
+  useEffect(() => {
+    async function fetchMeta() {
+      const { data } = await supabase
+        .from("investment_servers")
+        .select("*")
+        .eq("id", serverId)
+        .maybeSingle();
+      setServerMetadata(data || null);
+    }
+    fetchMeta();
+  }, [serverId, onRefreshSidebar]);
 
   return (
     <div className="flex h-full">
@@ -55,6 +69,7 @@ export function ServerDashboard({ serverId, onRefreshSidebar }: { serverId: stri
       </div>
       {/* Right sidebar */}
       <div className="w-64 border-l bg-muted/5 flex flex-col p-2 gap-3">
+        <ServerAboutPanel server={serverMetadata} />
         <ServerMembers serverId={serverId} onChange={onRefreshSidebar} />
         <hr className="my-2" />
         <ServerStrategyShares serverId={serverId} />

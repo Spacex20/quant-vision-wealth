@@ -191,6 +191,90 @@ export type Database = {
         }
         Relationships: []
       }
+      investment_server_announcements: {
+        Row: {
+          banner_url: string | null
+          content: string
+          created_at: string
+          created_by: string
+          id: string
+          server_id: string
+        }
+        Insert: {
+          banner_url?: string | null
+          content: string
+          created_at?: string
+          created_by: string
+          id?: string
+          server_id: string
+        }
+        Update: {
+          banner_url?: string | null
+          content?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          server_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_server_announcements_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_server_announcements_server_id_fkey"
+            columns: ["server_id"]
+            isOneToOne: false
+            referencedRelation: "investment_servers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investment_server_audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          performed_by: string | null
+          server_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          performed_by?: string | null
+          server_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          performed_by?: string | null
+          server_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_server_audit_logs_performed_by_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_server_audit_logs_server_id_fkey"
+            columns: ["server_id"]
+            isOneToOne: false
+            referencedRelation: "investment_servers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       investment_server_channels: {
         Row: {
           created_at: string
@@ -199,6 +283,7 @@ export type Database = {
           name: string
           position: number
           server_id: string
+          type: string
         }
         Insert: {
           created_at?: string
@@ -207,6 +292,7 @@ export type Database = {
           name: string
           position?: number
           server_id: string
+          type?: string
         }
         Update: {
           created_at?: string
@@ -215,6 +301,7 @@ export type Database = {
           name?: string
           position?: number
           server_id?: string
+          type?: string
         }
         Relationships: [
           {
@@ -226,9 +313,61 @@ export type Database = {
           },
         ]
       }
+      investment_server_events: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          end_time: string | null
+          id: string
+          server_id: string
+          start_time: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          server_id: string
+          start_time: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          server_id?: string
+          start_time?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_server_events_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_server_events_server_id_fkey"
+            columns: ["server_id"]
+            isOneToOne: false
+            referencedRelation: "investment_servers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       investment_server_memberships: {
         Row: {
           id: string
+          is_banned: boolean
           joined_at: string
           role: string
           server_id: string
@@ -236,6 +375,7 @@ export type Database = {
         }
         Insert: {
           id?: string
+          is_banned?: boolean
           joined_at?: string
           role?: string
           server_id: string
@@ -243,6 +383,7 @@ export type Database = {
         }
         Update: {
           id?: string
+          is_banned?: boolean
           joined_at?: string
           role?: string
           server_id?: string
@@ -265,6 +406,45 @@ export type Database = {
           },
         ]
       }
+      investment_server_message_reactions: {
+        Row: {
+          created_at: string
+          emoji: string
+          id: string
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji: string
+          id?: string
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_server_message_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "investment_server_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_server_message_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       investment_server_messages: {
         Row: {
           attachments: Json | null
@@ -273,6 +453,8 @@ export type Database = {
           created_at: string
           id: string
           is_pinned: boolean
+          mentions_channel: string[] | null
+          mentions_user: string[] | null
           updated_at: string
           user_id: string
         }
@@ -283,6 +465,8 @@ export type Database = {
           created_at?: string
           id?: string
           is_pinned?: boolean
+          mentions_channel?: string[] | null
+          mentions_user?: string[] | null
           updated_at?: string
           user_id: string
         }
@@ -293,6 +477,8 @@ export type Database = {
           created_at?: string
           id?: string
           is_pinned?: boolean
+          mentions_channel?: string[] | null
+          mentions_user?: string[] | null
           updated_at?: string
           user_id?: string
         }
@@ -368,39 +554,90 @@ export type Database = {
           },
         ]
       }
+      investment_server_subscriptions: {
+        Row: {
+          id: string
+          notification_types: string[] | null
+          server_id: string
+          tag_alerts: string[] | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          notification_types?: string[] | null
+          server_id: string
+          tag_alerts?: string[] | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          notification_types?: string[] | null
+          server_id?: string
+          tag_alerts?: string[] | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_server_subscriptions_server_id_fkey"
+            columns: ["server_id"]
+            isOneToOne: false
+            referencedRelation: "investment_servers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_server_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       investment_servers: {
         Row: {
+          category_tags: string[] | null
           color: string | null
           created_at: string
           created_by: string
           description: string | null
+          guidelines: string | null
           icon_url: string | null
           id: string
           is_public: boolean
           name: string
+          rules: string | null
           updated_at: string
+          visibility: string
         }
         Insert: {
+          category_tags?: string[] | null
           color?: string | null
           created_at?: string
           created_by: string
           description?: string | null
+          guidelines?: string | null
           icon_url?: string | null
           id?: string
           is_public?: boolean
           name: string
+          rules?: string | null
           updated_at?: string
+          visibility?: string
         }
         Update: {
+          category_tags?: string[] | null
           color?: string | null
           created_at?: string
           created_by?: string
           description?: string | null
+          guidelines?: string | null
           icon_url?: string | null
           id?: string
           is_public?: boolean
           name?: string
+          rules?: string | null
           updated_at?: string
+          visibility?: string
         }
         Relationships: [
           {

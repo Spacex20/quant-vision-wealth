@@ -1,52 +1,47 @@
-
 import { useState } from "react";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
 
-interface Props {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  onCreated: () => void;
-}
-export function CreateInvestmentServerDialog({ open, setOpen, onCreated }: Props) {
-  const { user } = useAuth();
+// Added: icon_url (manual for now), tags, rules, guidelines, visibility
+export function CreateInvestmentServerDialog({ open, setOpen, onCreated }: any) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [color, setColor] = useState("#60A5FA");
-  const [isPublic, setIsPublic] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [categoryTags, setCategoryTags] = useState<string>("");
+  const [rules, setRules] = useState("");
+  const [guidelines, setGuidelines] = useState("");
+  const [visibility, setVisibility] = useState<"public" | "private" | "invite-only">("public");
+  const [creating, setCreating] = useState(false);
 
-  const handleCreate = async () => {
-    if (!name.trim() || !user) return;
-    setLoading(true);
-    const { data, error } = await supabase.from("investment_servers").insert([
-      {
+  // NOTE: In production, use upload for icon_url. Here, a text input (a URL) for simplicity.
+  const [iconUrl, setIconUrl] = useState("");
+
+  // Handle creation
+  async function handleCreate() {
+    setCreating(true);
+    const tagsArr = categoryTags.split(",").map(t => t.trim()).filter(Boolean);
+    const { data, error } = await supabase
+      .from("investment_servers")
+      .insert([{
         name,
         description,
-        created_by: user.id,
-        color,
-        is_public: isPublic,
-      }
-    ]).select();
-    if (!error && data?.[0]?.id) {
-      // Add creator as admin
-      await supabase.from("investment_server_memberships").insert({
-        user_id: user.id,
-        server_id: data[0].id,
-        role: "admin"
-      });
+        icon_url: iconUrl || null,
+        category_tags: tagsArr.length ? tagsArr : null,
+        rules: rules || null,
+        guidelines: guidelines || null,
+        visibility,
+      }]);
+    setCreating(false);
+    if (!error) {
       setOpen(false);
-      setName("");
-      setDescription("");
-      setColor("#60A5FA");
-      setIsPublic(true);
-      onCreated();
+      if (onCreated) onCreated();
+      setName(""); setDescription(""); setCategoryTags(""); setRules(""); setGuidelines(""); setIconUrl(""); setVisibility("public");
+    } else {
+      alert("Error: " + error.message);
     }
-    setLoading(false);
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -54,40 +49,43 @@ export function CreateInvestmentServerDialog({ open, setOpen, onCreated }: Props
         <DialogHeader>
           <DialogTitle>Create Investment Server</DialogTitle>
         </DialogHeader>
-        <div className="space-y-3">
-          <Input
-            placeholder="Server Name"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            disabled={loading}
-          />
-          <Input
-            placeholder="Description"
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-            disabled={loading}
-          />
-          <div className="flex items-center gap-2">
-            <span className="text-xs">Color:</span>
-            <input
-              type="color"
-              value={color}
-              onChange={e => setColor(e.target.value)}
-              className="w-8 h-8 rounded border"
-              disabled={loading}
-            />
-            <label className="text-xs">Public?</label>
-            <input
-              type="checkbox"
-              checked={isPublic}
-              onChange={e => setIsPublic(e.target.checked)}
-              disabled={loading}
-            />
+        <div className="flex flex-col gap-3">
+          <Input placeholder="Server Name" value={name} onChange={e => setName(e.target.value)} />
+          <Input placeholder="Icon URL (optional)" value={iconUrl} onChange={e => setIconUrl(e.target.value)} />
+          <Textarea placeholder="Short Description" value={description} onChange={e => setDescription(e.target.value)} />
+          <Input placeholder="Category Tags (comma separated)" value={categoryTags} onChange={e => setCategoryTags(e.target.value)} />
+          <Textarea placeholder="Rules (optional, Markdown supported)" value={rules} onChange={e => setRules(e.target.value)} />
+          <Textarea placeholder="Guidelines (optional, Markdown supported)" value={guidelines} onChange={e => setGuidelines(e.target.value)} />
+          <div className="flex gap-3 mt-2">
+            <label className="flex items-center gap-2 text-xs">
+              <input
+                type="radio"
+                name="visibility"
+                checked={visibility === "public"}
+                onChange={() => setVisibility("public")}
+              /> Public
+            </label>
+            <label className="flex items-center gap-2 text-xs">
+              <input
+                type="radio"
+                name="visibility"
+                checked={visibility === "private"}
+                onChange={() => setVisibility("private")}
+              /> Private
+            </label>
+            <label className="flex items-center gap-2 text-xs">
+              <input
+                type="radio"
+                name="visibility"
+                checked={visibility === "invite-only"}
+                onChange={() => setVisibility("invite-only")}
+              /> Invite-only
+            </label>
           </div>
-          <Button className="w-full" onClick={handleCreate} disabled={loading || !name.trim()}>
-            {loading ? "Creating..." : "Create"}
-          </Button>
         </div>
+        <DialogFooter>
+          <Button onClick={handleCreate} disabled={creating}>{creating ? "Creating..." : "Create"}</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
