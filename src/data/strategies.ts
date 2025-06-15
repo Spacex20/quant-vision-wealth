@@ -449,4 +449,39 @@ export const libraryStrategies: Strategy[] = [
     implementationNotes: "Quarterly rebalance; maintain risk-parity through volatility-adjusted allocations. Broadest all-weather coverage.",
     chartData: generateChartData(100, 10, 0.028, 0.0008),
   },
+  // Golden Butterfly Portfolio
+  {
+    id: 'golden-butterfly',
+    name: 'Golden Butterfly Portfolio',
+    icon: Shield, // Shield for resilience/growth, but you can swap to any other Lucide icon if desired
+    description: 'Stability plus solid growth via equal allocation to stocks, bonds, and gold.',
+    objective: 'Balance stability and growth with a simple, all-weather allocation.',
+    allocation: [
+      { asset: 'Total Stock Market', weight: 20, etf: 'VTI' },
+      { asset: 'Small Cap Value', weight: 20, etf: 'VBR' },
+      { asset: 'Long-Term Bonds', weight: 20, etf: 'TLT' },
+      { asset: 'Short-Term Bonds', weight: 20, etf: 'SHY' },
+      { asset: 'Gold', weight: 20, etf: 'GLD' },
+    ],
+    riskProfile: 'Medium',
+    expectedReturn: 7.0,
+    volatility: 8.5,
+    sharpeRatio: 0.74,
+    bestYear: { year: 2019, return: 18.5 },
+    worstYear: { year: 2022, return: -6.4 },
+    sectorExposure: [
+      { sector: 'Stocks (Total Market)', weight: 20 },
+      { sector: 'Small Cap Value', weight: 20 },
+      { sector: 'Bonds (Long-Term)', weight: 20 },
+      { sector: 'Bonds (Short-Term)', weight: 20 },
+      { sector: 'Commodities (Gold)', weight: 20 },
+    ],
+    assetExposure: [
+      { asset: 'Equity', weight: 40 },
+      { asset: 'Bonds', weight: 40 },
+      { asset: 'Commodities', weight: 20 }
+    ],
+    implementationNotes: "Annually rebalance. Combines growth engine (stocks), stability (bonds), and inflation hedge (gold). Good for hands-off investors.",
+    chartData: generateChartData(100, 10, 0.025, 0.0007),
+  },
 ];
