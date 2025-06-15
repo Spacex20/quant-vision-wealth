@@ -19,6 +19,9 @@ import { Button } from "@/components/ui/button";
 import { PersonalizedStockIdeasModal } from "@/components/stock-ideas/PersonalizedStockIdeasModal";
 import { Sparkles } from "lucide-react";
 import { OnboardingTourProvider, useOnboardingTour } from "@/components/onboarding/OnboardingTour";
+import { UserStreakWidget } from "@/components/gamification/UserStreakWidget";
+import { UserBadgesWidget } from "@/components/gamification/UserBadgesWidget";
+import { LeaderboardWidget } from "@/components/gamification/LeaderboardWidget";
 
 function RestartTourBtn() {
   const { startTour } = useOnboardingTour();
@@ -63,6 +66,16 @@ const Index = () => {
         </button>
         <PersonalizedStockIdeasModal open={showIdeasModal} onOpenChange={setShowIdeasModal} />
         <div className="container mx-auto px-4 py-6">
+          {/* GAMIFICATION ROW: Streak, Badges, Leaderboard */}
+          <div className="flex flex-col lg:flex-row gap-4 mb-8 items-center">
+            <div className="flex-1 min-w-[220px]">
+              <UserStreakWidget />
+              <UserBadgesWidget />
+            </div>
+            <div className="min-w-[280px] w-full max-w-xs">
+              <LeaderboardWidget />
+            </div>
+          </div>
           <div className="mb-8 flex justify-between flex-wrap gap-2 items-center">
             <div>
               <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">

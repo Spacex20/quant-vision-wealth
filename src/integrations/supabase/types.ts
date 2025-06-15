@@ -740,6 +740,30 @@ export type Database = {
           },
         ]
       }
+      leaderboards: {
+        Row: {
+          id: string
+          points: number
+          rank: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          points?: number
+          rank?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          points?: number
+          rank?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       market_data_cache: {
         Row: {
           data: Json
@@ -1574,6 +1598,33 @@ export type Database = {
           },
         ]
       }
+      user_badges: {
+        Row: {
+          awarded_at: string
+          badge_icon: string
+          badge_type: string
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          awarded_at?: string
+          badge_icon?: string
+          badge_type: string
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          awarded_at?: string
+          badge_icon?: string
+          badge_type?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_portfolios: {
         Row: {
           assets: Json
@@ -1668,6 +1719,39 @@ export type Database = {
           is_active?: boolean | null
           last_activity?: string | null
           session_token?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_streaks: {
+        Row: {
+          best_streak: number
+          created_at: string
+          current_streak: number
+          id: string
+          last_activity: string
+          streak_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          best_streak?: number
+          created_at?: string
+          current_streak?: number
+          id?: string
+          last_activity?: string
+          streak_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          best_streak?: number
+          created_at?: string
+          current_streak?: number
+          id?: string
+          last_activity?: string
+          streak_type?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
