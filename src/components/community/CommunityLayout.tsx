@@ -30,7 +30,7 @@ interface Message {
   user_profile?: {
     full_name: string;
     avatar_url: string;
-  };
+  } | null;
   reactions?: Array<{
     emoji: string;
     count: number;
@@ -50,7 +50,17 @@ interface OnlineUser {
   name: string;
   avatar: string;
   status: 'online' | 'idle' | 'offline';
+  role: 'admin' | 'moderator' | 'member' | 'guest';
   last_seen?: string;
+}
+
+interface PresenceState {
+  [key: string]: Array<{
+    user_id: string;
+    user_name: string;
+    typing: boolean;
+    channel_id: string;
+  }>;
 }
 
 export function CommunityLayout() {
@@ -136,14 +146,16 @@ export function CommunityLayout() {
     const typingChannel = supabase
       .channel(`typing-${activeChannel}`)
       .on('presence', { event: 'sync' }, () => {
-        const newState = typingChannel.presenceState();
+        const newState = typingChannel.presenceState() as PresenceState;
         const typingData: Record<string, string[]> = {};
-        Object.entries(newState).forEach(([userId, presence]) => {
-          if (presence[0]?.typing && userId !== user.id) {
-            const channelId = presence[0].channel_id;
-            if (!typingData[channelId]) typingData[channelId] = [];
-            typingData[channelId].push(presence[0].user_name);
-          }
+        Object.entries(newState).forEach(([userId, presences]) => {
+          presences.forEach(presence => {
+            if (presence.typing && userId !== user.id) {
+              const channelId = presence.channel_id;
+              if (!typingData[channelId]) typingData[channelId] = [];
+              typingData[channelId].push(presence.user_name);
+            }
+          });
         });
         setTypingUsers(typingData);
       })

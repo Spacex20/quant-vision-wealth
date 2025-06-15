@@ -49,7 +49,7 @@ interface Message {
   user_profile?: {
     full_name: string;
     avatar_url: string;
-  };
+  } | null;
   reactions?: Array<{
     emoji: string;
     count: number;
@@ -243,13 +243,13 @@ export function ChatPanel({
                     <div key={message.id} className="p-3 border rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <Avatar className="w-6 h-6">
-                          <AvatarImage src={message.user_profile?.avatar_url} />
+                          <AvatarImage src={message.user_profile?.avatar_url || undefined} />
                           <AvatarFallback className="text-xs">
-                            {getInitials(message.user_profile?.full_name || '')}
+                            {getInitials(message.user_profile?.full_name || 'Unknown')}
                           </AvatarFallback>
                         </Avatar>
                         <span className="text-sm font-medium">
-                          {message.user_profile?.full_name}
+                          {message.user_profile?.full_name || 'Unknown User'}
                         </span>
                         <span className="text-xs text-muted-foreground">
                           {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
@@ -274,7 +274,7 @@ export function ChatPanel({
           <div className="flex items-center gap-2">
             <Reply className="w-4 h-4" />
             <span className="text-sm">
-              Replying to <strong>{replyingTo.user_profile?.full_name}</strong>
+              Replying to <strong>{replyingTo.user_profile?.full_name || 'Unknown User'}</strong>
             </span>
             <span className="text-xs text-muted-foreground truncate max-w-xs">
               {replyingTo.content}
@@ -298,6 +298,8 @@ export function ChatPanel({
             const timeAgo = formatDistanceToNow(new Date(message.created_at), { addSuffix: true });
             const isOwn = message.user_id === user?.id;
             const isEditing = editingMessageId === message.id;
+            const userName = message.user_profile?.full_name || 'Unknown User';
+            const userAvatar = message.user_profile?.avatar_url;
             
             return (
               <div
@@ -310,9 +312,9 @@ export function ChatPanel({
                 <div className="flex-shrink-0">
                   {showAvatar ? (
                     <Avatar className="w-10 h-10">
-                      <AvatarImage src={message.user_profile?.avatar_url} />
+                      <AvatarImage src={userAvatar || undefined} />
                       <AvatarFallback>
-                        {getInitials(message.user_profile?.full_name || '')}
+                        {getInitials(userName)}
                       </AvatarFallback>
                     </Avatar>
                   ) : (
@@ -330,7 +332,7 @@ export function ChatPanel({
                   {showAvatar && (
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-semibold text-sm">
-                        {message.user_profile?.full_name || 'Anonymous'}
+                        {userName}
                       </span>
                       <span className="text-xs text-muted-foreground">
                         {timeAgo}

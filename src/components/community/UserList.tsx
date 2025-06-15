@@ -50,8 +50,8 @@ export function UserList({ onlineUsers }: UserListProps) {
         id: profile.id,
         name: profile.full_name || 'Anonymous',
         avatar: profile.full_name?.split(' ').map(n => n[0]).join('') || 'A',
-        status: Math.random() > 0.3 ? 'online' : 'offline', // Mock status
-        role: (profile.user_roles as any)?.[0]?.role || 'member',
+        status: Math.random() > 0.3 ? 'online' : 'offline' as 'online' | 'offline',
+        role: (profile.user_roles as any)?.[0]?.role || 'member' as 'admin' | 'moderator' | 'member' | 'guest',
         last_seen: new Date(Date.now() - Math.random() * 3600000).toISOString()
       }));
 
