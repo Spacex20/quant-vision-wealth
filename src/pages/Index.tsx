@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PortfolioOverview } from "@/components/portfolio/PortfolioOverview";
@@ -22,6 +23,7 @@ import { OnboardingTourProvider, useOnboardingTour } from "@/components/onboardi
 import { UserStreakWidget } from "@/components/gamification/UserStreakWidget";
 import { UserBadgesWidget } from "@/components/gamification/UserBadgesWidget";
 import { LeaderboardWidget } from "@/components/gamification/LeaderboardWidget";
+import { Card, CardContent } from "@/components/ui/card";
 
 function RestartTourBtn() {
   const { startTour } = useOnboardingTour();
@@ -65,35 +67,42 @@ const Index = () => {
           Personalized Ideas
         </button>
         <PersonalizedStockIdeasModal open={showIdeasModal} onOpenChange={setShowIdeasModal} />
-        <div className="container mx-auto px-4 py-6">
+        <div className="container mx-auto px-0 py-6 max-w-6xl">
           {/* GAMIFICATION ROW: Streak, Badges, Leaderboard */}
-          <div className="flex flex-col lg:flex-row gap-4 mb-8 items-center">
-            <div className="flex-1 min-w-[220px]">
-              <UserStreakWidget />
-              <UserBadgesWidget />
-            </div>
-            <div className="min-w-[280px] w-full max-w-xs">
-              <LeaderboardWidget />
-            </div>
+          <div className="flex flex-col lg:flex-row gap-4 mb-8 items-stretch">
+            <Card className="flex-1 min-w-[260px] bg-white/90 dark:bg-card/80 shadow-md">
+              <CardContent className="p-4">
+                <UserStreakWidget />
+                <UserBadgesWidget />
+              </CardContent>
+            </Card>
+            <Card className="min-w-[320px] w-full max-w-xs bg-white/90 dark:bg-card/80 shadow-md flex flex-col">
+              <CardContent className="p-3 h-full flex flex-col">
+                <LeaderboardWidget />
+              </CardContent>
+            </Card>
           </div>
-          <div className="mb-8 flex justify-between flex-wrap gap-2 items-center">
-            <div>
-              <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Portfolio Intelligence Platform
-              </h1>
-              <p className="text-xl text-muted-foreground">
-                Build wealth with AI-driven insights and proven investment strategies 💎
-              </p>
-            </div>
-            {!user && (
-              <Button 
-                onClick={() => navigate('/login')} 
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-              >
-                Get Started Free 🚀
-              </Button>
-            )}
-          </div>
+          {/* Hero/Info section in a Card */}
+          <Card className="mb-8 bg-gradient-to-r from-blue-50/60 to-purple-50/70 dark:from-card dark:to-card">
+            <CardContent className="flex flex-col lg:flex-row justify-between items-center gap-2 py-8 px-6">
+              <div>
+                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  Portfolio Intelligence Platform
+                </h1>
+                <p className="text-xl text-muted-foreground">
+                  Build wealth with AI-driven insights and proven investment strategies 💎
+                </p>
+              </div>
+              {!user && (
+                <Button 
+                  onClick={() => navigate('/login')} 
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 mt-4 lg:mt-0"
+                >
+                  Get Started Free 🚀
+                </Button>
+              )}
+            </CardContent>
+          </Card>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList id="mainNavbarTabs" className="grid w-full grid-cols-5 lg:grid-cols-10 mb-8">
               <TabsTrigger value="overview">Overview</TabsTrigger>
