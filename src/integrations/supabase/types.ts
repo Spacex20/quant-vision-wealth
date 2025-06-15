@@ -85,12 +85,80 @@ export type Database = {
           },
         ]
       }
+      channel_invites: {
+        Row: {
+          channel_id: string
+          created_at: string
+          id: string
+          invitee_id: string
+          inviter_id: string
+          status: string
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string
+          id?: string
+          invitee_id: string
+          inviter_id: string
+          status?: string
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string
+          id?: string
+          invitee_id?: string
+          inviter_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_invites_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      channel_memberships: {
+        Row: {
+          channel_id: string
+          id: string
+          joined_at: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          channel_id: string
+          id?: string
+          joined_at?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          channel_id?: string
+          id?: string
+          joined_at?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_memberships_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       channels: {
         Row: {
           category: string
           created_at: string
           description: string | null
           id: string
+          is_dm: boolean
           is_private: boolean
           name: string
           position: number
@@ -102,6 +170,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          is_dm?: boolean
           is_private?: boolean
           name: string
           position?: number
@@ -113,6 +182,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          is_dm?: boolean
           is_private?: boolean
           name?: string
           position?: number
@@ -164,6 +234,35 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "message_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      message_reads: {
+        Row: {
+          id: string
+          message_id: string
+          seen_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          message_id: string
+          seen_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          message_id?: string
+          seen_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_reads_message_id_fkey"
             columns: ["message_id"]
             isOneToOne: false
             referencedRelation: "messages"
