@@ -76,7 +76,8 @@ export function CommunityLayout() {
 
       {/* Right Sidebar - Online Users */}
       <div className="w-48 bg-muted/20 border-l">
-        <UserList channelId={activeChannel} />
+        {/* UserList expects an `onlineUsers` prop */}
+        <UserList onlineUsers={[]} />
       </div>
     </div>
   );

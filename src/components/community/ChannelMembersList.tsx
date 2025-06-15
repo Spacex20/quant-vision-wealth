@@ -25,24 +25,31 @@ export function ChannelMembersList({ channelId }: { channelId: string }) {
 
   useEffect(() => {
     if (!channelId) return;
-    setLoading(true);
-    supabase
-      .from("channel_memberships")
-      .select(`
-        id, channel_id, user_id, joined_at, role,
-        profile:profiles(full_name, avatar_url)
-      `)
-      .eq("channel_id", channelId)
-      .then(({ data }) => {
-        // Defensive: filter out "profile" errors and ensure "profile" shape
+
+    const fetchMembers = async () => {
+      setLoading(true);
+      try {
+        const { data } = await supabase
+          .from("channel_memberships")
+          .select(`
+            id, channel_id, user_id, joined_at, role,
+            profile:profiles(full_name, avatar_url)
+          `)
+          .eq("channel_id", channelId);
+        // Defensive: filter out bad profiles and ensure correct shape
         const safeMembers: Member[] = (data || []).map((m: any) => ({
           ...m,
           profile: m.profile && m.profile.full_name ? m.profile : undefined
         }));
         setMembers(safeMembers);
-      })
-      .catch(() => setMembers([]))
-      .finally(() => setLoading(false));
+      } catch {
+        setMembers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMembers();
   }, [channelId]);
 
   const handleRemove = async (member: Member) => {

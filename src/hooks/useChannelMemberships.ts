@@ -18,15 +18,27 @@ export function useChannelMemberships(channelId?: string) {
 
   useEffect(() => {
     if (!user) return;
-    setLoading(true);
 
-    let query = supabase.from("channel_memberships").select("*").eq("user_id", user.id);
-    if (channelId) {
-      query = query.eq("channel_id", channelId);
-    }
-    query.then(({ data }) => setMemberships(data || []))
-      .catch(() => setMemberships([]))
-      .finally(() => setLoading(false));
+    const fetchMemberships = async () => {
+      setLoading(true);
+      try {
+        let query = supabase
+          .from("channel_memberships")
+          .select("*")
+          .eq("user_id", user.id);
+        if (channelId) {
+          query = query.eq("channel_id", channelId);
+        }
+        const { data } = await query;
+        setMemberships(data || []);
+      } catch {
+        setMemberships([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMemberships();
   }, [user, channelId]);
 
   return { memberships, loading };

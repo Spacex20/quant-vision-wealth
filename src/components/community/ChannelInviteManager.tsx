@@ -25,14 +25,23 @@ export function ChannelInviteManager() {
   // Load invites for user
   useEffect(() => {
     if (!user) return;
-    setLoading(true);
-    supabase
-      .from("channel_invites")
-      .select("*")
-      .eq("invitee_id", user.id)
-      .then(({ data }) => setInvites(data || []))
-      .catch(() => setInvites([]))
-      .finally(() => setLoading(false));
+
+    const fetchInvites = async () => {
+      setLoading(true);
+      try {
+        const { data } = await supabase
+          .from("channel_invites")
+          .select("*")
+          .eq("invitee_id", user.id);
+        setInvites(data || []);
+      } catch {
+        setInvites([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInvites();
   }, [user, open]);
 
   const handleAccept = async (invite: ChannelInvite) => {
