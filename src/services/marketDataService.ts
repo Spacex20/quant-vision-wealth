@@ -1,3 +1,5 @@
+import { API_CONFIG, API_ENDPOINTS } from './apiConfig';
+
 // Enhanced Market Data Service - Integrates multiple free APIs for comprehensive market data
 export interface RealTimeQuote {
   symbol: string;
@@ -88,15 +90,6 @@ class MarketDataService {
     news: 600000, // 10 minutes for news
   };
 
-  // API Configuration - Replace 'demo' with actual API keys
-  private readonly API_KEYS = {
-    ALPHA_VANTAGE: 'demo', // Replace with actual key
-    FMP: 'demo', // Replace with actual key
-    FINNHUB: 'demo', // Replace with actual key
-    MARKETAUX: 'demo', // Replace with actual key
-    NEWS_API: 'demo' // Replace with actual key
-  };
-
   private getCachedData<T>(key: string): T | null {
     const cached = this.cache.get(key);
     if (cached && Date.now() - cached.timestamp < cached.ttl) {
@@ -110,17 +103,17 @@ class MarketDataService {
     this.cache.set(key, { data, timestamp: Date.now(), ttl });
   }
 
-  // Alpha Vantage Integration
+  // Alpha Vantage Integration with your API key
   async getRealTimeQuote(symbol: string): Promise<RealTimeQuote> {
     const cacheKey = `realtime_${symbol}`;
     const cached = this.getCachedData<RealTimeQuote>(cacheKey);
     if (cached) return cached;
 
     try {
-      console.log(`Fetching real-time quote for ${symbol} from Alpha Vantage`);
+      console.log(`Fetching real-time quote for ${symbol} from Alpha Vantage with your API key`);
       
       const response = await fetch(
-        `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${this.API_KEYS.ALPHA_VANTAGE}`
+        `${API_ENDPOINTS.ALPHA_VANTAGE}?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${API_CONFIG.ALPHA_VANTAGE}`
       );
       
       if (!response.ok) {
@@ -130,7 +123,7 @@ class MarketDataService {
       const data = await response.json();
       
       if (data['Error Message'] || data['Note'] || data['Information']) {
-        console.log('Alpha Vantage API limit reached or error, using fallback');
+        console.log('Alpha Vantage API limit reached or error, using fallback:', data);
         return this.getFallbackQuote(symbol);
       }
 
@@ -153,14 +146,34 @@ class MarketDataService {
         lastUpdated: quote['07. Latest Trading Day'] || new Date().toISOString(),
       };
 
-      // Enhance with FMP data if available
-      await this.enhanceQuoteWithFMP(result);
+      // Enhance with company overview if available
+      await this.enhanceQuoteWithOverview(result);
 
       this.setCachedData(cacheKey, result, this.CACHE_TTL.realtime);
       return result;
     } catch (error) {
       console.error('Error fetching real-time quote:', error);
       return this.getFallbackQuote(symbol);
+    }
+  }
+
+  // Enhanced with your Alpha Vantage API key
+  private async enhanceQuoteWithOverview(quote: RealTimeQuote): Promise<void> {
+    try {
+      const response = await fetch(
+        `${API_ENDPOINTS.ALPHA_VANTAGE}?function=OVERVIEW&symbol=${quote.symbol}&apikey=${API_CONFIG.ALPHA_VANTAGE}`
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data['Symbol'] && !data['Error Message']) {
+          quote.marketCap = parseInt(data['MarketCapitalization']) || quote.marketCap;
+          quote.peRatio = parseFloat(data['PERatio']) || quote.peRatio;
+          quote.dividendYield = parseFloat(data['DividendYield']) || quote.dividendYield;
+        }
+      }
+    } catch (error) {
+      console.log('Overview enhancement failed, continuing with quote data');
     }
   }
 

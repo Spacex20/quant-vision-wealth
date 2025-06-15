@@ -1,4 +1,3 @@
-
 // News Service - Aggregates financial news from multiple sources
 export interface NewsArticle {
   id: string;
@@ -27,16 +26,13 @@ export interface NewsSource {
   country: string;
 }
 
+import { API_CONFIG, API_ENDPOINTS } from './apiConfig';
+
 class NewsService {
   private cache: Map<string, { data: any; timestamp: number; ttl: number }> = new Map();
   private readonly CACHE_TTL = {
     news: 600000, // 10 minutes
     sources: 3600000, // 1 hour
-  };
-
-  private readonly API_KEYS = {
-    MARKETAUX: 'demo', // Replace with actual key
-    NEWS_API: 'demo', // Replace with actual key
   };
 
   private getCachedData<T>(key: string): T | null {
@@ -59,9 +55,9 @@ class NewsService {
     if (cached) return cached;
 
     try {
-      console.log('Fetching financial news from Marketaux');
+      console.log('Fetching financial news from Marketaux with real API key');
       
-      let url = `https://api.marketaux.com/v1/news/all?language=en&limit=${limit}&api_token=${this.API_KEYS.MARKETAUX}`;
+      let url = `${API_ENDPOINTS.MARKETAUX}/news/all?language=en&limit=${limit}&api_token=${API_CONFIG.MARKETAUX}`;
       
       if (symbols && symbols.length > 0) {
         url += `&symbols=${symbols.join(',')}`;
