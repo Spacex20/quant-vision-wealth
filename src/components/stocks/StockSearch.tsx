@@ -7,16 +7,16 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Search, Plus, AlertTriangle } from "lucide-react";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
-import { financialApi } from "@/services/financialApi";
+import { unifiedMarketData, UnifiedSearchResult } from "@/services/unifiedMarketData";
 
 interface StockSearchProps {
   onSelectStock?: (stockData: any) => void;
   placeholder?: string;
 }
 
-export const StockSearch = ({ onSelectStock, placeholder = "Search stocks (e.g., AAPL, Tesla)..." }: StockSearchProps) => {
+export const StockSearch = ({ onSelectStock, placeholder = "Search stocks (e.g., RELIANCE, TCS)..." }: StockSearchProps) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<UnifiedSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,18 +30,10 @@ export const StockSearch = ({ onSelectStock, placeholder = "Search stocks (e.g.,
     setError(null);
     
     try {
-      const results = await financialApi.searchStocks(searchQuery);
+      const results = await unifiedMarketData.searchStocks(searchQuery);
+      setSearchResults(results);
       
-      // Add mock price data to search results
-      const enhancedResults = results.map(stock => ({
-        ...stock,
-        price: 100 + Math.random() * 200,
-        change: (Math.random() - 0.5) * 10
-      }));
-      
-      setSearchResults(enhancedResults);
-      
-      if (enhancedResults.length === 0) {
+      if (results.length === 0) {
         setError("No stocks found matching your search");
       }
     } catch (err) {
@@ -53,9 +45,16 @@ export const StockSearch = ({ onSelectStock, placeholder = "Search stocks (e.g.,
     }
   };
 
-  const handleSelectStock = (stock: any) => {
+  const handleSelectStock = async (stock: UnifiedSearchResult) => {
     if (onSelectStock) {
-      onSelectStock(stock);
+      try {
+        // Get detailed quote for the selected stock
+        const quote = await unifiedMarketData.getStockQuote(stock.symbol);
+        onSelectStock(quote);
+      } catch (error) {
+        console.error('Error fetching stock details:', error);
+        onSelectStock(stock);
+      }
     }
     setSearchQuery("");
     setSearchResults([]);
@@ -68,11 +67,16 @@ export const StockSearch = ({ onSelectStock, placeholder = "Search stocks (e.g.,
     }
   };
 
+  const currentMarket = unifiedMarketData.getCurrentMarket();
+  const currentPlaceholder = currentMarket === 'IN' 
+    ? "Search Indian stocks (e.g., RELIANCE, TCS, INFY)..."
+    : "Search US stocks (e.g., AAPL, MSFT, GOOGL)...";
+
   return (
     <div className="space-y-4">
       <div className="flex space-x-2">
         <Input
-          placeholder={placeholder}
+          placeholder={placeholder || currentPlaceholder}
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);
@@ -102,22 +106,26 @@ export const StockSearch = ({ onSelectStock, placeholder = "Search stocks (e.g.,
       {searchResults.length > 0 && !isLoading && (
         <div className="space-y-2">
           {searchResults.map((stock) => (
-            <Card key={`${stock.symbol}-${stock.name}`} className="cursor-pointer hover:shadow-md transition-shadow">
+            <Card key={`${stock.symbol}-${stock.market}`} className="cursor-pointer hover:shadow-md transition-shadow">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="font-medium">{stock.symbol}</div>
+                    <div className="font-medium flex items-center space-x-2">
+                      <span>{stock.symbol}</span>
+                      <Badge variant="outline" className="text-xs">
+                        {stock.exchange || (stock.market === 'IN' ? 'NSE' : 'NASDAQ')}
+                      </Badge>
+                      {stock.market === 'IN' && <span className="text-xs">🇮🇳</span>}
+                      {stock.market === 'US' && <span className="text-xs">🇺🇸</span>}
+                    </div>
                     <div className="text-sm text-muted-foreground">{stock.name}</div>
+                    {stock.sector && (
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Sector: {stock.sector}
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="text-right">
-                      <div className="font-medium">${stock.price?.toFixed(2) || 'N/A'}</div>
-                      {stock.change !== undefined && (
-                        <Badge variant={stock.change >= 0 ? "default" : "destructive"}>
-                          {stock.change >= 0 ? "+" : ""}{stock.change.toFixed(2)}
-                        </Badge>
-                      )}
-                    </div>
                     {onSelectStock && (
                       <Button
                         size="sm"
