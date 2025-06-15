@@ -50,7 +50,7 @@ const Index = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 lg:grid-cols-9 mb-8">
+          <TabsList className="grid w-full grid-cols-5 lg:grid-cols-10 mb-8">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="builder">Builder</TabsTrigger>
             <TabsTrigger value="manager">Manager</TabsTrigger>
@@ -59,6 +59,7 @@ const Index = () => {
             <TabsTrigger value="screener">Screener</TabsTrigger>
             <TabsTrigger value="quantlab">Quant Lab</TabsTrigger>
             <TabsTrigger value="simulator">Simulator</TabsTrigger>
+            <TabsTrigger value="community">Community</TabsTrigger>
             <TabsTrigger value="education">Education</TabsTrigger>
           </TabsList>
 
@@ -107,6 +108,12 @@ const Index = () => {
           <TabsContent value="simulator" className="space-y-6">
             <ErrorBoundary>
               <PortfolioSimulator />
+            </ErrorBoundary>
+          </TabsContent>
+
+          <TabsContent value="community" className="space-y-6">
+            <ErrorBoundary>
+              <CommunityHub />
             </ErrorBoundary>
           </TabsContent>
 
