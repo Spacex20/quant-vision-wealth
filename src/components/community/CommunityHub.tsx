@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +10,8 @@ import { CommunityLayout } from "./CommunityLayout";
 import { InvestmentServers } from "./InvestmentServers";
 import { LiveSessions } from "./LiveSessions";
 import { SocialTrading } from "./SocialTrading";
+// ADD THIS IMPORT:
+import { InvestmentServersPage } from "@/components/investment-servers";
 
 export function CommunityHub() {
   const [activeTab, setActiveTab] = useState("chat");
