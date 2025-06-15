@@ -6,8 +6,25 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { Download, FileText } from "lucide-react";
 
+interface PortfolioAsset {
+  symbol: string;
+  name: string;
+  allocation: number;
+  shares?: number;
+  avgCost?: number;
+}
 interface SummaryReportProps {
-  portfolio: any; // Portfolio type is flexible for now
+  portfolio: {
+    name?: string;
+    description?: string;
+    total_value?: number;
+    totalValue?: number;
+    assets?: PortfolioAsset[];
+    updated_at?: string;
+    updatedAt?: string;
+    // More portfolio fields can be added here
+    [key: string]: any;
+  };
   onDownloadJSON: () => void;
 }
 
@@ -27,13 +44,21 @@ export function SummaryReport({ portfolio, onDownloadJSON }: SummaryReportProps)
     pdf.save(`${portfolio.name || "portfolio"}-summary.pdf`);
   };
 
+  // Robust data handling for different portfolio sources
+  const formattedValue = (portfolio.total_value ?? portfolio.totalValue ?? 0);
+  const assetsArray = portfolio.assets ?? [];
+  const lastUpdatedStr = portfolio.updated_at || portfolio.updatedAt || null;
+  const lastUpdated = lastUpdatedStr
+    ? new Date(lastUpdatedStr).toLocaleDateString()
+    : "N/A";
+
   // [Summary stats]
   const stats = [
-    { label: "Value", value: `$${(portfolio.total_value || 0).toLocaleString()}` },
-    { label: "Assets", value: (portfolio.assets?.length || 0).toString() },
-    { label: "Updated", value: portfolio.updated_at ? new Date(portfolio.updated_at).toLocaleDateString() : "N/A" },
+    { label: "Value", value: `$${(+formattedValue).toLocaleString()}` },
+    { label: "Assets", value: assetsArray.length.toString() },
+    { label: "Updated", value: lastUpdated },
   ];
-  
+
   return (
     <Collapsible defaultOpen>
       <div className="mb-2 flex items-center justify-between">
@@ -53,26 +78,33 @@ export function SummaryReport({ portfolio, onDownloadJSON }: SummaryReportProps)
         <div ref={reportRef}>
           <Card className="mb-2">
             <CardHeader>
-              <CardTitle>{portfolio.name}</CardTitle>
-              <CardDescription>{portfolio.description}</CardDescription>
+              <CardTitle>{portfolio.name || "Portfolio"}</CardTitle>
+              <CardDescription>{portfolio.description ?? "No description provided."}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-4 mb-3">
                 {stats.map(s =>
-                  <div key={s.label} className="flex flex-col items-center bg-secondary p-3 rounded-md min-w-[80px]">
+                  <div
+                    key={s.label}
+                    className="flex flex-col items-center bg-secondary p-3 rounded-md min-w-[80px]"
+                  >
                     <span className="font-bold text-lg text-foreground">{s.value}</span>
                     <span className="text-xs text-muted-foreground">{s.label}</span>
                   </div>
                 )}
               </div>
-              <div className="space-y-2">
-                <div className="font-semibold">Top Holdings:</div>
-                <ul className="text-sm ml-2">
-                  {(portfolio.assets || []).slice(0, 5).map((a: any) => (
-                    <li key={a.symbol}>{a.name} ({a.symbol}): {a.allocation}%</li>
-                  ))}
-                </ul>
-              </div>
+              {assetsArray.length > 0 && (
+                <div className="space-y-2">
+                  <div className="font-semibold">Top Holdings:</div>
+                  <ul className="text-sm ml-2">
+                    {assetsArray.slice(0, 5).map((a: any) => (
+                      <li key={a.symbol}>
+                        {a.name || "-"} ({a.symbol || "-"}){typeof a.allocation === "number" ? `: ${a.allocation}%` : null}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               {/* Could add chart screenshots here */}
             </CardContent>
           </Card>
