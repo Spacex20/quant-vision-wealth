@@ -88,6 +88,16 @@ const Index = () => {
                 <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-playfair drop-shadow-lg tracking-tight animate-fade-in">
                   One Dashboard. Infinite Strategies.
                 </h1>
+                <div
+                  className="text-xl font-semibold mt-1 bg-gradient-to-r from-fuchsia-500 via-blue-600 to-purple-600 bg-clip-text text-transparent font-sans tracking-tight drop-shadow-md animate-fade-in"
+                  style={{
+                    letterSpacing: "0.01em",
+                    lineHeight: "1.45"
+                  }}
+                >
+                  Test, tweak, and track your portfolio —&nbsp;
+                  <span className="font-bold">powered by quant models and real data.</span>
+                </div>
               </div>
               {!user && (
                 <Button 
