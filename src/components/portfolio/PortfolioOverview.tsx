@@ -136,7 +136,6 @@ export const PortfolioOverview = () => {
         <h2 className="text-3xl font-bold mb-2">Portfolio Overview</h2>
         <div className="flex gap-2">
           <Button onClick={() => setShowSave(true)}>Save Portfolio</Button>
-          {/* Export actions in summary report */}
         </div>
       </div>
 
@@ -148,13 +147,13 @@ export const PortfolioOverview = () => {
 
       {/* Demo Portfolio Notice */}
       {isDemoPortfolio(activePortfolio) && (
-        <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
+        <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30">
           <CardContent className="pt-6">
             <div className="flex items-center space-x-3">
-              <Sparkles className="h-5 w-5 text-blue-600" />
+              <Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               <div>
-                <h3 className="font-semibold text-blue-900">Demo Portfolio - Ray Dalio's All Weather Strategy</h3>
-                <p className="text-sm text-blue-700">
+                <h3 className="font-semibold text-blue-900 dark:text-blue-200">Demo Portfolio - Ray Dalio's All Weather Strategy</h3>
+                <p className="text-sm text-blue-700 dark:text-blue-200/90">
                   This balanced portfolio is designed to perform well across all economic environments.
                   Sign up to create your own custom portfolios and access advanced features! 🚀
                 </p>
@@ -166,15 +165,16 @@ export const PortfolioOverview = () => {
 
       {/* Portfolio Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Portfolio Value */}
         <Card className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-blue-500/10"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-blue-500/10 dark:from-green-700/20 dark:to-blue-800/20 pointer-events-none" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
             <CardTitle className="text-sm font-medium">Portfolio Value</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent className="relative">
-            <div className="text-2xl font-bold">${portfolioValue.toLocaleString()}</div>
-            <div className={`flex items-center text-xs ${dayChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <div className="text-2xl font-bold text-foreground">${portfolioValue.toLocaleString()}</div>
+            <div className={`flex items-center text-xs ${dayChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
               {dayChange >= 0 ? (
                 <TrendingUp className="h-3 w-3 mr-1" />
               ) : (
@@ -185,43 +185,45 @@ export const PortfolioOverview = () => {
           </CardContent>
         </Card>
 
+        {/* Total Return */}
         <Card className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-700/20 dark:to-pink-900/20 pointer-events-none" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
             <CardTitle className="text-sm font-medium">Total Return</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent className="relative">
-            <div className="text-2xl font-bold text-green-600">+${totalReturn.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">+${totalReturn.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
               +{totalReturnPercent}% all time
             </p>
           </CardContent>
         </Card>
 
+        {/* Holdings */}
         <Card className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-red-500/10"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-red-500/10 dark:from-orange-700/20 dark:to-red-700/20 pointer-events-none" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
             <CardTitle className="text-sm font-medium">Holdings</CardTitle>
             <PieChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent className="relative">
-            <div className="text-2xl font-bold">{holdings.length}</div>
+            <div className="text-2xl font-bold text-foreground">{holdings.length}</div>
             <p className="text-xs text-muted-foreground">
               Asset classes
             </p>
           </CardContent>
         </Card>
 
+        {/* Strategy */}
         <Card className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-500/10"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 dark:from-cyan-700/20 dark:to-blue-800/20 pointer-events-none" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
             <CardTitle className="text-sm font-medium">Strategy</CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent className="relative">
-            <div className="text-2xl font-bold">
-              {/* Show the strategy if it's a demo portfolio, else fallback */}
+            <div className="text-2xl font-bold text-foreground">
               {isDemoPortfolio(activePortfolio)
                 ? activePortfolio.strategy
                 : "Balanced"}
@@ -268,25 +270,28 @@ export const PortfolioOverview = () => {
           <CardContent>
             <div className="space-y-4">
               {holdings.map((holding, index) => (
-                <div key={holding.symbol} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                <div
+                  key={holding.symbol}
+                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50 dark:bg-muted/80"
+                >
                   <div className="flex items-center space-x-3">
                     <div className={`w-3 h-3 rounded-full ${
-                      index === 0 ? 'bg-blue-500' :
-                      index === 1 ? 'bg-green-500' :
-                      index === 2 ? 'bg-orange-500' :
-                      index === 3 ? 'bg-purple-500' :
-                      'bg-pink-500'
+                      index === 0 ? 'bg-blue-500 dark:bg-blue-400' :
+                      index === 1 ? 'bg-green-500 dark:bg-green-400' :
+                      index === 2 ? 'bg-orange-500 dark:bg-orange-400' :
+                      index === 3 ? 'bg-purple-500 dark:bg-purple-400' :
+                      'bg-pink-500 dark:bg-pink-400'
                     }`}></div>
                     <div>
-                      <div className="font-medium">{holding.symbol}</div>
+                      <div className="font-medium text-foreground">{holding.symbol}</div>
                       <div className="text-sm text-muted-foreground">{holding.name}</div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-medium">${holding.value.toLocaleString()}</div>
+                    <div className="font-medium text-foreground">${holding.value.toLocaleString()}</div>
                     <div className="flex items-center space-x-2">
-                      <Badge variant="outline">{holding.weight}%</Badge>
-                      <div className={`text-sm ${holding.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      <Badge variant="outline" className="bg-secondary/60 dark:bg-secondary/30 text-foreground">{holding.weight}%</Badge>
+                      <div className={`text-sm ${holding.change >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                         {holding.change >= 0 ? '+' : ''}{holding.change}%
                       </div>
                     </div>
