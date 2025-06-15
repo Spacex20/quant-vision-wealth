@@ -1,4 +1,3 @@
-
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@radix-ui/react-collapsible";
 import { useRef } from "react";
@@ -60,8 +59,8 @@ export function SummaryReport({ portfolio, onDownloadJSON }: SummaryReportProps)
             <CardContent>
               <div className="flex flex-wrap gap-4 mb-3">
                 {stats.map(s =>
-                  <div key={s.label} className="flex flex-col items-center bg-gray-50 p-3 rounded-md min-w-[80px]">
-                    <span className="font-bold text-lg">{s.value}</span>
+                  <div key={s.label} className="flex flex-col items-center bg-secondary p-3 rounded-md min-w-[80px]">
+                    <span className="font-bold text-lg text-foreground">{s.value}</span>
                     <span className="text-xs text-muted-foreground">{s.label}</span>
                   </div>
                 )}
