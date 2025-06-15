@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PortfolioOverview } from "@/components/portfolio/PortfolioOverview";
@@ -17,18 +16,34 @@ import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { PersonalizedStockIdeasModal } from "@/components/stock-ideas/PersonalizedStockIdeasModal";
+import { Sparkles } from "lucide-react";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const [showIdeasModal, setShowIdeasModal] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative overflow-x-hidden">
       <ErrorBoundary>
         <DashboardHeader />
       </ErrorBoundary>
-      
+      {/* Floating Stock Ideas Button */}
+      <button
+        onClick={() => {
+          if (user) setShowIdeasModal(true);
+          else navigate("/login");
+        }}
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3 shadow-lg rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold text-base hover:scale-105 hover:shadow-2xl transition-all outline-none border-2 border-white"
+        aria-label="Show personalized stock ideas"
+        style={{ boxShadow: "0 6px 24px 0 rgba(80,60,210,.18)" }}
+      >
+        <Sparkles className="w-5 h-5 mr-1 -ml-1" />
+        Personalized Ideas
+      </button>
+      <PersonalizedStockIdeasModal open={showIdeasModal} onOpenChange={setShowIdeasModal} />
       <div className="container mx-auto px-4 py-6">
         <div className="mb-8 flex justify-between flex-wrap gap-2 items-center">
           <div>
