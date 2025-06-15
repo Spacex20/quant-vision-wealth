@@ -181,7 +181,7 @@ class MarketDataService {
   private async enhanceQuoteWithFMP(quote: RealTimeQuote): Promise<void> {
     try {
       const response = await fetch(
-        `https://financialmodelingprep.com/api/v3/quote/${quote.symbol}?apikey=${this.API_KEYS.FMP}`
+        `https://financialmodelingprep.com/api/v3/quote/${quote.symbol}?apikey=${API_CONFIG.FMP}`
       );
       
       if (response.ok) {
@@ -207,7 +207,7 @@ class MarketDataService {
       
       // Try Alpha Vantage first
       const avResponse = await fetch(
-        `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${this.API_KEYS.ALPHA_VANTAGE}`
+        `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${API_CONFIG.ALPHA_VANTAGE}`
       );
       
       if (avResponse.ok) {
@@ -222,7 +222,7 @@ class MarketDataService {
 
       // Fallback to FMP
       const fmpResponse = await fetch(
-        `https://financialmodelingprep.com/api/v3/profile/${symbol}?apikey=${this.API_KEYS.FMP}`
+        `https://financialmodelingprep.com/api/v3/profile/${symbol}?apikey=${API_CONFIG.FMP}`
       );
       
       if (fmpResponse.ok) {
@@ -300,8 +300,8 @@ class MarketDataService {
       
       // Try Marketaux first
       const marketauxUrl = symbols?.length 
-        ? `https://api.marketaux.com/v1/news/all?symbols=${symbols.join(',')}&filter_entities=true&language=en&api_token=${this.API_KEYS.MARKETAUX}`
-        : `https://api.marketaux.com/v1/news/all?filter_entities=true&language=en&api_token=${this.API_KEYS.MARKETAUX}`;
+        ? `https://api.marketaux.com/v1/news/all?symbols=${symbols.join(',')}&filter_entities=true&language=en&api_token=${API_CONFIG.MARKETAUX}`
+        : `https://api.marketaux.com/v1/news/all?filter_entities=true&language=en&api_token=${API_CONFIG.MARKETAUX}`;
       
       const response = await fetch(marketauxUrl);
       
@@ -336,7 +336,7 @@ class MarketDataService {
     try {
       const query = symbols?.length ? symbols.join(' OR ') : 'stock market';
       const response = await fetch(
-        `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&language=en&apiKey=${this.API_KEYS.NEWS_API}`
+        `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&language=en&apiKey=${API_CONFIG.NEWS_API}`
       );
       
       if (response.ok) {
@@ -370,7 +370,7 @@ class MarketDataService {
       console.log('Fetching sector performance from Alpha Vantage');
       
       const response = await fetch(
-        `https://www.alphavantage.co/query?function=SECTOR&apikey=${this.API_KEYS.ALPHA_VANTAGE}`
+        `https://www.alphavantage.co/query?function=SECTOR&apikey=${API_CONFIG.ALPHA_VANTAGE}`
       );
       
       if (response.ok) {
@@ -411,7 +411,7 @@ class MarketDataService {
       
       // Try Alpha Vantage search first
       const response = await fetch(
-        `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(query)}&apikey=${this.API_KEYS.ALPHA_VANTAGE}`
+        `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(query)}&apikey=${API_CONFIG.ALPHA_VANTAGE}`
       );
       
       if (response.ok) {
@@ -588,7 +588,7 @@ class MarketDataService {
       payoutRatio: 20 + Math.random() * 60,
       currentRatio: 1 + Math.random() * 2,
       quickRatio: 0.8 + Math.random() * 1.5,
-      sharesOutstanding: Math.floor(1000000000 + Math.random() * 15000000000),
+      sharesOutstanding: Math.floor(1000000000 + Math.random() * 1500000000),
       description: `${base.name} is a leading company in the ${base.sector} sector.`,
       employees: Math.floor(10000 + Math.random() * 500000),
       website: `https://www.${symbol.toLowerCase()}.com`,

@@ -106,7 +106,7 @@ class NewsService {
         ? symbols.join(' OR ') 
         : 'stock market OR finance OR investment OR trading';
       
-      const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&language=en&pageSize=${limit}&apiKey=${this.API_KEYS.NEWS_API}`;
+      const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&language=en&pageSize=${limit}&apiKey=${API_CONFIG.NEWS_API}`;
       
       const response = await fetch(url);
       
@@ -148,7 +148,7 @@ class NewsService {
       console.log(`Fetching ${category} news`);
       
       const query = this.getCategoryQuery(category);
-      const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&language=en&pageSize=${limit}&apiKey=${this.API_KEYS.NEWS_API}`;
+      const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&language=en&pageSize=${limit}&apiKey=${API_CONFIG.NEWS_API}`;
       
       const response = await fetch(url);
       
@@ -226,7 +226,7 @@ class NewsService {
       console.log(`Searching news for: ${query}`);
       
       const searchQuery = `${query} AND (finance OR investment OR stock OR market)`;
-      const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(searchQuery)}&sortBy=relevancy&language=en&pageSize=${limit}&apiKey=${this.API_KEYS.NEWS_API}`;
+      const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(searchQuery)}&sortBy=relevancy&language=en&pageSize=${limit}&apiKey=${API_CONFIG.NEWS_API}`;
       
       const response = await fetch(url);
       

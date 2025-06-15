@@ -1,4 +1,3 @@
-
 import { API_CONFIG, API_ENDPOINTS } from './apiConfig';
 
 export interface StockQuote {
@@ -27,6 +26,8 @@ export interface SearchResult {
   name: string;
   exchange: string;
 }
+
+export type HistoricalData = { date: string; close: number }[];
 
 class FinancialApiService {
   async getStockQuote(symbol: string): Promise<StockQuote> {
@@ -126,6 +127,25 @@ class FinancialApiService {
       console.error('Error searching stocks:', error);
       return this.getFallbackSearchResults(query);
     }
+  }
+
+  async getHistoricalData(symbol: string, period: string = '1y'): Promise<{ date: string; close: number }[]> {
+    // "period" could be '1m', '3m', '6m', '1y'
+    // We'll generate simple data for the required period
+    const numPoints = { '1m': 22, '3m': 66, '6m': 132, '1y': 252 }[period] || 252;
+    const today = new Date();
+    const result: { date: string; close: number }[] = [];
+    let price = 100 + Math.random() * 100;
+    for (let i = numPoints - 1; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      price *= 1 + (Math.random() - 0.48) * 0.01; // random walk
+      result.push({
+        date: d.toISOString().split('T')[0],
+        close: Math.max(5, price)
+      });
+    }
+    return result;
   }
 
   private getFallbackQuote(symbol: string): StockQuote {
