@@ -56,6 +56,71 @@ export type Database = {
           },
         ]
       }
+      bookmarks: {
+        Row: {
+          created_at: string
+          id: string
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookmarks_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      channels: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          is_private: boolean
+          name: string
+          position: number
+          type: Database["public"]["Enums"]["channel_type"]
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_private?: boolean
+          name: string
+          position?: number
+          type?: Database["public"]["Enums"]["channel_type"]
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_private?: boolean
+          name?: string
+          position?: number
+          type?: Database["public"]["Enums"]["channel_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       market_data_cache: {
         Row: {
           data: Json
@@ -73,6 +138,95 @@ export type Database = {
           symbol?: string
         }
         Relationships: []
+      }
+      message_reactions: {
+        Row: {
+          created_at: string
+          emoji: string
+          id: string
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji: string
+          id?: string
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          attachments: Json | null
+          channel_id: string
+          content: string
+          created_at: string
+          id: string
+          is_deleted: boolean
+          is_pinned: boolean
+          thread_id: string | null
+          updated_at: string
+          upvotes: number
+          user_id: string
+        }
+        Insert: {
+          attachments?: Json | null
+          channel_id: string
+          content: string
+          created_at?: string
+          id?: string
+          is_deleted?: boolean
+          is_pinned?: boolean
+          thread_id?: string | null
+          updated_at?: string
+          upvotes?: number
+          user_id: string
+        }
+        Update: {
+          attachments?: Json | null
+          channel_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_deleted?: boolean
+          is_pinned?: boolean
+          thread_id?: string | null
+          updated_at?: string
+          upvotes?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       paper_accounts: {
         Row: {
@@ -587,6 +741,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          assigned_at: string
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_sessions: {
         Row: {
           created_at: string | null
@@ -670,14 +845,20 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      get_user_role: {
+        Args: { user_uuid: string }
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
     }
     Enums: {
       alert_type: "price" | "volume" | "news" | "technical"
       asset_type: "stock" | "etf" | "bond" | "commodity" | "crypto" | "reit"
+      channel_type: "text" | "voice" | "announcement"
       investment_experience: "beginner" | "intermediate" | "advanced" | "expert"
       order_status: "pending" | "filled" | "cancelled" | "rejected"
       order_type: "market" | "limit" | "stop" | "stop_limit"
       risk_tolerance: "conservative" | "moderate" | "aggressive"
+      user_role: "admin" | "moderator" | "member" | "guest"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -795,10 +976,12 @@ export const Constants = {
     Enums: {
       alert_type: ["price", "volume", "news", "technical"],
       asset_type: ["stock", "etf", "bond", "commodity", "crypto", "reit"],
+      channel_type: ["text", "voice", "announcement"],
       investment_experience: ["beginner", "intermediate", "advanced", "expert"],
       order_status: ["pending", "filled", "cancelled", "rejected"],
       order_type: ["market", "limit", "stop", "stop_limit"],
       risk_tolerance: ["conservative", "moderate", "aggressive"],
+      user_role: ["admin", "moderator", "member", "guest"],
     },
   },
 } as const

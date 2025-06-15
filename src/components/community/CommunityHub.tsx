@@ -6,13 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Users, Video, MessageSquare, TrendingUp, Star, Eye } from "lucide-react";
+import { CommunityLayout } from "./CommunityLayout";
 import { InvestmentServers } from "./InvestmentServers";
 import { LiveSessions } from "./LiveSessions";
 import { SocialTrading } from "./SocialTrading";
-import { CommunityChat } from "./CommunityChat";
 
 export function CommunityHub() {
-  const [activeTab, setActiveTab] = useState("servers");
+  const [activeTab, setActiveTab] = useState("chat");
 
   const featuredCommunities = [
     {
@@ -55,7 +55,7 @@ export function CommunityHub() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold mb-2">Investment Community</h1>
-          <p className="text-muted-foreground">Connect, learn, and invest together</p>
+          <p className="text-muted-foreground">Connect, learn, and invest together with real-time chat</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline">
@@ -83,32 +83,36 @@ export function CommunityHub() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <Video className="w-5 h-5 text-green-500" />
-              <span className="font-semibold">Live Sessions</span>
+              <MessageSquare className="w-5 h-5 text-green-500" />
+              <span className="font-semibold">Live Messages</span>
             </div>
-            <p className="text-2xl font-bold">12</p>
-            <p className="text-sm text-muted-foreground">3 starting soon</p>
+            <p className="text-2xl font-bold">1,247</p>
+            <p className="text-sm text-muted-foreground">Today</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-purple-500" />
-              <span className="font-semibold">Shared Strategies</span>
+              <span className="font-semibold">Trending: #AAPL</span>
             </div>
-            <p className="text-2xl font-bold">1,247</p>
-            <p className="text-sm text-muted-foreground">89 this week</p>
+            <p className="text-2xl font-bold">89</p>
+            <p className="text-sm text-muted-foreground">Mentions in 1h</p>
           </CardContent>
         </Card>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="chat">Live Chat</TabsTrigger>
           <TabsTrigger value="servers">Investment Servers</TabsTrigger>
           <TabsTrigger value="live">Live Sessions</TabsTrigger>
           <TabsTrigger value="trading">Social Trading</TabsTrigger>
-          <TabsTrigger value="chat">Community Chat</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="chat" className="space-y-6">
+          <CommunityLayout />
+        </TabsContent>
 
         <TabsContent value="servers" className="space-y-6">
           <InvestmentServers />
@@ -120,10 +124,6 @@ export function CommunityHub() {
 
         <TabsContent value="trading" className="space-y-6">
           <SocialTrading />
-        </TabsContent>
-
-        <TabsContent value="chat" className="space-y-6">
-          <CommunityChat />
         </TabsContent>
       </Tabs>
     </div>
