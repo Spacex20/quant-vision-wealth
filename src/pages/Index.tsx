@@ -12,6 +12,7 @@ import { PortfolioAnalytics } from "@/components/analytics/PortfolioAnalytics";
 import { MarketIntelligence } from "@/components/market/MarketIntelligence";
 import { StockScreener } from "@/components/research/StockScreener";
 import QuantLab from "@/components/research/QuantLab";
+import { CommunityHub } from "@/components/community/CommunityHub";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
