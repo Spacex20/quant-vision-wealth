@@ -25,16 +25,26 @@ export function useRealTimeSubscription({
 
     console.log(`Setting up real-time subscription for table: ${table}`);
     
+    const filterOptions: {
+      event: 'INSERT' | 'UPDATE' | 'DELETE' | '*';
+      schema: 'public';
+      table: string;
+      filter?: string;
+    } = {
+      event,
+      schema: 'public',
+      table,
+    };
+
+    if (filter) {
+      filterOptions.filter = filter;
+    }
+
     const channel = supabase
       .channel(`${table}-changes`)
       .on(
         'postgres_changes',
-        {
-          event,
-          schema: 'public',
-          table,
-          filter
-        },
+        filterOptions,
         (payload) => {
           console.log('Real-time update received:', payload);
           onPayload(payload);

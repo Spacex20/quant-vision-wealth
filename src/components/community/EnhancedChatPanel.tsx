@@ -50,7 +50,7 @@ export function EnhancedChatPanel({ channelId, channelName }: EnhancedChatPanelP
         .from('messages')
         .select(`
           *,
-          profiles!inner(full_name, avatar_url)
+          profiles(full_name, avatar_url)
         `)
         .eq('channel_id', channelId)
         .order('created_at', { ascending: true })
