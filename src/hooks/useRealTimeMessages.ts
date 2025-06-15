@@ -8,7 +8,10 @@ interface Message {
   user_id: string;
   channel_id: string;
   created_at: string;
-  // Add other message properties as needed
+  profiles?: {
+    full_name: string | null;
+    avatar_url: string | null;
+  } | null;
 }
 
 export function useRealTimeMessages(channelId: string, initialMessages: Message[] = []) {
