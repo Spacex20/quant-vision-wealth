@@ -5,21 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Copy, Eye, Star, Users, BarChart2, TrendingUp } from "lucide-react";
+import { BarChart2, TrendingUp, Star, Copy } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useTopTraders, usePopularStrategies, useUserFeed, useFollowUser, useUnfollowUser } from "@/hooks/useSocialTrading";
+import { useTopTraders, usePopularStrategies, useUserFeed } from "@/hooks/useSocialTrading";
 import { StrategyCardSocial } from "./StrategyCardSocial";
 
 export function SocialTrading() {
   const { user } = useAuth();
-  const [followingTab, setFollowingTab] = useState("feed");
   
   const { data: topTraders = [], isLoading: loadingTraders } = useTopTraders();
   const { data: popularStrategies = [], isLoading: loadingStrategies } = usePopularStrategies();
   const { data: feed = [], isLoading: loadingFeed } = useUserFeed(user?.id || "");
-
-  // --- UI State ---
-  // --- Follow/unfollow (would want to know who the user is following; future improvement) ---
 
   return (
     <div className="space-y-6">
@@ -38,18 +34,20 @@ export function SocialTrading() {
           <TabsTrigger value="following">Following</TabsTrigger>
         </TabsList>
 
-        {/* --- TOP TRADERS --- */}
         <TabsContent value="traders" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {loadingTraders
-              ? <div>Loading…</div>
-              : topTraders.map((trader: any) => (
+            {loadingTraders ? (
+              <div>Loading traders...</div>
+            ) : topTraders.length === 0 ? (
+              <div>No traders found</div>
+            ) : (
+              topTraders.map((trader: any) => (
                 <Card key={trader.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-12 w-12">
                         {trader.avatar_url ? (
-                          <AvatarImage src={trader.avatar_url}/>
+                          <AvatarImage src={trader.avatar_url} alt={trader.full_name || "Trader"} />
                         ) : (
                           <AvatarFallback>
                             {trader.full_name
@@ -57,20 +55,25 @@ export function SocialTrading() {
                                   .split(" ")
                                   .map((n: string) => n[0])
                                   .join("")
-                              : "??"}
+                                  .toUpperCase()
+                              : "T"}
                           </AvatarFallback>
                         )}
                       </Avatar>
                       <div>
                         <CardTitle className="flex items-center gap-2">
-                          {trader.full_name}
+                          {trader.full_name || "Anonymous Trader"}
                           {trader.is_curated_trader && (
                             <Star className="w-4 h-4 text-yellow-500 fill-current" />
                           )}
                         </CardTitle>
                         <CardDescription className="text-xs">
                           <span className="text-muted-foreground">
-                            {trader.returns != null ? <>Return: <b>{Number(trader.returns).toFixed(2)}%</b></> : "—"}
+                            {trader.returns != null ? (
+                              <>Return: <b>{Number(trader.returns).toFixed(2)}%</b></>
+                            ) : (
+                              "—"
+                            )}
                             {" • "}
                             Sharpe: {trader.sharpe_ratio ? trader.sharpe_ratio.toFixed(2) : "—"}
                           </span>
@@ -80,43 +83,67 @@ export function SocialTrading() {
                   </CardHeader>
                   <CardContent>
                     <div className="flex gap-2 flex-wrap mb-3">
-                      <Badge variant="secondary">Returns: {trader.returns ? trader.returns.toFixed(2) : "—"}%</Badge>
-                      <Badge variant="secondary">Sharpe: {trader.sharpe_ratio ? trader.sharpe_ratio.toFixed(2) : "—"}</Badge>
-                      {trader.bio && <Badge variant="outline">{trader.bio.slice(0,22)}…</Badge>}
+                      <Badge variant="secondary">
+                        Returns: {trader.returns ? trader.returns.toFixed(2) : "—"}%
+                      </Badge>
+                      <Badge variant="secondary">
+                        Sharpe: {trader.sharpe_ratio ? trader.sharpe_ratio.toFixed(2) : "—"}
+                      </Badge>
+                      {trader.bio && (
+                        <Badge variant="outline">
+                          {trader.bio.length > 22 ? trader.bio.slice(0, 22) + "…" : trader.bio}
+                        </Badge>
+                      )}
                     </div>
-                    {/* Strategy breakdown and actions could go here */}
                     <div className="flex gap-2">
                       <Button variant="secondary" className="flex-1">
-                        <BarChart2 className="w-4 h-4 mr-2"/> View Profile
+                        <BarChart2 className="w-4 h-4 mr-2" /> View Profile
                       </Button>
                       <Button variant="outline" className="flex-1">
-                        <Copy className="w-4 h-4 mr-2"/> Clone Latest Portfolio
+                        <Copy className="w-4 h-4 mr-2" /> Clone Latest Portfolio
                       </Button>
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+              ))
+            )}
           </div>
         </TabsContent>
 
-        {/* --- POPULAR STRATEGIES --- */}
         <TabsContent value="strategies" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {loadingStrategies
-              ? <div>Loading…</div>
-              : popularStrategies.map((strategy: any) => (
-                <StrategyCardSocial key={strategy.id} strategy={strategy}/>
-              ))}
+            {loadingStrategies ? (
+              <div>Loading strategies...</div>
+            ) : popularStrategies.length === 0 ? (
+              <div>No strategies found</div>
+            ) : (
+              popularStrategies.map((strategy: any) => (
+                <StrategyCardSocial key={strategy.id} strategy={strategy} />
+              ))
+            )}
           </div>
         </TabsContent>
 
-        {/* --- FOLLOWING FEED --- */}
         <TabsContent value="following" className="space-y-6">
           <div>
-            {!user && <Card><CardContent className="py-8 text-center">Please sign in to view your feed!</CardContent></Card>}
-            {loadingFeed && user && <Card><CardContent>Loading...</CardContent></Card>}
+            {!user && (
+              <Card>
+                <CardContent className="py-8 text-center">
+                  Please sign in to view your feed!
+                </CardContent>
+              </Card>
+            )}
+            {loadingFeed && user && (
+              <Card>
+                <CardContent>Loading...</CardContent>
+              </Card>
+            )}
             {!loadingFeed && user && feed.length === 0 && (
-              <Card><CardContent className="text-center py-8">Your feed is empty. Follow traders and clone strategies to see activity here!</CardContent></Card>
+              <Card>
+                <CardContent className="text-center py-8">
+                  Your feed is empty. Follow traders and clone strategies to see activity here!
+                </CardContent>
+              </Card>
             )}
             {!loadingFeed && user && feed.length > 0 && (
               <div className="space-y-4">
@@ -124,10 +151,12 @@ export function SocialTrading() {
                   <Card key={item.id}>
                     <CardContent className="py-3">
                       <div className="flex items-center gap-2">
-                        <Avatar className="h-8 w-8" />
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback>U</AvatarFallback>
+                        </Avatar>
                         <div>
-                          <span className="font-semibold">{item.type}</span>
-                          {item.content ? <span> — {item.content}</span> : null}
+                          <span className="font-semibold">{item.type || "Activity"}</span>
+                          {item.content && <span> — {item.content}</span>}
                         </div>
                       </div>
                       <div className="text-xs text-muted-foreground mt-1">
