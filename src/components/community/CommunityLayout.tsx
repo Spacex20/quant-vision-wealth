@@ -233,14 +233,23 @@ export function CommunityLayout() {
         // Process mentions
         const mentions = extractMentions(message.content);
 
+        // Fix the TypeScript error by properly handling null user_profile
+        const userProfile = message.user_profile && typeof message.user_profile === 'object' && 'full_name' in message.user_profile 
+          ? {
+              full_name: (message.user_profile as any).full_name || 'Unknown User',
+              avatar_url: (message.user_profile as any).avatar_url || ''
+            }
+          : {
+              full_name: 'Unknown User',
+              avatar_url: ''
+            };
+
         return {
           ...message,
           attachments: Array.isArray(message.attachments) ? message.attachments : [],
           reactions: formattedReactions,
           mentions,
-          user_profile: message.user_profile && typeof message.user_profile === 'object' && 'full_name' in message.user_profile 
-            ? message.user_profile as { full_name: string; avatar_url: string }
-            : { full_name: 'Unknown User', avatar_url: '' }
+          user_profile: userProfile
         };
       }));
 
