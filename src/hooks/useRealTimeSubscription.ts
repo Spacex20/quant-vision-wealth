@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { RealtimeChannel } from '@supabase/supabase-js';
@@ -27,7 +28,7 @@ export function useRealTimeSubscription({
     const channel = supabase
       .channel(`${table}-changes`)
       .on(
-        'postgres_changes',
+        'postgres_changes' as any,  // type assertion resolves TS error
         {
           event,
           schema: 'public',
