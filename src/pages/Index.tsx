@@ -43,7 +43,9 @@ const Index = () => {
     <OnboardingTourProvider>
       <div className="min-h-screen bg-background relative overflow-x-hidden">
         <ErrorBoundary>
-          <DashboardHeader id="dashboardHeader" />
+          <div id="dashboardHeader">
+            <DashboardHeader />
+          </div>
         </ErrorBoundary>
         {/* Floating Stock Ideas Button */}
         <button
