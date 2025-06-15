@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Users, MessageSquare, TrendingUp, Star, Search, Filter } from "lucide-react";
+import { Users, MessageSquare, TrendingUp, Star, Search, Filter, Eye } from "lucide-react";
 
 export function InvestmentServers() {
   const [searchTerm, setSearchTerm] = useState("");
