@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,10 +15,7 @@ interface Message {
   user_id: string;
   channel_id: string;
   created_at: string;
-  profiles?: {
-    full_name: string | null;
-    avatar_url: string | null;
-  } | null;
+  profiles?: any;
 }
 
 interface EnhancedChatPanelProps {

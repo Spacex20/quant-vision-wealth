@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRealTimeSubscription } from './useRealTimeSubscription';
 
 interface Message {
@@ -8,14 +8,15 @@ interface Message {
   user_id: string;
   channel_id: string;
   created_at: string;
-  profiles?: {
-    full_name: string | null;
-    avatar_url: string | null;
-  } | null;
+  profiles?: any;
 }
 
 export function useRealTimeMessages(channelId: string, initialMessages: Message[] = []) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
+
+  useEffect(() => {
+    setMessages(initialMessages);
+  }, [initialMessages]);
 
   const handleNewMessage = useCallback((payload: any) => {
     if (payload.eventType === 'INSERT' && payload.new) {
