@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -22,10 +21,12 @@ export function DashboardHeader() {
   return (
     <header className="flex flex-col-reverse sm:flex-row sm:justify-between items-center py-4 mb-2 w-full gap-2">
       <div
-        className="text-2xl font-bold cursor-pointer"
+        className="text-3xl font-extrabold font-playfair bg-gradient-to-r from-purple-700 via-blue-400 to-pink-600 bg-clip-text text-transparent drop-shadow-lg hover:scale-105 transition-all cursor-pointer tracking-tight animate-fade-in"
         onClick={() => navigate("/")}
+        title="Home"
+        style={{ letterSpacing: "0.04em" }}
       >
-        Quantitative Investment Platform
+        QuantVerse
       </div>
       <div className="flex gap-3 items-center">
         {/* Theme Toggle */}

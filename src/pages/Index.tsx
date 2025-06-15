@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PortfolioOverview } from "@/components/portfolio/PortfolioOverview";
@@ -86,12 +85,9 @@ const Index = () => {
           <Card className="mb-8 bg-gradient-to-r from-blue-50/60 to-purple-50/70 dark:from-card dark:to-card">
             <CardContent className="flex flex-col lg:flex-row justify-between items-center gap-2 py-8 px-6">
               <div>
-                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  Portfolio Intelligence Platform
+                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-playfair drop-shadow-lg tracking-tight animate-fade-in">
+                  One Dashboard. Infinite Strategies.
                 </h1>
-                <p className="text-xl text-muted-foreground">
-                  Build wealth with AI-driven insights and proven investment strategies 💎
-                </p>
               </div>
               {!user && (
                 <Button 
