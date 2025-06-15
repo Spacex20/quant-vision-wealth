@@ -36,13 +36,29 @@ interface Message {
     count: number;
     users: string[];
   }>;
+  is_editing?: boolean;
+  mentions?: string[];
+  reply_to?: {
+    id: string;
+    content: string;
+    user_name: string;
+  };
+}
+
+interface OnlineUser {
+  id: string;
+  name: string;
+  avatar: string;
+  status: 'online' | 'idle' | 'offline';
+  last_seen?: string;
 }
 
 export function CommunityLayout() {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [activeChannel, setActiveChannel] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
+  const [typingUsers, setTypingUsers] = useState<Record<string, string[]>>({});
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
 
@@ -56,6 +72,7 @@ export function CommunityLayout() {
     if (activeChannel) {
       loadMessages(activeChannel);
       subscribeToMessages(activeChannel);
+      markChannelAsRead(activeChannel);
     }
   }, [activeChannel]);
 
@@ -75,7 +92,10 @@ export function CommunityLayout() {
         },
         (payload) => {
           if (payload.new.channel_id === activeChannel) {
-            loadMessages(activeChannel); // Reload to get user profile data
+            loadMessages(activeChannel);
+          } else {
+            // Update unread count for other channels
+            updateUnreadCount(payload.new.channel_id);
           }
         }
       )
@@ -112,9 +132,27 @@ export function CommunityLayout() {
       )
       .subscribe();
 
+    // Subscribe to typing indicators
+    const typingChannel = supabase
+      .channel(`typing-${activeChannel}`)
+      .on('presence', { event: 'sync' }, () => {
+        const newState = typingChannel.presenceState();
+        const typingData: Record<string, string[]> = {};
+        Object.entries(newState).forEach(([userId, presence]) => {
+          if (presence[0]?.typing && userId !== user.id) {
+            const channelId = presence[0].channel_id;
+            if (!typingData[channelId]) typingData[channelId] = [];
+            typingData[channelId].push(presence[0].user_name);
+          }
+        });
+        setTypingUsers(typingData);
+      })
+      .subscribe();
+
     return () => {
       supabase.removeChannel(messagesChannel);
       supabase.removeChannel(reactionsChannel);
+      supabase.removeChannel(typingChannel);
     };
   }, [activeChannel, user]);
 
@@ -154,66 +192,177 @@ export function CommunityLayout() {
         .eq('channel_id', channelId)
         .eq('is_deleted', false)
         .order('created_at', { ascending: true })
-        .limit(50);
+        .limit(100);
 
       if (error) throw error;
 
-      // Group reactions by message
+      // Process messages and add reactions
       const messagesWithReactions = await Promise.all((data || []).map(async (message) => {
         const { data: reactions } = await supabase
           .from('message_reactions')
-          .select('emoji')
+          .select('emoji, user_id')
           .eq('message_id', message.id);
 
         const reactionCounts = reactions?.reduce((acc, reaction) => {
-          acc[reaction.emoji] = (acc[reaction.emoji] || 0) + 1;
+          if (!acc[reaction.emoji]) {
+            acc[reaction.emoji] = { count: 0, users: [] };
+          }
+          acc[reaction.emoji].count++;
+          acc[reaction.emoji].users.push(reaction.user_id);
           return acc;
-        }, {} as Record<string, number>) || {};
+        }, {} as Record<string, { count: number; users: string[] }>) || {};
 
-        const formattedReactions = Object.entries(reactionCounts).map(([emoji, count]) => ({
+        const formattedReactions = Object.entries(reactionCounts).map(([emoji, data]) => ({
           emoji,
-          count,
-          users: [] // We could expand this to show who reacted
+          count: data.count,
+          users: data.users
         }));
+
+        // Process mentions
+        const mentions = extractMentions(message.content);
 
         return {
           ...message,
           attachments: Array.isArray(message.attachments) ? message.attachments : [],
-          reactions: formattedReactions
+          reactions: formattedReactions,
+          mentions,
+          user_profile: message.user_profile && typeof message.user_profile === 'object' && 'full_name' in message.user_profile 
+            ? message.user_profile as { full_name: string; avatar_url: string }
+            : { full_name: 'Unknown User', avatar_url: '' }
         };
       }));
 
       setMessages(messagesWithReactions);
     } catch (error) {
       console.error('Error loading messages:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load messages",
+        variant: "destructive"
+      });
     }
+  };
+
+  const extractMentions = (content: string): string[] => {
+    const mentionRegex = /@(\w+)/g;
+    const mentions = [];
+    let match;
+    while ((match = mentionRegex.exec(content)) !== null) {
+      mentions.push(match[1]);
+    }
+    return mentions;
+  };
+
+  const updateUnreadCount = async (channelId: string) => {
+    setChannels(prev => prev.map(channel => 
+      channel.id === channelId 
+        ? { ...channel, unread_count: (channel.unread_count || 0) + 1 }
+        : channel
+    ));
+  };
+
+  const markChannelAsRead = async (channelId: string) => {
+    setChannels(prev => prev.map(channel => 
+      channel.id === channelId 
+        ? { ...channel, unread_count: 0 }
+        : channel
+    ));
   };
 
   const subscribeToMessages = (channelId: string) => {
     // This function is handled by the useEffect above
   };
 
-  const sendMessage = async (content: string, attachments: any[] = []) => {
+  const sendMessage = async (content: string, attachments: any[] = [], replyTo?: Message) => {
     if (!user || !activeChannel || !content.trim()) return;
 
     try {
+      const messageData: any = {
+        channel_id: activeChannel,
+        user_id: user.id,
+        content: content.trim(),
+        attachments
+      };
+
+      if (replyTo) {
+        messageData.thread_id = replyTo.id;
+      }
+
       const { error } = await supabase
         .from('messages')
-        .insert({
-          channel_id: activeChannel,
-          user_id: user.id,
-          content: content.trim(),
-          attachments
-        });
+        .insert(messageData);
 
       if (error) throw error;
 
-      // Message will be added via real-time subscription
+      // Stop typing indicator
+      await stopTyping();
+
+      // Send notifications for mentions
+      const mentions = extractMentions(content);
+      if (mentions.length > 0) {
+        await sendMentionNotifications(mentions, content);
+      }
+
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
         title: "Error",
         description: "Failed to send message",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const editMessage = async (messageId: string, newContent: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .update({ 
+          content: newContent,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', messageId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Message updated successfully"
+      });
+    } catch (error) {
+      console.error('Error editing message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to edit message",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const deleteMessage = async (messageId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .update({ is_deleted: true })
+        .eq('id', messageId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Message deleted successfully"
+      });
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete message",
         variant: "destructive"
       });
     }
@@ -234,6 +383,28 @@ export function CommunityLayout() {
       if (error) throw error;
     } catch (error) {
       console.error('Error adding reaction:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add reaction",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const removeReaction = async (messageId: string, emoji: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('message_reactions')
+        .delete()
+        .eq('message_id', messageId)
+        .eq('user_id', user.id)
+        .eq('emoji', emoji);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error removing reaction:', error);
     }
   };
 
@@ -241,7 +412,6 @@ export function CommunityLayout() {
     if (!user) return;
 
     try {
-      // Get current message
       const message = messages.find(m => m.id === messageId);
       if (!message) return;
 
@@ -253,6 +423,55 @@ export function CommunityLayout() {
       if (error) throw error;
     } catch (error) {
       console.error('Error toggling upvote:', error);
+    }
+  };
+
+  const startTyping = async () => {
+    if (!user || !activeChannel) return;
+
+    const channel = supabase.channel(`typing-${activeChannel}`);
+    await channel.track({
+      user_id: user.id,
+      user_name: user.email?.split('@')[0] || 'Anonymous',
+      typing: true,
+      channel_id: activeChannel
+    });
+  };
+
+  const stopTyping = async () => {
+    if (!user || !activeChannel) return;
+
+    const channel = supabase.channel(`typing-${activeChannel}`);
+    await channel.untrack();
+  };
+
+  const sendMentionNotifications = async (mentions: string[], content: string) => {
+    // This would integrate with a notification service
+    console.log('Sending mention notifications:', mentions, content);
+  };
+
+  const pinMessage = async (messageId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .update({ is_pinned: true })
+        .eq('id', messageId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Message pinned successfully"
+      });
+    } catch (error) {
+      console.error('Error pinning message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to pin message",
+        variant: "destructive"
+      });
     }
   };
 
@@ -280,9 +499,16 @@ export function CommunityLayout() {
         <ChatPanel
           channelId={activeChannel}
           messages={messages}
+          typingUsers={typingUsers[activeChannel] || []}
           onSendMessage={sendMessage}
+          onEditMessage={editMessage}
+          onDeleteMessage={deleteMessage}
           onAddReaction={addReaction}
+          onRemoveReaction={removeReaction}
           onToggleUpvote={toggleUpvote}
+          onPinMessage={pinMessage}
+          onStartTyping={startTyping}
+          onStopTyping={stopTyping}
         />
       </div>
 
