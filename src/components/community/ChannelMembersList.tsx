@@ -5,12 +5,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 
+interface Profile {
+  full_name: string;
+  avatar_url: string;
+}
+
 interface Member {
   id: string;
   user_id: string;
   role: string;
   joined_at: string;
-  profile?: { full_name: string; avatar_url: string };
+  profile?: Profile;
 }
 
 export function ChannelMembersList({ channelId }: { channelId: string }) {
@@ -23,9 +28,20 @@ export function ChannelMembersList({ channelId }: { channelId: string }) {
     setLoading(true);
     supabase
       .from("channel_memberships")
-      .select("*, profile:profiles(full_name, avatar_url)")
+      .select(`
+        id, channel_id, user_id, joined_at, role,
+        profile:profiles(full_name, avatar_url)
+      `)
       .eq("channel_id", channelId)
-      .then(({ data }) => setMembers(data || []))
+      .then(({ data }) => {
+        // Defensive: filter out "profile" errors and ensure "profile" shape
+        const safeMembers: Member[] = (data || []).map((m: any) => ({
+          ...m,
+          profile: m.profile && m.profile.full_name ? m.profile : undefined
+        }));
+        setMembers(safeMembers);
+      })
+      .catch(() => setMembers([]))
       .finally(() => setLoading(false));
   }, [channelId]);
 

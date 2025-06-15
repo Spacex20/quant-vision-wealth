@@ -24,7 +24,9 @@ export function useChannelMemberships(channelId?: string) {
     if (channelId) {
       query = query.eq("channel_id", channelId);
     }
-    query.then(({ data }) => setMemberships(data || [])).finally(() => setLoading(false));
+    query.then(({ data }) => setMemberships(data || []))
+      .catch(() => setMemberships([]))
+      .finally(() => setLoading(false));
   }, [user, channelId]);
 
   return { memberships, loading };

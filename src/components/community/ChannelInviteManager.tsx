@@ -31,6 +31,7 @@ export function ChannelInviteManager() {
       .select("*")
       .eq("invitee_id", user.id)
       .then(({ data }) => setInvites(data || []))
+      .catch(() => setInvites([]))
       .finally(() => setLoading(false));
   }, [user, open]);
 

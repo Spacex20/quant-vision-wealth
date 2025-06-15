@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ChannelSidebar } from "./ChannelSidebar";
 import ChatPanel from "./ChatPanel";

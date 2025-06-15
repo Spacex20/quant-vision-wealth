@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Smile, Paperclip, Send } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Props {
   channelId: string;
@@ -40,7 +41,7 @@ export default function ChatPanel({ channelId, messages, hasMore, loadMore, memb
       attachmentUrls = await uploadFiles(inputFiles);
     }
 
-    await window.supabase
+    await supabase
       .from("messages")
       .insert({
         channel_id: channelId,
@@ -62,7 +63,6 @@ export default function ChatPanel({ channelId, messages, hasMore, loadMore, memb
       {/* Chat Header */}
       <div className="flex items-center p-2 border-b">
         <div className="font-bold text-md mr-2">Channel: {channelId.slice(-8)}</div>
-        {/* Maybe show pinned, members, mod menu here */}
       </div>
 
       {/* Message List (Infinite Scroll) */}
