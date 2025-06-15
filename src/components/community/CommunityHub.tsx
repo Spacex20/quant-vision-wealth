@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -103,9 +102,10 @@ export function CommunityHub() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="chat">Live Chat</TabsTrigger>
           <TabsTrigger value="servers">Investment Servers</TabsTrigger>
+          <TabsTrigger value="stocks">Stock Chat</TabsTrigger>
           <TabsTrigger value="live">Live Sessions</TabsTrigger>
           <TabsTrigger value="trading">Social Trading</TabsTrigger>
         </TabsList>
@@ -115,7 +115,10 @@ export function CommunityHub() {
         </TabsContent>
 
         <TabsContent value="servers" className="space-y-6">
-          <InvestmentServers />
+          {/* Render new Investment Servers main page */}
+          <div className="mt-4">
+            <InvestmentServersPage />
+          </div>
         </TabsContent>
 
         <TabsContent value="live" className="space-y-6">
