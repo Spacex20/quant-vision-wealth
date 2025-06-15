@@ -24,16 +24,12 @@ export function ChannelSidebar({ channels, activeChannel, onChannelSelect, loadC
         <span className="font-bold text-md flex-1">Community</span>
       </div>
 
+      {/* Main Buttons: Create Channel */}
       <div className="p-2 flex gap-2">
         <CreateChannelDialog onChannelCreated={loadChannels} />
-        <JoinChannelDialog onJoined={loadChannels} />
-        <ChannelInviteManager />
-        <Button variant="ghost" size="sm" onClick={() => setShowDM(s => !s)}>
-          <Mail className="w-4 h-4" />
-        </Button>
       </div>
 
-      {/* Channels */}
+      {/* Channels List */}
       <div className="flex-1 overflow-y-auto px-1">
         <div>
           <h4 className="font-semibold text-xs mb-1">Channels</h4>
@@ -50,6 +46,25 @@ export function ChannelSidebar({ channels, activeChannel, onChannelSelect, loadC
           ))}
         </div>
       </div>
+
+      {/* Sidebar Bottom Section: Invites, Join, DMs */}
+      <div className="p-2 border-t flex flex-col gap-2">
+        <div>
+          <h4 className="font-semibold text-xs mb-1">Channel Actions</h4>
+          <ChannelInviteManager />
+          <JoinChannelDialog onJoined={loadChannels} />
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowDM((s) => !s)}
+          className="mt-1"
+        >
+          <Mail className="w-4 h-4" />
+          <span className="ml-2">Direct Messages</span>
+        </Button>
+      </div>
     </div>
   );
 }
+
