@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -22,17 +23,30 @@ export function CreateInvestmentServerDialog({ open, setOpen, onCreated }: any) 
   async function handleCreate() {
     setCreating(true);
     const tagsArr = categoryTags.split(",").map(t => t.trim()).filter(Boolean);
+
+    // Fetch current user id
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (!userData?.user) {
+      setCreating(false);
+      alert("You must be logged in to create a server.");
+      return;
+    }
+    const userId = userData.user.id;
+
+    const insertObj = {
+      name,
+      description,
+      icon_url: iconUrl || null,
+      category_tags: tagsArr.length ? tagsArr : null,
+      rules: rules || null,
+      guidelines: guidelines || null,
+      visibility,
+      created_by: userId,
+    };
+
     const { data, error } = await supabase
       .from("investment_servers")
-      .insert([{
-        name,
-        description,
-        icon_url: iconUrl || null,
-        category_tags: tagsArr.length ? tagsArr : null,
-        rules: rules || null,
-        guidelines: guidelines || null,
-        visibility,
-      }]);
+      .insert([insertObj]);
     setCreating(false);
     if (!error) {
       setOpen(false);
@@ -90,3 +104,4 @@ export function CreateInvestmentServerDialog({ open, setOpen, onCreated }: any) 
     </Dialog>
   );
 }
+
