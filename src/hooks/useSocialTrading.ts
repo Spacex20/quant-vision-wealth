@@ -36,8 +36,8 @@ export function useCloneStrategy() {
       return r.json();
     },
     onSuccess: () => {
-      qc.invalidateQueries(["social-popular-strategies"]);
-      qc.invalidateQueries(["user-feed"]);
+      qc.invalidateQueries({ queryKey: ["social-popular-strategies"] });
+      qc.invalidateQueries({ queryKey: ["user-feed"] });
     }
   });
 }
@@ -68,7 +68,10 @@ export function useFollowUser() {
       });
       return r.json();
     },
-    onSuccess: () => { qc.invalidateQueries(["social-top-traders"]); qc.invalidateQueries(["user-feed"]); }
+    onSuccess: () => { 
+      qc.invalidateQueries({ queryKey: ["social-top-traders"] }); 
+      qc.invalidateQueries({ queryKey: ["user-feed"] }); 
+    }
   });
 }
 
@@ -83,6 +86,9 @@ export function useUnfollowUser() {
       });
       return r.json();
     },
-    onSuccess: () => { qc.invalidateQueries(["social-top-traders"]); qc.invalidateQueries(["user-feed"]); }
+    onSuccess: () => { 
+      qc.invalidateQueries({ queryKey: ["social-top-traders"] }); 
+      qc.invalidateQueries({ queryKey: ["user-feed"] }); 
+    }
   });
 }
