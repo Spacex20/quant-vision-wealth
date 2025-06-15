@@ -178,6 +178,7 @@ export function CommunityLayout() {
 
         return {
           ...message,
+          attachments: Array.isArray(message.attachments) ? message.attachments : [],
           reactions: formattedReactions
         };
       }));
