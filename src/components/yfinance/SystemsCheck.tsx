@@ -53,9 +53,9 @@ export const SystemsCheck = () => {
       // Test 1: API Connectivity
       const startTime = Date.now();
       try {
-        const response = await yfinanceService.getCurrentPrice('AAPL');
+        const response = await yfinanceService.getQuote('AAPL');
         const duration = Date.now() - startTime;
-        latencyResults.push({ endpoint: 'getCurrentPrice', time: Date.now(), latency: duration });
+        latencyResults.push({ endpoint: 'getQuote', time: Date.now(), latency: duration });
         
         testResults.push({
           test: 'API Connectivity',
@@ -77,9 +77,9 @@ export const SystemsCheck = () => {
       // Test 2: Data Validation
       try {
         const startTime2 = Date.now();
-        const historicalData = await yfinanceService.getHistoricalData('AAPL', '1y');
+        const historicalData = await yfinanceService.getHistorical('AAPL', '1y');
         const duration2 = Date.now() - startTime2;
-        latencyResults.push({ endpoint: 'getHistoricalData', time: Date.now(), latency: duration2 });
+        latencyResults.push({ endpoint: 'getHistorical', time: Date.now(), latency: duration2 });
         
         const isValidData = historicalData && 
                            Array.isArray(historicalData) && 
@@ -109,7 +109,7 @@ export const SystemsCheck = () => {
       try {
         const startTime3 = Date.now();
         const promises = testTickers.slice(0, 3).map(ticker => 
-          yfinanceService.getCurrentPrice(ticker)
+          yfinanceService.getQuote(ticker)
         );
         const responses = await Promise.allSettled(promises);
         const duration3 = Date.now() - startTime3;
@@ -138,7 +138,7 @@ export const SystemsCheck = () => {
       // Test 4: Error Handling
       try {
         const startTime4 = Date.now();
-        const invalidResponse = await yfinanceService.getCurrentPrice('INVALID_TICKER_123');
+        const invalidResponse = await yfinanceService.getQuote('INVALID_TICKER_123');
         const duration4 = Date.now() - startTime4;
         
         testResults.push({
@@ -164,7 +164,7 @@ export const SystemsCheck = () => {
       try {
         const performanceStart = Date.now();
         const performancePromises = Array(5).fill(null).map(() => 
-          yfinanceService.getCurrentPrice('AAPL')
+          yfinanceService.getQuote('AAPL')
         );
         await Promise.all(performancePromises);
         const performanceDuration = Date.now() - performanceStart;
@@ -217,7 +217,7 @@ export const SystemsCheck = () => {
       // Test 7: Backtest Engine Simulation
       try {
         const backtestStart = Date.now();
-        const historicalForBacktest = await yfinanceService.getHistoricalData('AAPL', '3mo');
+        const historicalForBacktest = await yfinanceService.getHistorical('AAPL', '3mo');
         const backtestDuration = Date.now() - backtestStart;
         
         // Simulate a simple moving average strategy
@@ -249,8 +249,8 @@ export const SystemsCheck = () => {
         const integrationStart = Date.now();
         // Test integration by fetching data and simulating frontend consumption
         const integrationData = await Promise.all([
-          yfinanceService.getCurrentPrice('AAPL'),
-          yfinanceService.getHistoricalData('AAPL', '1mo')
+          yfinanceService.getQuote('AAPL'),
+          yfinanceService.getHistorical('AAPL', '1mo')
         ]);
         const integrationDuration = Date.now() - integrationStart;
         
