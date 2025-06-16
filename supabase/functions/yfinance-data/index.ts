@@ -1,4 +1,3 @@
-
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
@@ -49,9 +48,9 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const url = new URL(req.url);
-    const action = url.searchParams.get('action');
-    const symbol = url.searchParams.get('symbol');
+    // Parse request body for all requests
+    const body = await req.json();
+    const { action, symbol, period, interval, ...requestData } = body;
 
     console.log(`yFinance API request - Action: ${action}, Symbol: ${symbol}`);
 
@@ -60,16 +59,13 @@ Deno.serve(async (req) => {
         return await handleQuoteRequest(supabase, symbol);
       
       case 'historical':
-        const period = url.searchParams.get('period') || '1y';
-        const interval = url.searchParams.get('interval') || '1d';
-        return await handleHistoricalRequest(supabase, symbol, period, interval);
+        return await handleHistoricalRequest(supabase, symbol, period || '1y', interval || '1d');
       
       case 'fundamentals':
         return await handleFundamentalsRequest(supabase, symbol);
       
       case 'backtest':
-        const body = await req.json();
-        return await handleBacktestRequest(supabase, body as BacktestRequest);
+        return await handleBacktestRequest(supabase, requestData as BacktestRequest);
       
       default:
         return new Response(

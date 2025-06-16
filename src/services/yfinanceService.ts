@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export interface YFinanceQuoteData {
@@ -103,12 +102,11 @@ class YFinanceService {
 
     try {
       const { data, error } = await supabase.functions.invoke('yfinance-data', {
-        body: null,
+        body: { action: 'quote', symbol },
         headers: {
           'Content-Type': 'application/json',
         },
-        method: 'GET',
-        query: { action: 'quote', symbol }
+        method: 'POST'
       });
 
       if (error) throw error;
@@ -143,12 +141,11 @@ class YFinanceService {
 
     try {
       const { data, error } = await supabase.functions.invoke('yfinance-data', {
-        body: null,
+        body: { action: 'historical', symbol, period, interval },
         headers: {
           'Content-Type': 'application/json',
         },
-        method: 'GET',
-        query: { action: 'historical', symbol, period, interval }
+        method: 'POST'
       });
 
       if (error) throw error;
@@ -179,12 +176,11 @@ class YFinanceService {
 
     try {
       const { data, error } = await supabase.functions.invoke('yfinance-data', {
-        body: null,
+        body: { action: 'fundamentals', symbol },
         headers: {
           'Content-Type': 'application/json',
         },
-        method: 'GET',
-        query: { action: 'fundamentals', symbol }
+        method: 'POST'
       });
 
       if (error) throw error;
@@ -210,12 +206,11 @@ class YFinanceService {
 
     try {
       const { data, error } = await supabase.functions.invoke('yfinance-data', {
-        body: request,
+        body: { action: 'backtest', ...request },
         headers: {
           'Content-Type': 'application/json',
         },
-        method: 'POST',
-        query: { action: 'backtest' }
+        method: 'POST'
       });
 
       if (error) throw error;
