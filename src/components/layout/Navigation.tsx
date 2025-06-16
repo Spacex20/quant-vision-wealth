@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -23,13 +24,7 @@ export const Navigation = () => {
   const { unreadCount } = useNotificationBadge();
 
   const navigationItems = [
-    { name: "Dashboard", href: "/" },
-    { name: "Strategies", href: "/strategies" },
-    { name: "Portfolio", href: "/portfolio" },
-    { name: "Research", href: "/research" },
-    { name: "Community", href: "/community" },
-    { name: "Investment Servers", href: "/investment-servers" },
-    { name: "Systems Check", href: "/systems-check" }, // Added systems check
+    { name: "Systems Check", href: "/systems-check" },
   ];
 
   const handleSignOut = async () => {
@@ -43,7 +38,7 @@ export const Navigation = () => {
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link to="/" className="text-xl font-bold text-indigo-600">
-                InvestPro
+                QuantVerse
               </Link>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
