@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { CheckCircle, XCircle, AlertCircle, Activity, Database, TrendingUp, Clock } from 'lucide-react';
-import { yFinanceService } from '@/services/yfinanceService';
+import { yfinanceService } from '@/services/yfinanceService';
 import { toast } from '@/hooks/use-toast';
 
 interface TestResult {
