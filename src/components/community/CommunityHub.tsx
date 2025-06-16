@@ -8,7 +8,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Users, Video, MessageSquare, TrendingUp, Star, Eye } from "lucide-react";
 import { CommunityLayout } from "./CommunityLayout";
 import { InvestmentServers } from "./InvestmentServers";
-import { LiveSessions } from "./LiveSessions";
 import { SocialTrading } from "./SocialTrading";
 // ADD THIS IMPORT:
 import { InvestmentServersPage } from "@/components/investment-servers";
@@ -60,10 +59,6 @@ export function CommunityHub() {
           <p className="text-muted-foreground">Connect, learn, and invest together with real-time chat</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
-            <Video className="w-4 h-4 mr-2" />
-            Go Live
-          </Button>
           <Button>
             <Users className="w-4 h-4 mr-2" />
             Create Server
@@ -105,11 +100,9 @@ export function CommunityHub() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="chat">Live Chat</TabsTrigger>
           <TabsTrigger value="servers">Investment Servers</TabsTrigger>
-          <TabsTrigger value="stocks">Stock Chat</TabsTrigger>
-          <TabsTrigger value="live">Live Sessions</TabsTrigger>
           <TabsTrigger value="trading">Social Trading</TabsTrigger>
         </TabsList>
 
@@ -122,10 +115,6 @@ export function CommunityHub() {
           <div className="mt-4">
             <InvestmentServersPage />
           </div>
-        </TabsContent>
-
-        <TabsContent value="live" className="space-y-6">
-          <LiveSessions />
         </TabsContent>
 
         <TabsContent value="trading" className="space-y-6">
