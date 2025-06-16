@@ -304,8 +304,8 @@ async function fetchYFinanceQuote(symbol: string): Promise<StockData> {
   
   console.log(`Fetching quote for ${symbol}`);
   
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 100));
+  // Simulate API delay for testing
+  await new Promise(resolve => setTimeout(resolve, Math.random() * 200 + 100));
 
   // Check if symbol exists and is valid
   const validSymbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'INFY.NS', 'TCS.NS', 'RELIANCE.NS'];
@@ -314,7 +314,7 @@ async function fetchYFinanceQuote(symbol: string): Promise<StockData> {
     throw new Error(`Invalid or delisted ticker: ${symbol}`);
   }
 
-  // Generate realistic mock data
+  // Generate realistic mock data with some volatility
   const basePrice = symbol.includes('.NS') ? 1000 + Math.random() * 2000 : 100 + Math.random() * 200;
   const change = (Math.random() - 0.5) * 10;
   

@@ -1,46 +1,44 @@
-
+import React from 'react';
+import './App.css';
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
+import { supabase } from './integrations/supabase/client';
+import { Account } from './components/auth/Account';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { Navigation } from "@/components/layout/Navigation";
 import Index from "./pages/Index";
+import Profile from "./pages/Profile";
 import Strategies from "./pages/Strategies";
+import InvestmentServers from "./pages/InvestmentServers";
+import SystemsCheck from "./pages/SystemsCheck"; // Added systems check import
 import NotFound from "./pages/NotFound";
-import { AuthPage } from "@/components/auth/AuthPage";
-import { ThemeProvider } from "next-themes"; // <-- import ThemeProvider
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route 
-                path="/" 
-                element={
-                  <Index />
-                } 
-              />
-              <Route path="/strategies" element={<Strategies />} />
-              <Route path="/login" element={<AuthPage />} />
-              <Route path="/signup" element={<AuthPage />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <div className="min-h-screen bg-gray-50">
+          <Navigation />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/strategies" element={<Strategies />} />
+            <Route path="/investment-servers" element={<InvestmentServers />} />
+            <Route path="/systems-check" element={<SystemsCheck />} /> {/* Added systems check route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
+    </TooltipProvider>
   </QueryClientProvider>
 );
 
 export default App;
-
