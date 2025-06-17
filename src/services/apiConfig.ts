@@ -1,11 +1,10 @@
-
-// API Configuration - Now using production Alpha Vantage key
+// API Configuration - Now using production keys
 export const API_CONFIG = {
   ALPHA_VANTAGE: 'LGMV7GX6J901QF06', // Your production Alpha Vantage API key
   FMP: 'demo', // Replace with Financial Modeling Prep API key when available
-  FINNHUB: 'demo', // Replace with Finnhub API key when available
-  MARKETAUX: 'demo', // Replace with MarketAux API key when available
-  NEWS_API: 'demo' // Replace with NewsAPI key when available
+  FINNHUB: 'd18gr11r01qg5217uro0d18gr11r01qg5217urog', // Your production Finnhub API key
+  MARKETAUX: 'FiGd7T0vodrz7HFHG80R1jngzbY0cvtR360mt29n', // Your production MarketAux API key
+  NEWS_API: 'e99b5b70215e4fc9a8b018306fa34c17' // Your production NewsAPI key
 };
 
 // API Endpoints
