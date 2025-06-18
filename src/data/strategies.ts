@@ -22,6 +22,7 @@ export interface Strategy {
   expectedReturn: number;
   volatility: number;
   sharpeRatio: number;
+  timeHorizon: string;
   bestYear: { year: number; return: number };
   worstYear: { year: number; return: number };
   sectorExposure: { sector: string; weight: number }[];
@@ -67,6 +68,7 @@ export const libraryStrategies: Strategy[] = [
     expectedReturn: 7.5,
     volatility: 11.2,
     sharpeRatio: 0.67,
+    timeHorizon: '5-10 years',
     bestYear: { year: 2019, return: 18.2 },
     worstYear: { year: 2022, return: -14.5 },
     sectorExposure: [
@@ -97,6 +99,7 @@ export const libraryStrategies: Strategy[] = [
     expectedReturn: 12.5,
     volatility: 18.7,
     sharpeRatio: 0.67,
+    timeHorizon: '3-5 years',
     bestYear: { year: 2021, return: 25.4 },
     worstYear: { year: 2018, return: -12.1 },
     sectorExposure: [
@@ -125,6 +128,7 @@ export const libraryStrategies: Strategy[] = [
     expectedReturn: 9.8,
     volatility: 14.3,
     sharpeRatio: 0.68,
+    timeHorizon: '7-10 years',
     bestYear: { year: 2016, return: 22.1 },
     worstYear: { year: 2022, return: -15.9 },
     sectorExposure: [
@@ -156,6 +160,7 @@ export const libraryStrategies: Strategy[] = [
     expectedReturn: 6.2,
     volatility: 8.9,
     sharpeRatio: 0.70,
+    timeHorizon: '3-7 years',
     bestYear: { year: 2017, return: 15.3 },
     worstYear: { year: 2022, return: -7.8 },
     sectorExposure: [
@@ -186,6 +191,7 @@ export const libraryStrategies: Strategy[] = [
     expectedReturn: 10.5,
     volatility: 13.5,
     sharpeRatio: 0.78,
+    timeHorizon: '5-15 years',
     bestYear: { year: 2020, return: 28.9 },
     worstYear: { year: 2022, return: -11.5 },
     sectorExposure: [
@@ -205,7 +211,7 @@ export const libraryStrategies: Strategy[] = [
   {
     id: 'permanent-portfolio',
     name: 'Permanent Portfolio',
-    icon: Anchor, // Lucide Anchor for stability
+    icon: Anchor,
     description: 'Simple yet powerful hedge across inflation, growth, deflation, and recessions.',
     objective: 'Survive any economic climate.',
     allocation: [
@@ -218,6 +224,7 @@ export const libraryStrategies: Strategy[] = [
     expectedReturn: 5.8,
     volatility: 7.2,
     sharpeRatio: 0.60,
+    timeHorizon: '10+ years',
     bestYear: { year: 2020, return: 14.2 },
     worstYear: { year: 2013, return: -4.0 },
     sectorExposure: [
@@ -238,7 +245,7 @@ export const libraryStrategies: Strategy[] = [
   {
     id: 'ivy-portfolio',
     name: 'Ivy Portfolio',
-    icon: Gem, // Lucide Gem for endowment sophistication
+    icon: Gem,
     description: 'Diversification beyond public markets with a smart long-term mix.',
     objective: 'Replicate Ivy League university endowments.',
     allocation: [
@@ -252,6 +259,7 @@ export const libraryStrategies: Strategy[] = [
     expectedReturn: 7.2,
     volatility: 9.5,
     sharpeRatio: 0.75,
+    timeHorizon: '10+ years',
     bestYear: { year: 2017, return: 14.7 },
     worstYear: { year: 2022, return: -10.5 },
     sectorExposure: [
@@ -272,7 +280,7 @@ export const libraryStrategies: Strategy[] = [
   {
     id: 'yale-endowment',
     name: 'Yale Endowment Model',
-    icon: Crown, // Use Crown for elite approach
+    icon: Crown,
     description: 'Emphasizes illiquid, high-alpha strategies. Adapt with ETFs like VNQ, QQQM, etc.',
     objective: 'Long-term wealth creation via alternative investments.',
     allocation: [
@@ -287,6 +295,7 @@ export const libraryStrategies: Strategy[] = [
     expectedReturn: 8.5,
     volatility: 14.2,
     sharpeRatio: 0.67,
+    timeHorizon: '15+ years',
     bestYear: { year: 2019, return: 19.3 },
     worstYear: { year: 2022, return: -13.4 },
     sectorExposure: [
@@ -307,7 +316,7 @@ export const libraryStrategies: Strategy[] = [
   {
     id: 'bogleheads-3fund',
     name: 'Bogleheads 3-Fund Portfolio',
-    icon: BarChart, // Lucide BarChart for simplicity & tracking
+    icon: BarChart,
     description: 'Ideal for beginners; efficient and rebalancing-friendly.',
     objective: 'Simple, low-cost, passive diversification.',
     allocation: [
@@ -319,6 +328,7 @@ export const libraryStrategies: Strategy[] = [
     expectedReturn: 7.1,
     volatility: 10.1,
     sharpeRatio: 0.73,
+    timeHorizon: '5-20 years',
     bestYear: { year: 2019, return: 20.5 },
     worstYear: { year: 2022, return: -12.2 },
     sectorExposure: [
@@ -336,7 +346,7 @@ export const libraryStrategies: Strategy[] = [
   {
     id: 'blackrock-target',
     name: 'BlackRock Target Allocation',
-    icon: PieChart, // Lucide PieChart for managed mix
+    icon: PieChart,
     description: 'Managed mix based on user risk tolerance (aggressive to conservative).',
     objective: 'Managed mix based on user risk tolerance.',
     allocation: [
@@ -351,6 +361,7 @@ export const libraryStrategies: Strategy[] = [
     expectedReturn: 6.9,
     volatility: 8.5,
     sharpeRatio: 0.70,
+    timeHorizon: '3-10 years',
     bestYear: { year: 2017, return: 13.7 },
     worstYear: { year: 2022, return: -9.1 },
     sectorExposure: [
@@ -359,7 +370,7 @@ export const libraryStrategies: Strategy[] = [
       { sector: 'Bonds', weight: 40 }
     ],
     assetExposure: [
-      { asset: 'Equity', weight: 48 }, // Average weighting for display
+      { asset: 'Equity', weight: 48 },
       { asset: 'Bonds', weight: 52 }
     ],
     implementationNotes: "Allocate based on personal risk profile. Rebalance quarterly or at 10% drift. Can be implemented with iShares Target Allocation ETFs.",
@@ -368,7 +379,7 @@ export const libraryStrategies: Strategy[] = [
   {
     id: 'sector-rotation',
     name: 'Sector Rotation Strategy',
-    icon: TrendingUp, // Lucide TrendingUp for momentum
+    icon: TrendingUp,
     description: 'Beat the market by rotating into the strongest sectors.',
     objective: 'Rotate into top 3 sectors by momentum, rebalanced monthly or quarterly.',
     allocation: [
@@ -378,6 +389,7 @@ export const libraryStrategies: Strategy[] = [
     expectedReturn: 13.0,
     volatility: 19.5,
     sharpeRatio: 0.68,
+    timeHorizon: '1-3 years',
     bestYear: { year: 2020, return: 28.0 },
     worstYear: { year: 2018, return: -16.4 },
     sectorExposure: [
@@ -393,7 +405,7 @@ export const libraryStrategies: Strategy[] = [
   {
     id: 'barbell-strategy',
     name: 'Barbell Strategy',
-    icon: Layers, // Lucide Layers for extremes
+    icon: Layers,
     description: 'Balance risk by going ultra-safe and ultra-aggressive.',
     objective: 'Balance risk by going ultra-safe and ultra-aggressive.',
     allocation: [
@@ -404,6 +416,7 @@ export const libraryStrategies: Strategy[] = [
     expectedReturn: 9.1,
     volatility: 17.8,
     sharpeRatio: 0.61,
+    timeHorizon: '3-7 years',
     bestYear: { year: 2020, return: 22.5 },
     worstYear: { year: 2022, return: -15.8 },
     sectorExposure: [
@@ -420,7 +433,7 @@ export const libraryStrategies: Strategy[] = [
   {
     id: 'all-weather',
     name: 'All Weather Portfolio',
-    icon: Shield, // Lucide Shield for resilience
+    icon: Shield,
     description: "Ray Dalio's risk parity approach for all economic environments.",
     objective: 'Survive recessions, inflation, booms, and busts.',
     allocation: [
@@ -434,6 +447,7 @@ export const libraryStrategies: Strategy[] = [
     expectedReturn: 8.2,
     volatility: 12.0,
     sharpeRatio: 0.68,
+    timeHorizon: '10+ years',
     bestYear: { year: 2019, return: 16.7 },
     worstYear: { year: 2022, return: -10.0 },
     sectorExposure: [
@@ -449,11 +463,10 @@ export const libraryStrategies: Strategy[] = [
     implementationNotes: "Quarterly rebalance; maintain risk-parity through volatility-adjusted allocations. Broadest all-weather coverage.",
     chartData: generateChartData(100, 10, 0.028, 0.0008),
   },
-  // Golden Butterfly Portfolio
   {
     id: 'golden-butterfly',
     name: 'Golden Butterfly Portfolio',
-    icon: Shield, // Shield for resilience/growth, but you can swap to any other Lucide icon if desired
+    icon: Shield,
     description: 'Stability plus solid growth via equal allocation to stocks, bonds, and gold.',
     objective: 'Balance stability and growth with a simple, all-weather allocation.',
     allocation: [
@@ -467,6 +480,7 @@ export const libraryStrategies: Strategy[] = [
     expectedReturn: 7.0,
     volatility: 8.5,
     sharpeRatio: 0.74,
+    timeHorizon: '7-15 years',
     bestYear: { year: 2019, return: 18.5 },
     worstYear: { year: 2022, return: -6.4 },
     sectorExposure: [
