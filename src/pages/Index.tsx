@@ -20,6 +20,7 @@ import { UserStreakWidget } from "@/components/gamification/UserStreakWidget";
 import { UserBadgesWidget } from "@/components/gamification/UserBadgesWidget";
 import { LeaderboardWidget } from "@/components/gamification/LeaderboardWidget";
 import { Card, CardContent } from "@/components/ui/card";
+import { EnhancedPortfolioAdvisor } from "@/components/portfolio/EnhancedPortfolioAdvisor";
 
 function RestartTourBtn() {
   const { startTour } = useOnboardingTour();
@@ -120,6 +121,9 @@ const Index = () => {
             <TabsContent value="overview" className="space-y-6">
               <ErrorBoundary>
                 <PortfolioOverview />
+              </ErrorBoundary>
+              <ErrorBoundary>
+                <EnhancedPortfolioAdvisor />
               </ErrorBoundary>
             </TabsContent>
             <TabsContent value="builder" className="space-y-6">
