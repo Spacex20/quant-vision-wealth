@@ -1,17 +1,15 @@
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PortfolioOverview } from "@/components/portfolio/PortfolioOverview";
 import { PortfolioBuilder } from "@/components/portfolio/PortfolioBuilder";
 import { PortfolioManager } from "@/components/portfolio/PortfolioManager";
-import { ValueInvestingTools } from "@/components/investing/ValueInvestingTools";
 import { PortfolioSimulator } from "@/components/simulation/PortfolioSimulator";
-import { EducationHub } from "@/components/education/EducationHub";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { PortfolioAnalytics } from "@/components/analytics/PortfolioAnalytics";
 import { MarketIntelligence } from "@/components/market/MarketIntelligence";
 import { StockScreener } from "@/components/research/StockScreener";
 import QuantLab from "@/components/research/QuantLab";
-import { CommunityHub } from "@/components/community/CommunityHub";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -64,7 +62,7 @@ const Index = () => {
         >
           <Sparkles className="w-5 h-5 mr-1 -ml-1" />
           Personalized Ideas
-        </button>
+        </Button>
         <PersonalizedStockIdeasModal open={showIdeasModal} onOpenChange={setShowIdeasModal} />
         <div className="container mx-auto px-0 py-6 max-w-6xl">
           {/* GAMIFICATION ROW: Streak, Badges, Leaderboard */}
@@ -110,7 +108,7 @@ const Index = () => {
             </CardContent>
           </Card>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList id="mainNavbarTabs" className="grid w-full grid-cols-5 lg:grid-cols-10 mb-8">
+            <TabsList id="mainNavbarTabs" className="grid w-full grid-cols-4 lg:grid-cols-8 mb-8">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="builder">Builder</TabsTrigger>
               <TabsTrigger value="manager">Manager</TabsTrigger>
@@ -119,8 +117,6 @@ const Index = () => {
               <TabsTrigger value="screener">Screener</TabsTrigger>
               <TabsTrigger value="quantlab">Quant Lab</TabsTrigger>
               <TabsTrigger value="simulator">Simulator</TabsTrigger>
-              <TabsTrigger value="community" id="communityTab">Community</TabsTrigger>
-              <TabsTrigger value="education">Education</TabsTrigger>
             </TabsList>
             <TabsContent value="overview" className="space-y-6">
               <ErrorBoundary>
@@ -160,16 +156,6 @@ const Index = () => {
             <TabsContent value="simulator" className="space-y-6">
               <ErrorBoundary>
                 <PortfolioSimulator />
-              </ErrorBoundary>
-            </TabsContent>
-            <TabsContent value="community" className="space-y-6">
-              <ErrorBoundary>
-                <CommunityHub />
-              </ErrorBoundary>
-            </TabsContent>
-            <TabsContent value="education" className="space-y-6">
-              <ErrorBoundary>
-                <EducationHub />
               </ErrorBoundary>
             </TabsContent>
           </Tabs>
