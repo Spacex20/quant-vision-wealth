@@ -900,6 +900,54 @@ export type Database = {
           },
         ]
       }
+      news_articles: {
+        Row: {
+          author: string | null
+          content: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          published_at: string
+          relevance_score: number | null
+          sentiment: string | null
+          source: string
+          summary: string | null
+          symbols: string[] | null
+          title: string
+          url: string | null
+        }
+        Insert: {
+          author?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          published_at: string
+          relevance_score?: number | null
+          sentiment?: string | null
+          source: string
+          summary?: string | null
+          symbols?: string[] | null
+          title: string
+          url?: string | null
+        }
+        Update: {
+          author?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          published_at?: string
+          relevance_score?: number | null
+          sentiment?: string | null
+          source?: string
+          summary?: string | null
+          symbols?: string[] | null
+          title?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
       paper_accounts: {
         Row: {
           created_at: string
@@ -1538,6 +1586,226 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      terminal_market_data: {
+        Row: {
+          change_amount: number
+          change_percent: number
+          dividend_yield: number | null
+          high_52w: number | null
+          id: string
+          last_updated: string
+          low_52w: number | null
+          market_cap: number | null
+          pe_ratio: number | null
+          price: number
+          symbol: string
+          volume: number
+        }
+        Insert: {
+          change_amount?: number
+          change_percent?: number
+          dividend_yield?: number | null
+          high_52w?: number | null
+          id?: string
+          last_updated?: string
+          low_52w?: number | null
+          market_cap?: number | null
+          pe_ratio?: number | null
+          price: number
+          symbol: string
+          volume?: number
+        }
+        Update: {
+          change_amount?: number
+          change_percent?: number
+          dividend_yield?: number | null
+          high_52w?: number | null
+          id?: string
+          last_updated?: string
+          low_52w?: number | null
+          market_cap?: number | null
+          pe_ratio?: number | null
+          price?: number
+          symbol?: string
+          volume?: number
+        }
+        Relationships: []
+      }
+      terminal_watchlists: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          symbols: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          symbols?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          symbols?: string[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      trading_accounts: {
+        Row: {
+          account_name: string
+          account_type: string
+          created_at: string
+          currency: string
+          current_balance: number
+          id: string
+          initial_balance: number
+          total_pnl: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_name?: string
+          account_type?: string
+          created_at?: string
+          currency?: string
+          current_balance?: number
+          id?: string
+          initial_balance?: number
+          total_pnl?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_name?: string
+          account_type?: string
+          created_at?: string
+          currency?: string
+          current_balance?: number
+          id?: string
+          initial_balance?: number
+          total_pnl?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      trading_orders: {
+        Row: {
+          account_id: string | null
+          created_at: string
+          filled_at: string | null
+          filled_price: number | null
+          filled_quantity: number
+          id: string
+          order_type: string
+          price: number | null
+          quantity: number
+          side: string
+          status: string
+          stop_price: number | null
+          symbol: string
+          updated_at: string
+        }
+        Insert: {
+          account_id?: string | null
+          created_at?: string
+          filled_at?: string | null
+          filled_price?: number | null
+          filled_quantity?: number
+          id?: string
+          order_type: string
+          price?: number | null
+          quantity: number
+          side: string
+          status?: string
+          stop_price?: number | null
+          symbol: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string | null
+          created_at?: string
+          filled_at?: string | null
+          filled_price?: number | null
+          filled_quantity?: number
+          id?: string
+          order_type?: string
+          price?: number | null
+          quantity?: number
+          side?: string
+          status?: string
+          stop_price?: number | null
+          symbol?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trading_orders_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "trading_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trading_positions: {
+        Row: {
+          account_id: string | null
+          avg_entry_price: number
+          created_at: string
+          current_price: number
+          id: string
+          position_type: string
+          quantity: number
+          realized_pnl: number
+          symbol: string
+          unrealized_pnl: number
+          updated_at: string
+        }
+        Insert: {
+          account_id?: string | null
+          avg_entry_price: number
+          created_at?: string
+          current_price?: number
+          id?: string
+          position_type: string
+          quantity: number
+          realized_pnl?: number
+          symbol: string
+          unrealized_pnl?: number
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string | null
+          avg_entry_price?: number
+          created_at?: string
+          current_price?: number
+          id?: string
+          position_type?: string
+          quantity?: number
+          realized_pnl?: number
+          symbol?: string
+          unrealized_pnl?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trading_positions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "trading_accounts"
             referencedColumns: ["id"]
           },
         ]

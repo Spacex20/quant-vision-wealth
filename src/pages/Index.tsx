@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PortfolioOverview } from "@/components/portfolio/PortfolioOverview";
@@ -14,7 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { PersonalizedStockIdeasModal } from "@/components/stock-ideas/PersonalizedStockIdeasModal";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Monitor } from "lucide-react";
 import { OnboardingTourProvider, useOnboardingTour } from "@/components/onboarding/OnboardingTour";
 import { UserStreakWidget } from "@/components/gamification/UserStreakWidget";
 import { UserBadgesWidget } from "@/components/gamification/UserBadgesWidget";
@@ -49,6 +50,17 @@ const Index = () => {
             <DashboardHeader />
           </div>
         </ErrorBoundary>
+        
+        {/* Bloomberg Terminal Access Button */}
+        <Button
+          onClick={() => navigate('/terminal')}
+          className="fixed top-6 right-20 z-50 flex items-center gap-2 px-4 py-2 shadow-lg rounded-lg bg-gradient-to-r from-gray-800 to-black text-green-400 font-semibold text-sm hover:scale-105 hover:shadow-2xl transition-all outline-none border border-green-600"
+          aria-label="Access Bloomberg Terminal"
+        >
+          <Monitor className="w-4 h-4" />
+          Terminal
+        </Button>
+
         {/* Floating Stock Ideas Button */}
         <Button
           id="personalizedFab"

@@ -1,52 +1,55 @@
 
-import React from 'react';
-import './App.css';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "next-themes";
-import { AuthProvider } from "@/hooks/useAuth";
-import { Navigation } from "@/components/layout/Navigation";
+import { useAuth } from "@/hooks/useAuth";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
+import AuthPage from "./pages/AuthPage";
 import Profile from "./pages/Profile";
 import Strategies from "./pages/Strategies";
 import InvestmentServers from "./pages/InvestmentServers";
 import SystemsCheck from "./pages/SystemsCheck";
+import Terminal from "./pages/Terminal";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="light"
-      enableSystem={true}
-      disableTransitionOnChange={false}
-    >
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-              <Navigation />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/strategies" element={<Strategies />} />
-                <Route path="/investment-servers" element={<InvestmentServers />} />
-                <Route path="/systems-check" element={<SystemsCheck />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<AuthPage />} />
+            <Route path="/" element={<Index />} />
+            <Route path="/terminal" element={
+              <ProtectedRoute>
+                <Terminal />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
+            <Route path="/strategies" element={<Strategies />} />
+            <Route path="/community" element={
+              <ProtectedRoute>
+                <InvestmentServers />
+              </ProtectedRoute>
+            } />
+            <Route path="/systems" element={<SystemsCheck />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
