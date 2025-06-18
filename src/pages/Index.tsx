@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PortfolioOverview } from "@/components/portfolio/PortfolioOverview";
@@ -50,7 +49,7 @@ const Index = () => {
           </div>
         </ErrorBoundary>
         {/* Floating Stock Ideas Button */}
-        <button
+        <Button
           id="personalizedFab"
           onClick={() => {
             if (user) setShowIdeasModal(true);
