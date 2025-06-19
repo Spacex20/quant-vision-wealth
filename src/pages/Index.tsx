@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Navigation } from "@/components/layout/Navigation";
@@ -16,11 +15,16 @@ import {
   Globe,
   Database,
   Target,
-  CheckCircle
+  CheckCircle,
+  Calculator
 } from "lucide-react";
+import { useState } from "react";
+import { AnalysisWidget } from "@/components/analytics/AnalysisWidget";
 
 export default function Index() {
   const { user } = useAuth();
+  const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
+  const [selectedSymbol, setSelectedSymbol] = useState("AAPL");
 
   const features = [
     {
@@ -55,6 +59,14 @@ export default function Index() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <Navigation />
       
+      {/* Analysis Widget */}
+      <AnalysisWidget
+        isOpen={isAnalysisOpen}
+        onClose={() => setIsAnalysisOpen(false)}
+        selectedSymbol={selectedSymbol}
+        onSymbolSelect={setSelectedSymbol}
+      />
+      
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -79,25 +91,51 @@ export default function Index() {
               and connect with investment professionals in one powerful platform.
             </p>
 
-            {!user ? (
-              <div className="flex justify-center gap-4">
-                <Link to="/login">
-                  <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-3">
-                    Get Started Free
+            <div className="flex justify-center gap-4 mb-8">
+              {!user ? (
+                <>
+                  <Link to="/login">
+                    <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-3">
+                      Get Started Free
+                    </Button>
+                  </Link>
+                  <Button size="lg" variant="outline" className="px-8 py-3">
+                    Watch Demo
                   </Button>
-                </Link>
-                <Button size="lg" variant="outline" className="px-8 py-3">
-                  Watch Demo
+                </>
+              ) : (
+                <>
+                  <Link to="/research">
+                    <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-3">
+                      <Brain className="w-5 h-5 mr-2" />
+                      Start AI Research
+                      <Zap className="w-4 h-4 ml-2 animate-pulse" />
+                    </Button>
+                  </Link>
+                  <Button 
+                    size="lg" 
+                    variant="outline" 
+                    className="px-8 py-3 border-blue-300 text-blue-600 hover:bg-blue-50"
+                    onClick={() => setIsAnalysisOpen(true)}
+                  >
+                    <Calculator className="w-5 h-5 mr-2" />
+                    Open Analysis Lab
+                  </Button>
+                </>
+              )}
+            </div>
+
+            {user && (
+              <div className="flex justify-center">
+                <Button 
+                  onClick={() => setIsAnalysisOpen(true)}
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold border border-yellow-400 shadow-lg transform hover:scale-105 transition-all duration-200"
+                >
+                  <Calculator className="w-4 h-4 mr-2" />
+                  ANALYSIS LAB
+                  <Zap className="w-3 h-3 ml-1 animate-pulse" />
                 </Button>
               </div>
-            ) : (
-              <Link to="/research">
-                <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-3">
-                  <Brain className="w-5 h-5 mr-2" />
-                  Start AI Research
-                  <Zap className="w-4 h-4 ml-2 animate-pulse" />
-                </Button>
-              </Link>
             )}
           </div>
         </div>
