@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -288,7 +287,7 @@ export const TerminalPortfolio = () => {
                 />
                 <Bar 
                   dataKey="pnl" 
-                  fill={(entry) => entry.pnl >= 0 ? '#22c55e' : '#ef4444'} 
+                  fill="#22c55e"
                 />
               </BarChart>
             </ResponsiveContainer>

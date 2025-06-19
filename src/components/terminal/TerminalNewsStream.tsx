@@ -185,13 +185,13 @@ export const TerminalNewsStream = ({ selectedSymbol, isRealTime }: TerminalNewsS
         </CardHeader>
         <CardContent className="p-4">
           <div className="flex gap-4">
-            <div className="flex-1">
+            <div className="flex-1 relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-green-400" />
               <Input
                 placeholder="Search news..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-black border-green-600 text-green-400"
-                icon={<Search className="w-4 h-4" />}
+                className="bg-black border-green-600 text-green-400 pl-10"
               />
             </div>
             <Select value={sentimentFilter} onValueChange={setSentimentFilter}>
