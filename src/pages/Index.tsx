@@ -1,184 +1,246 @@
 
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PortfolioOverview } from "@/components/portfolio/PortfolioOverview";
-import { PortfolioBuilder } from "@/components/portfolio/PortfolioBuilder";
-import { PortfolioManager } from "@/components/portfolio/PortfolioManager";
-import { PortfolioSimulator } from "@/components/simulation/PortfolioSimulator";
-import { DashboardHeader } from "@/components/layout/DashboardHeader";
-import { PortfolioAnalytics } from "@/components/analytics/PortfolioAnalytics";
-import { MarketIntelligence } from "@/components/market/MarketIntelligence";
-import { StockScreener } from "@/components/research/StockScreener";
-import QuantLab from "@/components/research/QuantLab";
-import { ErrorBoundary } from "@/components/common/ErrorBoundary";
-import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { PersonalizedStockIdeasModal } from "@/components/stock-ideas/PersonalizedStockIdeasModal";
-import { Sparkles, Monitor } from "lucide-react";
-import { OnboardingTourProvider, useOnboardingTour } from "@/components/onboarding/OnboardingTour";
-import { UserStreakWidget } from "@/components/gamification/UserStreakWidget";
-import { UserBadgesWidget } from "@/components/gamification/UserBadgesWidget";
-import { LeaderboardWidget } from "@/components/gamification/LeaderboardWidget";
-import { Card, CardContent } from "@/components/ui/card";
-import { EnhancedPortfolioAdvisor } from "@/components/portfolio/EnhancedPortfolioAdvisor";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Navigation } from "@/components/layout/Navigation";
+import { useAuth } from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
+import { 
+  Brain, 
+  Terminal, 
+  TrendingUp, 
+  Users, 
+  BarChart3, 
+  Shield, 
+  Zap,
+  FileText,
+  Globe,
+  Database,
+  Target,
+  CheckCircle
+} from "lucide-react";
 
-function RestartTourBtn() {
-  const { startTour } = useOnboardingTour();
-  return (
-    <Button
-      onClick={startTour}
-      className="fixed bottom-16 right-6 z-50 bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white font-bold rounded shadow-lg hover:scale-105 transition focus:outline-none"
-      aria-label="Show onboarding tour again"
-    >
-      <Sparkles className="w-5 h-5 mr-2" /> Show Tour
-    </Button>
-  );
-}
-
-const Index = () => {
-  const [activeTab, setActiveTab] = useState("overview");
-  const [showIdeasModal, setShowIdeasModal] = useState(false);
+export default function Index() {
   const { user } = useAuth();
-  const navigate = useNavigate();
+
+  const features = [
+    {
+      icon: <Brain className="w-8 h-8 text-blue-600" />,
+      title: "AI Research Copilot",
+      description: "Generate comprehensive PDF reports with advanced financial analysis, real-time data integration, and statistical rigor.",
+      highlights: ["Chain-of-thought reasoning", "Real-time market data", "Statistical validation", "PDF report generation"],
+      link: "/research",
+      featured: true
+    },
+    {
+      icon: <Terminal className="w-6 h-6 text-green-600" />,
+      title: "Bloomberg Terminal",
+      description: "Professional-grade trading terminal with real-time market data, advanced charting, and portfolio management.",
+      link: "/terminal"
+    },
+    {
+      icon: <TrendingUp className="w-6 h-6 text-purple-600" />,
+      title: "Strategy Library",
+      description: "Access proven investment strategies with backtesting, optimization, and performance analytics.",
+      link: "/strategies"
+    },
+    {
+      icon: <Users className="w-6 h-6 text-orange-600" />,
+      title: "Investment Community",
+      description: "Connect with professional investors, share insights, and collaborate on investment strategies.",
+      link: "/community"
+    }
+  ];
 
   return (
-    <OnboardingTourProvider>
-      <div className="min-h-screen bg-background relative overflow-x-hidden">
-        <ErrorBoundary>
-          <div id="dashboardHeader">
-            <DashboardHeader />
-          </div>
-        </ErrorBoundary>
-        
-        {/* Bloomberg Terminal Access Button */}
-        <Button
-          onClick={() => navigate('/terminal')}
-          className="fixed top-6 right-20 z-50 flex items-center gap-2 px-4 py-2 shadow-lg rounded-lg bg-gradient-to-r from-gray-800 to-black text-green-400 font-semibold text-sm hover:scale-105 hover:shadow-2xl transition-all outline-none border border-green-600"
-          aria-label="Access Bloomberg Terminal"
-        >
-          <Monitor className="w-4 h-4" />
-          Terminal
-        </Button>
-
-        {/* Floating Stock Ideas Button */}
-        <Button
-          id="personalizedFab"
-          onClick={() => {
-            if (user) setShowIdeasModal(true);
-            else navigate("/login");
-          }}
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3 shadow-lg rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold text-base hover:scale-105 hover:shadow-2xl transition-all outline-none border-2 border-white"
-          aria-label="Show personalized stock ideas"
-          style={{ boxShadow: "0 6px 24px 0 rgba(80,60,210,.18)" }}
-        >
-          <Sparkles className="w-5 h-5 mr-1 -ml-1" />
-          Personalized Ideas
-        </Button>
-        <PersonalizedStockIdeasModal open={showIdeasModal} onOpenChange={setShowIdeasModal} />
-        <div className="container mx-auto px-0 py-6 max-w-6xl">
-          {/* GAMIFICATION ROW: Streak, Badges, Leaderboard */}
-          <div className="flex flex-col lg:flex-row gap-4 mb-8 items-stretch">
-            <Card className="flex-1 min-w-[260px] bg-white/90 dark:bg-card/80 shadow-md">
-              <CardContent className="p-4">
-                <UserStreakWidget />
-                <UserBadgesWidget />
-              </CardContent>
-            </Card>
-            <Card className="min-w-[320px] w-full max-w-xs bg-white/90 dark:bg-card/80 shadow-md flex flex-col">
-              <CardContent className="p-3 h-full flex flex-col">
-                <LeaderboardWidget />
-              </CardContent>
-            </Card>
-          </div>
-          {/* Hero/Info section in a Card */}
-          <Card className="mb-8 bg-gradient-to-r from-blue-50/60 to-purple-50/70 dark:from-card dark:to-card">
-            <CardContent className="flex flex-col lg:flex-row justify-between items-center gap-2 py-8 px-6">
-              <div>
-                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-playfair drop-shadow-lg tracking-tight animate-fade-in">
-                  One Dashboard. Infinite Strategies.
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <Navigation />
+      
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <div className="p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl">
+                <BarChart3 className="w-10 h-10 text-white" />
+              </div>
+              <div className="text-left">
+                <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  FinanceAI
                 </h1>
-                <div
-                  className="text-xl font-semibold mt-1 bg-gradient-to-r from-fuchsia-500 via-blue-600 to-purple-600 bg-clip-text text-transparent font-sans tracking-tight drop-shadow-md animate-fade-in"
-                  style={{
-                    letterSpacing: "0.01em",
-                    lineHeight: "1.45"
-                  }}
-                >
-                  Test, tweak, and track your portfolio —&nbsp;
-                  <span className="font-bold">powered by quant models and real data.</span>
+                <p className="text-lg text-gray-600">Professional Investment Platform</p>
+              </div>
+            </div>
+            
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">
+              AI-Powered Financial Research & Analysis
+            </h2>
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+              Generate comprehensive research reports, analyze markets with professional tools, 
+              and connect with investment professionals in one powerful platform.
+            </p>
+
+            {!user ? (
+              <div className="flex justify-center gap-4">
+                <Link to="/login">
+                  <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-3">
+                    Get Started Free
+                  </Button>
+                </Link>
+                <Button size="lg" variant="outline" className="px-8 py-3">
+                  Watch Demo
+                </Button>
+              </div>
+            ) : (
+              <Link to="/research">
+                <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-3">
+                  <Brain className="w-5 h-5 mr-2" />
+                  Start AI Research
+                  <Zap className="w-4 h-4 ml-2 animate-pulse" />
+                </Button>
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Featured AI Research Copilot Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Introducing AI Research Copilot
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Generate institutional-quality research reports with advanced AI analysis, 
+            real-time data integration, and comprehensive risk assessment.
+          </p>
+        </div>
+
+        <Card className="border-2 border-blue-200 shadow-xl">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl">
+                <Brain className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-2xl">AI Research Copilot</CardTitle>
+                <CardDescription className="text-lg">
+                  High-powered research analyst with CREATE framework
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold">Key Capabilities</h3>
+                <div className="space-y-3">
+                  {[
+                    { icon: <Globe className="w-5 h-5 text-blue-600" />, text: "Real-time web data integration" },
+                    { icon: <Database className="w-5 h-5 text-green-600" />, text: "Statistical rigor with data validation" },
+                    { icon: <FileText className="w-5 h-5 text-purple-600" />, text: "Professional PDF report generation" },
+                    { icon: <Target className="w-5 h-5 text-orange-600" />, text: "Risk assessment and recommendations" }
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      {item.icon}
+                      <span className="text-gray-700">{item.text}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-              {!user && (
-                <Button 
-                  onClick={() => navigate('/login')} 
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 mt-4 lg:mt-0"
-                >
-                  Get Started Free 🚀
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList id="mainNavbarTabs" className="grid w-full grid-cols-4 lg:grid-cols-8 mb-8">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="builder">Builder</TabsTrigger>
-              <TabsTrigger value="manager">Manager</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
-              <TabsTrigger value="market">Market Data</TabsTrigger>
-              <TabsTrigger value="screener">Screener</TabsTrigger>
-              <TabsTrigger value="quantlab">Quant Lab</TabsTrigger>
-              <TabsTrigger value="simulator">Simulator</TabsTrigger>
-            </TabsList>
-            <TabsContent value="overview" className="space-y-6">
-              <ErrorBoundary>
-                <PortfolioOverview />
-              </ErrorBoundary>
-              <ErrorBoundary>
-                <EnhancedPortfolioAdvisor />
-              </ErrorBoundary>
-            </TabsContent>
-            <TabsContent value="builder" className="space-y-6">
-              <ErrorBoundary>
-                <PortfolioBuilder />
-              </ErrorBoundary>
-            </TabsContent>
-            <TabsContent value="manager" className="space-y-6">
-              <ErrorBoundary>
-                <PortfolioManager />
-              </ErrorBoundary>
-            </TabsContent>
-            <TabsContent value="analytics" className="space-y-6">
-              <ErrorBoundary>
-                <PortfolioAnalytics />
-              </ErrorBoundary>
-            </TabsContent>
-            <TabsContent value="market" className="space-y-6">
-              <ErrorBoundary>
-                <MarketIntelligence />
-              </ErrorBoundary>
-            </TabsContent>
-            <TabsContent value="screener" className="space-y-6">
-              <ErrorBoundary>
-                <StockScreener />
-              </ErrorBoundary>
-            </TabsContent>
-            <TabsContent value="quantlab" className="space-y-6">
-              <ErrorBoundary>
-                <QuantLab />
-              </ErrorBoundary>
-            </TabsContent>
-            <TabsContent value="simulator" className="space-y-6">
-              <ErrorBoundary>
-                <PortfolioSimulator />
-              </ErrorBoundary>
-            </TabsContent>
-          </Tabs>
-        </div>
-        <RestartTourBtn />
+              
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold">CREATE Framework</h3>
+                <div className="space-y-2">
+                  {[
+                    "Character: Expert analyst targeting",
+                    "Request: Specific query breakdown", 
+                    "Examples: Analogous case studies",
+                    "Adjustments: Custom constraints",
+                    "Type: Professional PDF format",
+                    "Extras: Advanced metrics & analysis"
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-sm text-gray-600">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-8 pt-6 border-t">
+              <div className="flex justify-center">
+                <Link to="/research">
+                  <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-3">
+                    <Brain className="w-5 h-5 mr-2" />
+                    Try AI Research Copilot
+                    <Zap className="w-4 h-4 ml-2 animate-pulse" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </OnboardingTourProvider>
-  );
-};
 
-export default Index;
+      {/* Features Grid */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Complete Investment Platform
+          </h2>
+          <p className="text-lg text-gray-600">
+            Everything you need for professional financial analysis and investment management.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {features.slice(1).map((feature, index) => (
+            <Card key={index} className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  {feature.icon}
+                  <CardTitle className="text-lg">{feature.title}</CardTitle>
+                </div>
+                <CardDescription>{feature.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Link to={feature.link}>
+                  <Button variant="outline" className="w-full">
+                    Explore
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 py-16">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Ready to Transform Your Investment Research?
+          </h2>
+          <p className="text-xl text-blue-100 mb-8">
+            Join thousands of professional investors using AI-powered analysis.
+          </p>
+          {!user ? (
+            <Link to="/login">
+              <Button size="lg" variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-3">
+                Start Free Trial
+              </Button>
+            </Link>
+          ) : (
+            <Link to="/research">
+              <Button size="lg" variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-3">
+                <Brain className="w-5 h-5 mr-2" />
+                Generate Your First Report
+              </Button>
+            </Link>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

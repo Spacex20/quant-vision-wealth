@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +13,7 @@ import InvestmentServers from "./pages/InvestmentServers";
 import SystemsCheck from "./pages/SystemsCheck";
 import Terminal from "./pages/Terminal";
 import NotFound from "./pages/NotFound";
+import Research from "./pages/Research";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +28,11 @@ const App = () => {
             <Routes>
               <Route path="/login" element={<AuthPage />} />
               <Route path="/" element={<Index />} />
+              <Route path="/research" element={
+                <ProtectedRoute>
+                  <Research />
+                </ProtectedRoute>
+              } />
               <Route path="/terminal" element={
                 <ProtectedRoute>
                   <Terminal />
