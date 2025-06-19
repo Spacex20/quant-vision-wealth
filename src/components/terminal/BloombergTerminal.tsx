@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,13 +12,27 @@ import { TerminalWatchlist } from "./TerminalWatchlist";
 import { TerminalPortfolio } from "./TerminalPortfolio";
 import { TerminalResearch } from "./TerminalResearch";
 import { TerminalMacroData } from "./TerminalMacroData";
-import { Monitor, TrendingUp, Newspaper, BarChart3, Target, Briefcase, Search, Globe, Settings } from "lucide-react";
+import { AnalysisLab } from "./AnalysisLab";
+import { 
+  Monitor, 
+  TrendingUp, 
+  Newspaper, 
+  BarChart3, 
+  Target, 
+  Briefcase, 
+  Search, 
+  Globe, 
+  Settings,
+  Calculator,
+  Zap
+} from "lucide-react";
 
 export const BloombergTerminal = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("market");
   const [selectedSymbol, setSelectedSymbol] = useState("AAPL");
   const [isRealTime, setIsRealTime] = useState(true);
+  const [isAnalysisLabOpen, setIsAnalysisLabOpen] = useState(false);
 
   // Bloomberg-style status indicators
   const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'connecting'>('connected');
@@ -74,6 +87,14 @@ export const BloombergTerminal = () => {
         </div>
         
         <div className="flex items-center gap-4">
+          <Button
+            onClick={() => setIsAnalysisLabOpen(true)}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold border border-yellow-400"
+          >
+            <Calculator className="w-4 h-4 mr-2" />
+            ANALYSIS LAB
+            <Zap className="w-3 h-3 ml-1 animate-pulse" />
+          </Button>
           <span className="text-xs">USER: {user?.email?.toUpperCase() || 'GUEST'}</span>
           <span className="text-xs">TIME: {new Date().toLocaleTimeString()}</span>
           <Button 
@@ -86,6 +107,14 @@ export const BloombergTerminal = () => {
           </Button>
         </div>
       </div>
+
+      {/* Analysis Lab Modal */}
+      <AnalysisLab
+        isOpen={isAnalysisLabOpen}
+        onClose={() => setIsAnalysisLabOpen(false)}
+        selectedSymbol={selectedSymbol}
+        onSymbolSelect={setSelectedSymbol}
+      />
 
       {/* Main terminal interface */}
       <div className="p-4">
