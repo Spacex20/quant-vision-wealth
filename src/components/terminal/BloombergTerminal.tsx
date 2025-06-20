@@ -1,6 +1,6 @@
+
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
@@ -22,8 +22,7 @@ import {
   Search, 
   Globe, 
   Building2,
-  Activity,
-  Zap
+  Activity
 } from "lucide-react";
 
 export const BloombergTerminal = () => {
@@ -66,45 +65,44 @@ export const BloombergTerminal = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-slate-800 font-mono">
-      {/* Enhanced Bloomberg-style header with Wall Street theme */}
-      <div className="relative border-b-2 border-slate-300/50 bg-gradient-to-r from-slate-100/95 via-blue-100/95 to-slate-100/95 p-4 shadow-2xl backdrop-blur-sm">
+    <div className="min-h-screen bg-slate-100 text-slate-800 font-mono">
+      {/* Bloomberg-style header */}
+      <div className="relative border-b border-slate-300 bg-slate-200/95 p-4 shadow-lg backdrop-blur-sm">
         {/* Wall Street background pattern */}
         <div 
-          className="absolute inset-0 opacity-15"
+          className="absolute inset-0 opacity-10"
           style={{
             backgroundImage: `url('/lovable-uploads/baf93fd5-edaa-4822-8ff5-bd9d7ee8b15a.png')`,
             backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            filter: 'brightness(1.2) contrast(1.1)'
+            backgroundPosition: 'center'
           }}
         />
         
         <div className="relative flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-slate-800/95 to-blue-900/95 rounded-xl border-2 border-white/40 shadow-lg backdrop-blur-sm">
-                <Building2 className="h-8 w-8 text-white" />
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-slate-900 rounded-xl border border-white/20 shadow-lg">
+                <Building2 className="w-6 h-6 text-white" />
               </div>
               <div>
-                <span className="text-slate-900 font-bold text-2xl tracking-wider drop-shadow-sm">QUANTVERSE TERMINAL</span>
+                <span className="text-slate-900 font-bold text-xl tracking-wide">QUANTVERSE TERMINAL</span>
                 <div className="text-slate-700 text-sm font-semibold">Professional Trading Platform</div>
               </div>
             </div>
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-3 bg-white/80 px-4 py-2 rounded-lg backdrop-blur-sm border border-slate-300/50 shadow-sm">
-                <div className={`w-3 h-3 rounded-full ${getStatusColor(connectionStatus)} shadow-lg`} />
-                <span className="text-sm font-semibold text-slate-800">{connectionStatus.toUpperCase()}</span>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 bg-white/80 px-3 py-1 rounded-lg border border-slate-300 shadow-sm">
+                <div className={`w-2 h-2 rounded-full ${getStatusColor(connectionStatus)}`} />
+                <span className="text-xs font-semibold text-slate-800">{connectionStatus.toUpperCase()}</span>
               </div>
-              <div className="flex items-center gap-3 bg-white/80 px-4 py-2 rounded-lg backdrop-blur-sm border border-slate-300/50 shadow-sm">
-                <div className={`w-3 h-3 rounded-full ${getStatusColor(marketStatus)} shadow-lg`} />
-                <span className="text-sm font-semibold text-slate-800">MARKET {marketStatus.toUpperCase()}</span>
+              <div className="flex items-center gap-2 bg-white/80 px-3 py-1 rounded-lg border border-slate-300 shadow-sm">
+                <div className={`w-2 h-2 rounded-full ${getStatusColor(marketStatus)}`} />
+                <span className="text-xs font-semibold text-slate-800">MARKET {marketStatus.toUpperCase()}</span>
               </div>
             </div>
           </div>
           
-          <div className="flex items-center gap-6">
-            <div className="text-right text-sm text-slate-700 bg-white/80 px-4 py-2 rounded-lg backdrop-blur-sm border border-slate-300/50 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="text-right text-xs text-slate-700 bg-white/80 px-3 py-2 rounded-lg border border-slate-300 shadow-sm">
               <div className="font-semibold">USER: {user?.email?.toUpperCase() || 'GUEST'}</div>
               <div className="font-medium">TIME: {new Date().toLocaleTimeString()}</div>
             </div>
@@ -112,9 +110,9 @@ export const BloombergTerminal = () => {
               variant="outline" 
               size="sm"
               onClick={() => setIsRealTime(!isRealTime)}
-              className="text-sm border-slate-500/50 text-slate-800 hover:bg-slate-100 backdrop-blur-sm font-semibold shadow-sm"
+              className="text-xs border-slate-500 text-slate-800 hover:bg-slate-100 font-semibold shadow-sm"
             >
-              <Activity className="w-4 h-4 mr-2" />
+              <Activity className="w-3 h-3 mr-1" />
               {isRealTime ? "REAL-TIME ON" : "REAL-TIME OFF"}
             </Button>
           </div>
@@ -122,65 +120,65 @@ export const BloombergTerminal = () => {
       </div>
 
       {/* Main terminal interface */}
-      <div className="p-6">
+      <div className="p-4">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-8 bg-slate-200/90 border-2 border-slate-300/50 backdrop-blur-sm rounded-xl shadow-2xl">
-            <TabsTrigger value="market" className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-800 data-[state=active]:border-emerald-400 text-slate-700 hover:text-slate-900 font-semibold transition-all duration-300">
-              <Monitor className="w-5 h-5 mr-2" />
+          <TabsList className="grid w-full grid-cols-8 bg-slate-200 border border-slate-300 rounded-lg shadow-lg">
+            <TabsTrigger value="market" className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-800 text-slate-700 hover:text-slate-900 font-semibold transition-all">
+              <Monitor className="w-4 h-4 mr-1" />
               MARKET
             </TabsTrigger>
-            <TabsTrigger value="news" className="data-[state=active]:bg-blue-500/20 data-[state=active]:text-blue-800 data-[state=active]:border-blue-400 text-slate-700 hover:text-slate-900 font-semibold transition-all duration-300">
-              <Newspaper className="w-5 h-5 mr-2" />
+            <TabsTrigger value="news" className="data-[state=active]:bg-blue-500/20 data-[state=active]:text-blue-800 text-slate-700 hover:text-slate-900 font-semibold transition-all">
+              <Newspaper className="w-4 h-4 mr-1" />
               NEWS
             </TabsTrigger>
-            <TabsTrigger value="chart" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-800 data-[state=active]:border-purple-400 text-slate-700 hover:text-slate-900 font-semibold transition-all duration-300">
-              <BarChart3 className="w-5 h-5 mr-2" />
+            <TabsTrigger value="chart" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-800 text-slate-700 hover:text-slate-900 font-semibold transition-all">
+              <BarChart3 className="w-4 h-4 mr-1" />
               CHART
             </TabsTrigger>
-            <TabsTrigger value="orders" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-800 data-[state=active]:border-amber-400 text-slate-700 hover:text-slate-900 font-semibold transition-all duration-300">
-              <Target className="w-5 h-5 mr-2" />
+            <TabsTrigger value="orders" className="data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-800 text-slate-700 hover:text-slate-900 font-semibold transition-all">
+              <Target className="w-4 h-4 mr-1" />
               ORDERS
             </TabsTrigger>
-            <TabsTrigger value="portfolio" className="data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-800 data-[state=active]:border-pink-400 text-slate-700 hover:text-slate-900 font-semibold transition-all duration-300">
-              <Briefcase className="w-5 h-5 mr-2" />
+            <TabsTrigger value="portfolio" className="data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-800 text-slate-700 hover:text-slate-900 font-semibold transition-all">
+              <Briefcase className="w-4 h-4 mr-1" />
               PORTFOLIO
             </TabsTrigger>
-            <TabsTrigger value="research" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-800 data-[state=active]:border-cyan-400 text-slate-700 hover:text-slate-900 font-semibold transition-all duration-300">
-              <Search className="w-5 h-5 mr-2" />
+            <TabsTrigger value="research" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-800 text-slate-700 hover:text-slate-900 font-semibold transition-all">
+              <Search className="w-4 h-4 mr-1" />
               RESEARCH
             </TabsTrigger>
-            <TabsTrigger value="macro" className="data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-800 data-[state=active]:border-indigo-400 text-slate-700 hover:text-slate-900 font-semibold transition-all duration-300">
-              <Globe className="w-5 h-5 mr-2" />
+            <TabsTrigger value="macro" className="data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-800 text-slate-700 hover:text-slate-900 font-semibold transition-all">
+              <Globe className="w-4 h-4 mr-1" />
               MACRO
             </TabsTrigger>
-            <TabsTrigger value="watchlist" className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-800 data-[state=active]:border-teal-400 text-slate-700 hover:text-slate-900 font-semibold transition-all duration-300">
-              <TrendingUp className="w-5 h-5 mr-2" />
+            <TabsTrigger value="watchlist" className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-800 text-slate-700 hover:text-slate-900 font-semibold transition-all">
+              <TrendingUp className="w-4 h-4 mr-1" />
               WATCH
             </TabsTrigger>
           </TabsList>
 
           {/* Symbol selector and quick actions */}
-          <div className="flex items-center justify-between mb-6 mt-6 bg-white/80 p-4 rounded-xl backdrop-blur-sm border border-slate-200/50 shadow-sm">
-            <div className="flex items-center gap-6">
-              <div className="text-slate-900 font-bold text-2xl tracking-wider drop-shadow-sm">
+          <div className="flex items-center justify-between mb-4 mt-4 bg-white/80 p-3 rounded-lg border border-slate-200 shadow-sm">
+            <div className="flex items-center gap-4">
+              <div className="text-slate-900 font-bold text-lg">
                 {selectedSymbol} - SELECTED SECURITY
               </div>
-              <Badge className="border-slate-500/50 text-slate-800 bg-slate-100/80 backdrop-blur-sm font-semibold px-3 py-1 shadow-sm">
-                <Zap className="w-4 h-4 mr-1 animate-pulse" />
+              <Badge className="border-slate-500 text-slate-800 bg-slate-100 font-semibold px-2 py-1 shadow-sm">
+                <Activity className="w-3 h-3 mr-1" />
                 {isRealTime ? "LIVE FEED" : "DELAYED"}
               </Badge>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               {["AAPL", "MSFT", "GOOGL", "TSLA", "NVDA"].map((symbol) => (
                 <Button
                   key={symbol}
                   variant={selectedSymbol === symbol ? "default" : "outline"}
                   size="sm"
                   onClick={() => setSelectedSymbol(symbol)}
-                  className={`text-sm font-semibold transition-all duration-300 ${
+                  className={`text-xs font-semibold transition-all ${
                     selectedSymbol === symbol 
                       ? "bg-emerald-500/20 text-emerald-800 border-emerald-400" 
-                      : "border-slate-500/50 text-slate-700 hover:bg-slate-100/50 hover:text-slate-900"
+                      : "border-slate-500 text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                   }`}
                 >
                   {symbol}
@@ -189,7 +187,7 @@ export const BloombergTerminal = () => {
             </div>
           </div>
 
-          {/* Tab Contents remain the same with updated styling */}
+          {/* Tab Contents */}
           <TabsContent value="market" className="space-y-4">
             <TerminalMarketData 
               selectedSymbol={selectedSymbol} 

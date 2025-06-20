@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useYFinanceQuote, useYFinanceMultipleQuotes } from "@/hooks/useYFinanceData";
-import { TrendingUp, TrendingDown, Search, Zap, AlertTriangle } from "lucide-react";
+import { TrendingUp, TrendingDown, Search, Activity, AlertTriangle } from "lucide-react";
 
 interface TerminalMarketDataProps {
   selectedSymbol: string;
@@ -38,10 +38,10 @@ export const TerminalMarketData = ({
   return (
     <div className="grid grid-cols-3 gap-4">
       {/* Main quote display */}
-      <Card className="col-span-2 bg-white/90 border-slate-300/50 shadow-lg backdrop-blur-sm">
-        <CardHeader className="border-b border-slate-200/50 bg-slate-50/70">
+      <Card className="col-span-2 bg-white/90 border-slate-300 shadow-lg">
+        <CardHeader className="border-b border-slate-200 bg-slate-50">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-slate-900 font-mono text-xl font-bold">
+            <CardTitle className="text-slate-900 font-mono text-lg font-bold">
               {selectedSymbol} - REAL-TIME QUOTE
             </CardTitle>
             <div className="flex items-center gap-2">
@@ -51,7 +51,7 @@ export const TerminalMarketData = ({
                   value={searchSymbol}
                   onChange={(e) => setSearchSymbol(e.target.value.toUpperCase())}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  className="w-32 bg-white border-slate-400 text-slate-800 font-semibold"
+                  className="w-28 bg-white border-slate-400 text-slate-800 font-semibold text-sm"
                 />
                 <Button 
                   onClick={handleSearch}
@@ -62,77 +62,77 @@ export const TerminalMarketData = ({
                 </Button>
               </div>
               {isRealTime && (
-                <Badge className="bg-emerald-700 text-white animate-pulse font-bold">
-                  <Zap className="w-3 h-3 mr-1" />
+                <Badge className="bg-emerald-700 text-white font-bold">
+                  <Activity className="w-3 h-3 mr-1" />
                   LIVE
                 </Badge>
               )}
             </div>
           </div>
         </CardHeader>
-        <CardContent className="p-6">
+        <CardContent className="p-5">
           {selectedLoading ? (
             <div className="text-center text-blue-700 font-semibold">LOADING QUOTE DATA...</div>
           ) : selectedQuote ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {/* Price display */}
               <div className="text-center">
-                <div className="text-4xl font-bold text-slate-900 mb-2">
+                <div className="text-3xl font-bold text-slate-900 mb-2">
                   ${formatPrice(selectedQuote.price)}
                 </div>
-                <div className={`text-xl font-semibold ${
+                <div className={`text-lg font-semibold ${
                   selectedQuote.change >= 0 ? 'text-emerald-700' : 'text-red-700'
                 }`}>
                   {formatChange(selectedQuote.change)} ({formatPercent(selectedQuote.changePercent)})
                   {selectedQuote.change >= 0 ? 
-                    <TrendingUp className="inline w-5 h-5 ml-2" /> : 
-                    <TrendingDown className="inline w-5 h-5 ml-2" />
+                    <TrendingUp className="inline w-4 h-4 ml-2" /> : 
+                    <TrendingDown className="inline w-4 h-4 ml-2" />
                   }
                 </div>
               </div>
 
               {/* Key metrics grid */}
-              <div className="grid grid-cols-2 gap-4 border-t border-slate-200/50 pt-4">
+              <div className="grid grid-cols-2 gap-3 border-t border-slate-200 pt-3">
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-slate-700 font-semibold">VOLUME:</span>
-                    <span className="text-slate-900 font-bold">{selectedQuote.volume?.toLocaleString() || "N/A"}</span>
+                    <span className="text-slate-700 font-semibold text-sm">VOLUME:</span>
+                    <span className="text-slate-900 font-bold text-sm">{selectedQuote.volume?.toLocaleString() || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-700 font-semibold">MKT CAP:</span>
-                    <span className="text-slate-900 font-bold">
+                    <span className="text-slate-700 font-semibold text-sm">MKT CAP:</span>
+                    <span className="text-slate-900 font-bold text-sm">
                       {selectedQuote.marketCap ? `$${(selectedQuote.marketCap / 1e9).toFixed(1)}B` : "N/A"}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-700 font-semibold">P/E RATIO:</span>
-                    <span className="text-slate-900 font-bold">{selectedQuote.peRatio?.toFixed(2) || "N/A"}</span>
+                    <span className="text-slate-700 font-semibold text-sm">P/E RATIO:</span>
+                    <span className="text-slate-900 font-bold text-sm">{selectedQuote.peRatio?.toFixed(2) || "N/A"}</span>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-slate-700 font-semibold">52W HIGH:</span>
-                    <span className="text-slate-900 font-bold">${formatPrice(selectedQuote.high52Week)}</span>
+                    <span className="text-slate-700 font-semibold text-sm">52W HIGH:</span>
+                    <span className="text-slate-900 font-bold text-sm">${formatPrice(selectedQuote.high52Week)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-700 font-semibold">52W LOW:</span>
-                    <span className="text-slate-900 font-bold">${formatPrice(selectedQuote.low52Week)}</span>
+                    <span className="text-slate-700 font-semibold text-sm">52W LOW:</span>
+                    <span className="text-slate-900 font-bold text-sm">${formatPrice(selectedQuote.low52Week)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-700 font-semibold">DIV YIELD:</span>
-                    <span className="text-slate-900 font-bold">{selectedQuote.dividendYield?.toFixed(2) || "0.00"}%</span>
+                    <span className="text-slate-700 font-semibold text-sm">DIV YIELD:</span>
+                    <span className="text-slate-900 font-bold text-sm">{selectedQuote.dividendYield?.toFixed(2) || "0.00"}%</span>
                   </div>
                 </div>
               </div>
 
               {/* Real-time timestamp */}
-              <div className="text-xs text-slate-600 text-center border-t border-slate-200/50 pt-2 font-medium">
+              <div className="text-xs text-slate-600 text-center border-t border-slate-200 pt-2 font-medium">
                 LAST UPDATE: {new Date(selectedQuote.timestamp).toLocaleString()}
               </div>
             </div>
           ) : (
             <div className="text-center text-red-700">
-              <AlertTriangle className="w-8 h-8 mx-auto mb-2" />
+              <AlertTriangle className="w-6 h-6 mx-auto mb-2" />
               <span className="font-semibold">QUOTE DATA UNAVAILABLE</span>
             </div>
           )}
@@ -140,8 +140,8 @@ export const TerminalMarketData = ({
       </Card>
 
       {/* Market overview */}
-      <Card className="bg-white/90 border-slate-300/50 shadow-lg backdrop-blur-sm">
-        <CardHeader className="border-b border-slate-200/50 bg-slate-50/70">
+      <Card className="bg-white/90 border-slate-300 shadow-lg">
+        <CardHeader className="border-b border-slate-200 bg-slate-50">
           <CardTitle className="text-slate-900 font-mono font-bold">MARKET OVERVIEW</CardTitle>
         </CardHeader>
         <CardContent className="p-4">
@@ -161,14 +161,14 @@ export const TerminalMarketData = ({
                 return (
                   <div 
                     key={symbol}
-                    className="flex justify-between items-center py-1 border-b border-slate-200 cursor-pointer hover:bg-slate-100/60 rounded px-2 transition-colors"
+                    className="flex justify-between items-center py-1 border-b border-slate-200 cursor-pointer hover:bg-slate-100 rounded px-2 transition-colors"
                     onClick={() => onSymbolSelect(symbol)}
                   >
                     <div>
-                      <div className="text-slate-900 font-bold">{symbol}</div>
+                      <div className="text-slate-900 font-bold text-sm">{symbol}</div>
                       <div className="text-xs text-slate-700 font-semibold">${formatPrice(quote.price)}</div>
                     </div>
-                    <div className={`text-right font-bold ${quote.change >= 0 ? 'text-emerald-700' : 'text-red-700'}`}>
+                    <div className={`text-right font-bold text-sm ${quote.change >= 0 ? 'text-emerald-700' : 'text-red-700'}`}>
                       <div className="font-bold">{formatChange(quote.change)}</div>
                       <div className="text-xs">{formatPercent(quote.changePercent)}</div>
                     </div>
