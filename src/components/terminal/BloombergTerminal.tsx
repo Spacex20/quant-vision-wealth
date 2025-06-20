@@ -21,7 +21,6 @@ import {
   Briefcase, 
   Search, 
   Globe, 
-  Building2,
   Activity
 } from "lucide-react";
 
@@ -72,7 +71,7 @@ export const BloombergTerminal = () => {
         <div 
           className="absolute inset-0 opacity-10"
           style={{
-            backgroundImage: `url('/lovable-uploads/baf93fd5-edaa-4822-8ff5-bd9d7ee8b15a.png')`,
+            backgroundImage: `url('/lovable-uploads/eb3351e4-f6ef-4e49-a715-2d78114e0d15.png')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}
@@ -81,11 +80,8 @@ export const BloombergTerminal = () => {
         <div className="relative flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-slate-900 rounded-xl border border-white/20 shadow-lg">
-                <Building2 className="w-6 h-6 text-white" />
-              </div>
               <div>
-                <span className="text-slate-900 font-bold text-xl tracking-wide">QUANTVERSE TERMINAL</span>
+                <span className="text-slate-900 font-bold text-xl tracking-wide">QuantVerse Terminal</span>
                 <div className="text-slate-700 text-sm font-semibold">Professional Trading Platform</div>
               </div>
             </div>

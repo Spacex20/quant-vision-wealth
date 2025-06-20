@@ -17,7 +17,6 @@ import {
   Target,
   CheckCircle,
   Calculator,
-  Building2,
   Activity
 } from "lucide-react";
 import { useState } from "react";
@@ -71,24 +70,21 @@ export default function Index() {
       
       {/* Hero Section with Wall Street Background */}
       <div className="relative overflow-hidden">
-        {/* Wall Street Background Image - Normal brightness */}
+        {/* Wall Street Background Image */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url('/lovable-uploads/baf93fd5-edaa-4822-8ff5-bd9d7ee8b15a.png')`,
+            backgroundImage: `url('/lovable-uploads/eb3351e4-f6ef-4e49-a715-2d78114e0d15.png')`,
           }}
         />
         
-        {/* Lighter overlay for better text visibility */}
+        {/* Overlay for better text visibility */}
         <div className="absolute inset-0 bg-white/40" />
         
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
             <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="p-3 bg-slate-900/90 rounded-xl backdrop-blur-sm border border-white/20 shadow-xl">
-                <Building2 className="w-8 h-8 text-white" />
-              </div>
-              <div className="text-left">
+              <div className="text-center">
                 <h1 className="text-4xl font-bold text-slate-900">
                   QuantVerse
                 </h1>
@@ -286,7 +282,6 @@ export default function Index() {
           {!user ? (
             <Link to="/login">
               <Button size="lg" className="bg-slate-900 hover:bg-black text-white font-bold px-8 py-3 text-base shadow-lg transform hover:scale-105 transition-all duration-200">
-                <Building2 className="w-5 h-5 mr-2" />
                 Start Free Trial
               </Button>
             </Link>

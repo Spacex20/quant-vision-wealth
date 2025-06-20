@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -55,7 +54,7 @@ export const AnalysisWidget = ({ isOpen, onClose, selectedSymbol = "AAPL", onSym
           <div 
             className="absolute inset-0 opacity-15"
             style={{
-              backgroundImage: `url('/lovable-uploads/baf93fd5-edaa-4822-8ff5-bd9d7ee8b15a.png')`,
+              backgroundImage: `url('/lovable-uploads/eb3351e4-f6ef-4e49-a715-2d78114e0d15.png')`,
               backgroundSize: 'cover',
               backgroundPosition: 'center'
             }}
@@ -64,13 +63,10 @@ export const AnalysisWidget = ({ isOpen, onClose, selectedSymbol = "AAPL", onSym
           <div className="relative px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="p-2 bg-slate-900 rounded-xl shadow-lg">
-                  <Building2 className="w-6 h-6 text-white" />
-                </div>
                 <div>
                   <div className="flex items-center gap-3">
                     <h1 className="text-2xl font-bold text-slate-900">
-                      QUANTVERSE LAB
+                      QuantVerse Lab
                     </h1>
                     <Badge className="bg-slate-700 text-white text-xs font-bold px-2 py-1 shadow-lg">
                       <Activity className="w-3 h-3 mr-1" />
