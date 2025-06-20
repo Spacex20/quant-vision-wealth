@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Navigation } from "@/components/layout/Navigation";
@@ -10,14 +9,14 @@ import {
   TrendingUp, 
   Users, 
   BarChart3, 
+  Shield, 
   Zap,
   FileText,
   Globe,
   Database,
   Target,
   CheckCircle,
-  Calculator,
-  Activity
+  Calculator
 } from "lucide-react";
 import { useState } from "react";
 import { AnalysisWidget } from "@/components/analytics/AnalysisWidget";
@@ -37,19 +36,19 @@ export default function Index() {
       featured: true
     },
     {
-      icon: <Terminal className="w-6 h-6 text-emerald-600" />,
+      icon: <Terminal className="w-6 h-6 text-green-600" />,
       title: "Bloomberg Terminal",
       description: "Professional-grade trading terminal with real-time market data, advanced charting, and portfolio management.",
       link: "/terminal"
     },
     {
-      icon: <TrendingUp className="w-6 h-6 text-amber-600" />,
+      icon: <TrendingUp className="w-6 h-6 text-purple-600" />,
       title: "Strategy Library",
       description: "Access proven investment strategies with backtesting, optimization, and performance analytics.",
       link: "/strategies"
     },
     {
-      icon: <Users className="w-6 h-6 text-purple-600" />,
+      icon: <Users className="w-6 h-6 text-orange-600" />,
       title: "Investment Community",
       description: "Connect with professional investors, share insights, and collaborate on investment strategies.",
       link: "/community"
@@ -57,7 +56,7 @@ export default function Index() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <Navigation />
       
       {/* Analysis Widget */}
@@ -68,70 +67,59 @@ export default function Index() {
         onSymbolSelect={setSelectedSymbol}
       />
       
-      {/* Hero Section with Wall Street Background */}
+      {/* Hero Section */}
       <div className="relative overflow-hidden">
-        {/* Wall Street Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url('/lovable-uploads/eb3351e4-f6ef-4e49-a715-2d78114e0d15.png')`,
-          }}
-        />
-        
-        {/* Overlay for better text visibility */}
-        <div className="absolute inset-0 bg-white/40" />
-        
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
             <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="text-center">
-                <h1 className="text-4xl font-bold text-slate-900">
-                  QuantVerse
+              <div className="p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl">
+                <BarChart3 className="w-10 h-10 text-white" />
+              </div>
+              <div className="text-left">
+                <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  FinanceAI
                 </h1>
-                <p className="text-lg text-slate-800 font-semibold">Financial Intelligence Platform</p>
+                <p className="text-lg text-gray-600">Professional Investment Platform</p>
               </div>
             </div>
             
-            <h2 className="text-3xl font-bold text-slate-900 mb-4 leading-tight">
-              Professional Financial Research
-              <span className="block text-slate-800">
-                Powered by AI
-              </span>
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">
+              AI-Powered Financial Research & Analysis
             </h2>
-            <p className="text-lg text-slate-800 mb-8 max-w-3xl mx-auto leading-relaxed font-medium">
-              Generate institutional-quality research reports, analyze markets with Bloomberg-grade tools, 
-              and connect with professional investors on Wall Street's most advanced AI platform.
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+              Generate comprehensive research reports, analyze markets with professional tools, 
+              and connect with investment professionals in one powerful platform.
             </p>
 
-            <div className="flex justify-center gap-4 mb-10">
+            <div className="flex justify-center gap-4 mb-8">
               {!user ? (
                 <>
                   <Link to="/login">
-                    <Button size="lg" className="bg-slate-900 hover:bg-black text-white font-bold px-8 py-3 text-base shadow-xl transform hover:scale-105 transition-all duration-200">
-                      <Brain className="w-5 h-5 mr-2" />
-                      Start Trading
+                    <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-3">
+                      Get Started Free
                     </Button>
                   </Link>
-                  <Button size="lg" variant="outline" className="px-8 py-3 text-base border-2 border-slate-800 text-slate-900 hover:bg-slate-100 bg-white/60 backdrop-blur-sm shadow-lg font-semibold">
+                  <Button size="lg" variant="outline" className="px-8 py-3">
                     Watch Demo
                   </Button>
                 </>
               ) : (
                 <>
                   <Link to="/research">
-                    <Button size="lg" className="bg-slate-900 hover:bg-black text-white font-bold px-8 py-3 text-base shadow-xl transform hover:scale-105 transition-all duration-200">
+                    <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-3">
                       <Brain className="w-5 h-5 mr-2" />
-                      AI Research Lab
+                      Start AI Research
+                      <Zap className="w-4 h-4 ml-2 animate-pulse" />
                     </Button>
                   </Link>
                   <Button 
                     size="lg" 
                     variant="outline" 
-                    className="px-8 py-3 text-base border-2 border-slate-800 text-slate-900 hover:bg-slate-100 bg-white/60 backdrop-blur-sm shadow-lg font-semibold"
+                    className="px-8 py-3 border-blue-300 text-blue-600 hover:bg-blue-50"
                     onClick={() => setIsAnalysisOpen(true)}
                   >
                     <Calculator className="w-5 h-5 mr-2" />
-                    Analysis Terminal
+                    Open Analysis Lab
                   </Button>
                 </>
               )}
@@ -141,10 +129,11 @@ export default function Index() {
               <div className="flex justify-center">
                 <Button 
                   onClick={() => setIsAnalysisOpen(true)}
-                  className="bg-slate-800 hover:bg-slate-900 text-white font-bold px-6 py-2 shadow-xl transform hover:scale-105 transition-all duration-200 backdrop-blur-sm"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold border border-yellow-400 shadow-lg transform hover:scale-105 transition-all duration-200"
                 >
-                  <Activity className="w-4 h-4 mr-2" />
-                  LIVE ANALYSIS LAB
+                  <Calculator className="w-4 h-4 mr-2" />
+                  ANALYSIS LAB
+                  <Zap className="w-3 h-3 ml-1 animate-pulse" />
                 </Button>
               </div>
             )}
@@ -153,141 +142,136 @@ export default function Index() {
       </div>
 
       {/* Featured AI Research Copilot Section */}
-      <div className="relative bg-white/95 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-800 mb-4">
-              Advanced AI Research Platform
-            </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Generate institutional-quality research reports with Bloomberg-grade analysis, 
-              real-time Wall Street data, and comprehensive risk assessment.
-            </p>
-          </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Introducing AI Research Copilot
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Generate institutional-quality research reports with advanced AI analysis, 
+            real-time data integration, and comprehensive risk assessment.
+          </p>
+        </div>
 
-          <Card className="border border-slate-300 shadow-xl bg-white/90 backdrop-blur-sm">
-            <CardHeader className="bg-slate-50/90 border-b border-slate-200">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-slate-900 rounded-xl border border-white/20 shadow-lg">
-                  <Brain className="w-8 h-8 text-white" />
-                </div>
-                <div>
-                  <CardTitle className="text-2xl text-slate-800">AI Research Copilot</CardTitle>
-                  <CardDescription className="text-lg text-slate-600">
-                    Wall Street-grade analysis with CREATE framework
-                  </CardDescription>
-                </div>
+        <Card className="border-2 border-blue-200 shadow-xl">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl">
+                <Brain className="w-8 h-8 text-white" />
               </div>
-            </CardHeader>
-            <CardContent className="p-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-6">
-                  <h3 className="text-xl font-bold text-slate-800">Key Capabilities</h3>
-                  <div className="space-y-3">
-                    {[
-                      { icon: <Globe className="w-5 h-5 text-blue-600" />, text: "Real-time market data integration" },
-                      { icon: <Database className="w-5 h-5 text-emerald-600" />, text: "Statistical rigor with data validation" },
-                      { icon: <FileText className="w-5 h-5 text-purple-600" />, text: "Professional PDF report generation" },
-                      { icon: <Target className="w-5 h-5 text-amber-600" />, text: "Risk assessment and recommendations" }
-                    ].map((item, index) => (
-                      <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200 shadow-sm">
-                        {item.icon}
-                        <span className="text-slate-700">{item.text}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="space-y-6">
-                  <h3 className="text-xl font-bold text-slate-800">CREATE Framework</h3>
-                  <div className="space-y-2">
-                    {[
-                      "Character: Expert analyst targeting",
-                      "Request: Specific query breakdown", 
-                      "Examples: Analogous case studies",
-                      "Adjustments: Custom constraints",
-                      "Type: Professional PDF format",
-                      "Extras: Advanced metrics & analysis"
-                    ].map((item, index) => (
-                      <div key={index} className="flex items-center gap-2 p-2 rounded-lg bg-slate-50">
-                        <CheckCircle className="w-4 h-4 text-emerald-600" />
-                        <span className="text-slate-700 text-sm">{item}</span>
-                      </div>
-                    ))}
-                  </div>
+              <div>
+                <CardTitle className="text-2xl">AI Research Copilot</CardTitle>
+                <CardDescription className="text-lg">
+                  High-powered research analyst with CREATE framework
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold">Key Capabilities</h3>
+                <div className="space-y-3">
+                  {[
+                    { icon: <Globe className="w-5 h-5 text-blue-600" />, text: "Real-time web data integration" },
+                    { icon: <Database className="w-5 h-5 text-green-600" />, text: "Statistical rigor with data validation" },
+                    { icon: <FileText className="w-5 h-5 text-purple-600" />, text: "Professional PDF report generation" },
+                    { icon: <Target className="w-5 h-5 text-orange-600" />, text: "Risk assessment and recommendations" }
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      {item.icon}
+                      <span className="text-gray-700">{item.text}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
               
-              <div className="mt-10 pt-6 border-t border-slate-200">
-                <div className="flex justify-center">
-                  <Link to="/research">
-                    <Button size="lg" className="bg-slate-900 hover:bg-black text-white font-bold px-8 py-3 text-base shadow-lg transform hover:scale-105 transition-all duration-200">
-                      <Brain className="w-5 h-5 mr-2" />
-                      Launch AI Research Platform
-                    </Button>
-                  </Link>
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold">CREATE Framework</h3>
+                <div className="space-y-2">
+                  {[
+                    "Character: Expert analyst targeting",
+                    "Request: Specific query breakdown", 
+                    "Examples: Analogous case studies",
+                    "Adjustments: Custom constraints",
+                    "Type: Professional PDF format",
+                    "Extras: Advanced metrics & analysis"
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-sm text-gray-600">{item}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+            
+            <div className="mt-8 pt-6 border-t">
+              <div className="flex justify-center">
+                <Link to="/research">
+                  <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-3">
+                    <Brain className="w-5 h-5 mr-2" />
+                    Try AI Research Copilot
+                    <Zap className="w-4 h-4 ml-2 animate-pulse" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Features Grid */}
-      <div className="relative bg-slate-100/95">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-800 mb-4">
-              Complete Wall Street Platform
-            </h2>
-            <p className="text-lg text-slate-600">
-              Everything you need for professional financial analysis and investment management.
-            </p>
-          </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Complete Investment Platform
+          </h2>
+          <p className="text-lg text-gray-600">
+            Everything you need for professional financial analysis and investment management.
+          </p>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.slice(1).map((feature, index) => (
-              <Card key={index} className="bg-white/90 border border-slate-200 hover:border-slate-400 transition-all duration-300 hover:shadow-lg backdrop-blur-sm transform hover:scale-105 shadow-md">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 bg-slate-100 rounded-lg border border-slate-200 shadow-sm">
-                      {feature.icon}
-                    </div>
-                    <CardTitle className="text-lg text-slate-800">{feature.title}</CardTitle>
-                  </div>
-                  <CardDescription className="text-slate-600 text-sm leading-relaxed">{feature.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Link to={feature.link}>
-                    <Button variant="outline" className="w-full border-slate-400 text-slate-800 hover:bg-slate-100 backdrop-blur-sm shadow-sm font-semibold">
-                      Explore Platform
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {features.slice(1).map((feature, index) => (
+            <Card key={index} className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  {feature.icon}
+                  <CardTitle className="text-lg">{feature.title}</CardTitle>
+                </div>
+                <CardDescription>{feature.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Link to={feature.link}>
+                  <Button variant="outline" className="w-full">
+                    Explore
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
 
       {/* CTA Section */}
-      <div className="relative bg-slate-50 backdrop-blur-sm border-t border-slate-200">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8 py-16">
-          <h2 className="text-3xl font-bold text-slate-800 mb-4">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 py-16">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Transform Your Investment Research?
           </h2>
-          <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-            Join thousands of professional investors using AI-powered Wall Street analysis.
+          <p className="text-xl text-blue-100 mb-8">
+            Join thousands of professional investors using AI-powered analysis.
           </p>
           {!user ? (
             <Link to="/login">
-              <Button size="lg" className="bg-slate-900 hover:bg-black text-white font-bold px-8 py-3 text-base shadow-lg transform hover:scale-105 transition-all duration-200">
+              <Button size="lg" variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-3">
                 Start Free Trial
               </Button>
             </Link>
           ) : (
             <Link to="/research">
-              <Button size="lg" className="bg-slate-900 hover:bg-black text-white font-bold px-8 py-3 text-base shadow-lg transform hover:scale-105 transition-all duration-200">
+              <Button size="lg" variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-3">
                 <Brain className="w-5 h-5 mr-2" />
                 Generate Your First Report
               </Button>
